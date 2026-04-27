@@ -1,0 +1,169 @@
+.attachmentCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.acHeader {
+  background: var(--navy);
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.acOrg {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.acSub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pillActive {
+  background: rgba(22,101,52,0.3);
+  color: #86EFAC;
+  border: 0.5px solid rgba(134,239,172,0.3);
+}
+
+.pillPending {
+  background: rgba(146,64,14,0.3);
+  color: #FDE68A;
+  border: 0.5px solid rgba(253,230,138,0.3);
+}
+
+.pillComplete {
+  background: rgba(27,79,216,0.3);
+  color: #93C5FD;
+  border: 0.5px solid rgba(147,197,253,0.3);
+}
+
+.acBody {
+  padding: 1.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.infoKey {
+  font-size: 11px;
+  color: var(--subtle);
+  letter-spacing: 0.02em;
+  margin-bottom: 3px;
+}
+
+.infoVal {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.infoValLight {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.progressSection {
+  padding-top: 1.25rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.progHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progHeader span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.progHeader strong {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.progTrack {
+  height: 6px;
+  background: var(--surface);
+  border-radius: 100px;
+  border: 0.5px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.progFill {
+  height: 100%;
+  border-radius: 100px;
+  background: var(--blue);
+  transition: width 0.5s;
+}
+
+.progMarkers {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progMarkers span {
+  font-size: 10px;
+  color: var(--subtle);
+}
+
+.acFooter {
+  padding: 1rem 1.5rem;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.acFooter p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.btnSmOutline {
+  background: transparent;
+  border: 0.5px solid var(--border);
+  color: var(--muted);
+  border-radius: 7px;
+  padding: 0.4rem 0.85rem;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btnSmOutline:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,121 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 34, 68, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: var(--w);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+}
+
+.mh {
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mht {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.mclose {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.rejectBody {
+  padding: 20px;
+}
+
+.rfl {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.rfh {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-bottom: 8px;
+}
+
+.rejectBody textarea {
+  width: 100%;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  line-height: 1.6;
+}
+
+.rejectBody textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.07);
+}
+
+.mf {
+  padding: 14px 20px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.bcl {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.bcaRed {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}

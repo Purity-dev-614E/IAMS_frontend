@@ -1,0 +1,137 @@
+.registerForm {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rfHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.rfHeader h2 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+
+.rfHeader p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rfBody {
+  padding: 1.5rem;
+}
+
+.field {
+  margin-bottom: 1.1rem;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.fieldHint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--subtle);
+}
+
+input[type=text], input[type=email], input[type=date] {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27,79,216,0.07);
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.fieldNote {
+  background: var(--blue-light);
+  border: 0.5px solid rgba(27,79,216,0.15);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 0.75rem;
+}
+
+.fieldNote p {
+  font-size: 12px;
+  color: var(--blue);
+  line-height: 1.55;
+}
+
+.rfFooter {
+  padding: 1rem 1.5rem;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.btnCancelForm {
+  background: transparent;
+  border: 0.5px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 0.55rem 1.1rem;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.btnSubmitForm {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnSubmitForm:hover {
+  background: #1740B0;
+}
+
+@media (max-width: 768px) {
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+}

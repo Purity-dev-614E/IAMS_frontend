@@ -1,0 +1,167 @@
+.drawer {
+  position: fixed;
+  right: -500px;
+  top: 0;
+  bottom: 0;
+  width: 420px;
+  background: var(--w);
+  border-left: 0.5px solid var(--border);
+  z-index: 100;
+  transition: right 0.25s;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer.open {
+  right: 0;
+}
+
+.dh {
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.dht {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.dclose {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.db {
+  padding: 20px;
+  flex: 1;
+}
+
+.di {
+  margin-bottom: 14px;
+}
+
+.dil {
+  font-size: 11px;
+  color: var(--subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+
+.div2 {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.divs {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.drow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.dsep {
+  height: 0.5px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.statusChange {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.scl2 {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+
+.statusBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.sbtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  transition: all 0.15s;
+}
+
+.sbtnActivate {
+  background: var(--gbg);
+  border-color: rgba(22, 101, 52, 0.3);
+  color: var(--green);
+}
+
+.sbtnComplete {
+  background: var(--bl);
+  border-color: rgba(27, 79, 216, 0.3);
+  color: var(--blue);
+}
+
+.sbtnDeact {
+  background: var(--rbg);
+  border-color: rgba(159, 18, 57, 0.3);
+  color: var(--red);
+}
+
+.df {
+  padding: 16px 20px;
+  border-top: 0.5px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sp {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}

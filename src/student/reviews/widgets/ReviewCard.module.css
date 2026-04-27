@@ -1,0 +1,104 @@
+.reviewCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.reviewCard.current {
+  border-color: rgba(27,79,216,0.3);
+  box-shadow: 0 0 0 3px rgba(27,79,216,0.06);
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  gap: 12px;
+  transition: background 0.12s;
+}
+
+.reviewHeader:hover {
+  background: var(--surface);
+}
+
+.rhLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.weekBadge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wNum {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #fff;
+  line-height: 1;
+}
+
+.wLabel {
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 1px;
+}
+
+.weekBadge.complete {
+  background: var(--green);
+}
+
+.weekBadge.inprogress {
+  background: var(--blue);
+}
+
+.rhTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.rhDates {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 2px;
+}
+
+.rhRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.reviewBody {
+  display: none;
+  border-top: 0.5px solid var(--border);
+}
+
+.reviewBody.open {
+  display: block;
+}
+
+.chevron {
+  font-size: 14px;
+  color: var(--subtle);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}

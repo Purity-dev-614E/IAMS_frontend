@@ -1,0 +1,14 @@
+.studentReviews {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.studentReviews h1 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.studentReviews p {
+  color: var(--muted);
+}

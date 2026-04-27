@@ -1,0 +1,20 @@
+/* CSS Variables for theme consistency */
+:root {
+  --navy: #0F2244;
+  --blue: #1B4FD8;
+  --blue-light: #EEF2FF;
+  --sky: #60A5FA;
+  --text: #0F172A;
+  --muted: #475569;
+  --border: #E2E8F0;
+  --surface: #F8FAFC;
+  --white: #FFFFFF;
+  --green: #166534;
+  --green-bg: #F0FDF4;
+  --amber: #92400E;
+  --amber-bg: #FFFBEB;
+  --purple: #5B21B6;
+  --purple-bg: #F5F3FF;
+  --red: #DC2626;
+  --red-bg: #FFF1F2;
+}

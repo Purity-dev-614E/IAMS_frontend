@@ -1,0 +1,35 @@
+.footer {
+  padding: 2rem 2.5rem;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--white);
+}
+
+.footer p {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footerBadge {
+  font-size: 11px;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.footerCompliance {
+  font-size: 13px;
+  color: #94A3B8;
+}

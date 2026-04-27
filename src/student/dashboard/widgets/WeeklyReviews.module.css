@@ -1,0 +1,118 @@
+.reviewItem {
+  padding: 0.85rem 0;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.reviewItem:last-child {
+  border-bottom: none;
+}
+
+.reviewTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.reviewWeek {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.reviewDates {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 1px;
+}
+
+.reviewProgress {
+  display: flex;
+  gap: 6px;
+  margin-top: 0.6rem;
+}
+
+.progressStep {
+  flex: 1;
+  height: 3px;
+  border-radius: 100px;
+}
+
+.reviewFeedback {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+}
+
+.pendingFeedback {
+  background: var(--amber-bg);
+  border-color: var(--amber-border);
+}
+
+.feedbackLabel {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+
+.feedbackText {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.cardAction {
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cardBody {
+  padding: 1.25rem;
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pillComplete {
+  background: var(--purple-bg);
+  color: var(--purple);
+}
+
+.pillPending {
+  background: var(--amber-bg);
+  color: var(--amber);
+}

@@ -1,0 +1,50 @@
+.logCTA {
+  background: var(--navy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.logCTAText h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+.logCTAText p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+}
+
+.btnLog {
+  background: #fff;
+  color: var(--navy);
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.1rem;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.btnLog:hover {
+  background: #F1F5F9;
+}
+
+@media (max-width: 768px) {
+  .logCTA {
+    flex-direction: column;
+    text-align: center;
+  }
+}

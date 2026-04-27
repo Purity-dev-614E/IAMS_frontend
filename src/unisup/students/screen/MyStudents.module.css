@@ -1,0 +1,14 @@
+.myStudents {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.myStudents h1 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.myStudents p {
+  color: var(--muted);
+}

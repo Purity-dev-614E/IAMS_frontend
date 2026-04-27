@@ -1,0 +1,30 @@
+.weekDots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.wd {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+.dotSubmitted {
+  background: var(--blue);
+}
+
+.dotMissing {
+  background: var(--red-bg);
+  border: 0.5px solid var(--red-border);
+}
+
+.dotDraft {
+  background: var(--amber-bg);
+  border: 0.5px solid var(--amber-border);
+}
+
+.dotUpcoming {
+  background: var(--border);
+}

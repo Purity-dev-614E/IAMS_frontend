@@ -1,0 +1,14 @@
+.editDailyLog {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.editDailyLog h1 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.editDailyLog p {
+  color: var(--muted);
+}

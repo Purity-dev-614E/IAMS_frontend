@@ -1,0 +1,63 @@
+.progressSummary {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.psStat {
+  text-align: center;
+}
+
+.psNum {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: var(--navy);
+}
+
+.psLabel {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 2px;
+}
+
+.psDivider {
+  width: 0.5px;
+  height: 40px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.psPipeline {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pipelineLabel {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-bottom: 8px;
+}
+
+.pipeline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pipeStep {
+  flex: 1;
+  height: 5px;
+  border-radius: 100px;
+}
+
+.pipeArrow {
+  font-size: 10px;
+  color: var(--subtle);
+  flex-shrink: 0;
+}

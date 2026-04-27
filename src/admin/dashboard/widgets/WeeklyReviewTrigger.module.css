@@ -1,0 +1,46 @@
+.triggerCard {
+  background: var(--navy);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.triggerCard h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+
+.triggerCard p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.triggerBtn {
+  background: rgba(255,255,255,0.1);
+  border: 0.5px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 7px;
+  padding: 0.45rem 0.9rem;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.triggerBtn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.triggerMeta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 0.65rem;
+  text-align: center;
+}

@@ -1,0 +1,14 @@
+.dailyLogs {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dailyLogs h1 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.dailyLogs p {
+  color: var(--muted);
+}

@@ -1,0 +1,34 @@
+.alertBanner {
+  background: var(--amber-bg);
+  border: 0.5px solid var(--amber-border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.alertBannerIcon {
+  font-size: 14px;
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.alertBanner p {
+  font-size: 13px;
+  color: var(--amber);
+  flex: 1;
+}
+
+.alertBanner strong {
+  font-weight: 500;
+}
+
+.alertLink {
+  font-size: 13px;
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+}

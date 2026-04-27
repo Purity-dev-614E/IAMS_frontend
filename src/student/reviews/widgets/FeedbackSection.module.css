@@ -1,0 +1,85 @@
+.feedbackSection {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.feedbackSection:last-child {
+  border-bottom: none;
+}
+
+.fbHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.fbWho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fbAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.fbName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.fbRole {
+  font-size: 10px;
+  color: var(--subtle);
+  margin-top: 1px;
+}
+
+.fbBlock {
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.fbLabel {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.fbText {
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.fbImprovements {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 0.5px solid rgba(0,0,0,0.06);
+}
+
+.fbImprLabel {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.fbWaiting {
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

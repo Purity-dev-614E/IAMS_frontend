@@ -1,0 +1,141 @@
+.card {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--subtle);
+  text-align: left;
+  padding: 10px 16px;
+  letter-spacing: 0.03em;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.table td {
+  font-size: 12px;
+  color: var(--text);
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #FAFBFF;
+}
+
+.sname {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.sreg {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 1px;
+}
+
+.org {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.orgSup {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 1px;
+}
+
+.sp {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.abtn {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.abtn:hover {
+  background: var(--surface);
+}
+
+.abtnActivate {
+  background: var(--gbg);
+  border-color: rgba(22, 101, 52, 0.3);
+  color: var(--green);
+}
+
+.abtnActivate:hover {
+  background: #DCFCE7;
+}
+
+.abtnView:hover {
+  background: var(--bl);
+  border-color: rgba(27, 79, 216, 0.3);
+  color: var(--blue);
+}
+
+.abtnDel:hover {
+  background: var(--rbg);
+  border-color: rgba(159, 18, 57, 0.3);
+  color: var(--red);
+}
+
+.abtnResend:hover {
+  background: var(--abg);
+  border-color: rgba(146, 64, 14, 0.3);
+  color: var(--amber);
+}
+
+.acts {
+  display: flex;
+  gap: 6px;
+}

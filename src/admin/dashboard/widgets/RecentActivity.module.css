@@ -1,0 +1,59 @@
+.card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.activityItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.activityText {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.activityText strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.activityTime {
+  font-size: 10px;
+  color: var(--subtle);
+  white-space: nowrap;
+  margin-top: 1px;
+}

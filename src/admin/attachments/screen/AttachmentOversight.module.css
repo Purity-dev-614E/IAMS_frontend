@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--navy);
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 24px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.logoMark {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  color: #fff;
+  font-size: 13px;
+}
+
+.logoLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.navSectionLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 0 20px;
+  margin: 16px 0 6px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.navItem:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.navItem.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border-left-color: #60A5FA;
+}
+
+.navItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navIcon {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.navItem.active .navIcon {
+  opacity: 1;
+}
+
+.navBadge {
+  background: #EF4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 100px;
+}
+
+.sidebarBottom {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #FCA5A5;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.userRole {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--w);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 28px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbarTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.topbarSubtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.btnGhost:hover {
+  background: var(--surface);
+}
+
+.content {
+  padding: 24px 28px;
+  flex: 1;
+}
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+.pgInfo {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pgBtns {
+  display: flex;
+  gap: 4px;
+}
+
+.pgBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+  background: var(--w);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.pgBtn.on {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+@media (max-width: 1024px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  
+  .main {
+    min-height: auto;
+  }
+}
+
+.attachmentOversight h1 {
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.attachmentOversight p {
+  color: var(--muted);
+}

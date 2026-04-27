@@ -1,0 +1,38 @@
+.stages {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.stageDone {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.stageWait {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.stagePending {
+  background: var(--surface);
+  color: var(--subtle);
+  border: 0.5px solid var(--border);
+}
+
+.stageDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

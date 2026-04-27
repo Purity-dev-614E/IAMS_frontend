@@ -1,0 +1,282 @@
+.pageContent {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+
+.card {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 16px 20px;
+}
+
+.eye {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--subtle);
+  margin-bottom: 6px;
+}
+
+.cardRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+
+.cardSub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.weekBadge {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.weekNumber {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.weekLabel {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 1px;
+}
+
+.meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.meta strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.logsHeader {
+  padding: 10px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logsTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.logsSubtitle {
+  font-size: 11px;
+  color: var(--subtle);
+}
+
+.logEntry {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.logEntry:last-child {
+  border-bottom: none;
+}
+
+.logEntryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.logDate {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.status {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.statusSubmitted {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.statusNotSubmitted {
+  background: var(--surface);
+  color: var(--subtle);
+  border: 0.5px solid var(--border);
+}
+
+.logField {
+  margin-bottom: 5px;
+}
+
+.logField:last-child {
+  margin-bottom: 0;
+}
+
+.logFieldLabel {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--subtle);
+  margin-bottom: 2px;
+}
+
+.logFieldText {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.noLogMessage {
+  font-size: 12px;
+  color: var(--subtle);
+  font-style: italic;
+}
+
+.reviewHeader {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+.reviewTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.reviewSubtitle {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.reviewForm {
+  padding: 20px;
+}
+
+.approvalOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--subtle);
+}
+
+.required {
+  color: var(--red);
+}
+
+textarea {
+  width: 100%;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--w);
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.6;
+  display: block;
+  margin-bottom: 14px;
+}
+
+textarea:last-of-type {
+  margin-bottom: 0;
+}
+
+textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.07);
+}
+
+textarea::placeholder {
+  color: var(--subtle);
+}
+
+.submitButton {
+  width: 100%;
+  padding: 13px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background 0.15s;
+}
+
+.submitButton:hover {
+  background: #1740B0;
+}
+
+.submitButton:disabled {
+  background: #93C5FD;
+  cursor: not-allowed;
+}
+
+.footerNote {
+  text-align: center;
+  font-size: 11px;
+  color: var(--subtle);
+  padding: 10px 0 4px;
+  line-height: 1.6;
+}

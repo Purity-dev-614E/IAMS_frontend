@@ -1,0 +1,176 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 34, 68, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: var(--w);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.modalClose {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.modalField {
+  margin-bottom: 14px;
+}
+
+.modalField:last-child {
+  margin-bottom: 0;
+}
+
+.modalFieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.modalFieldHint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.studentDisplay {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.studentChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.schip {
+  background: var(--bl);
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.modalBody select,
+.modalBody input[type="text"] {
+  width: 100%;
+  padding: 9px 13px;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--w);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.modalBody select:focus,
+.modalBody input[type="text"]:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.07);
+}
+
+.modalFooter {
+  padding: 14px 20px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.btnGhost:hover {
+  background: var(--surface);
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  transition: all 0.15s;
+}
+
+.btnPrimary:hover {
+  background: #1740B0;
+}
+
+.btnPrimary:disabled {
+  background: #93C5FD;
+  cursor: not-allowed;
+}

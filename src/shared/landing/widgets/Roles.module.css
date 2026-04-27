@@ -1,0 +1,87 @@
+.rolesSection {
+  padding: 5rem 2.5rem;
+  background: var(--surface);
+}
+
+.max600 {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.sectionTitle {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--navy);
+  font-weight: 400;
+  max-width: 520px;
+  line-height: 1.25;
+}
+
+.rolesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.roleCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.roleCard:hover {
+  border-color: #93C5FD;
+  transform: translateY(-2px);
+}
+
+.roleIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 1rem;
+}
+
+.roleName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 0.4rem;
+}
+
+.roleDesc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.roleTag {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.serif {
+  font-family: 'DM Serif Display', serif;
+}

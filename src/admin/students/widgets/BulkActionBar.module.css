@@ -1,0 +1,59 @@
+.bulkBar {
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 10px 16px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bulkBar.show {
+  display: flex;
+}
+
+.bulkInfo {
+  font-size: 13px;
+  color: #fff;
+}
+
+.bulkInfo strong {
+  font-weight: 500;
+}
+
+.bulkActions {
+  display: flex;
+  gap: 8px;
+}
+
+.bbtn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.bbtnAssign {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.bbtnAssign:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bbtnClear {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.bbtnClear:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
