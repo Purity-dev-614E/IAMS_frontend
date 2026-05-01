@@ -1,5 +1,5 @@
-import { apiClient } from '../apis';
-import { API_ROUTES } from '../apis/apiRoutes';
+import { apiClient } from '../../apis';
+import { API_ROUTES } from '../../apis/apiRoutes';
 
 export const profileService = {
   // Fetch user profile data based on role

@@ -5,11 +5,11 @@ import LandingScreen from './shared/landing/screen/LandingScreen';
 import LoginScreen from './shared/login/screen/LoginScreen';
 import IndustryReviewScreen from './shared/review/screen/IndustryReviewScreen';
 import ProfileScreen from './shared/profile/screen/ProfileScreen';
+import RegisterPage from './shared/register/screen/RegisterPage';
 
 // Student Screens
 import StudentDashboard from './student/dashboard/screen/StudentDashboard';
 import MyAttachmentsWidget from './student/attachments/screen/MyAttachmentsWidget';
-import CreateAttachment from './student/attachments/new/screen/CreateAttachment';
 import DailyLogs from './student/daily-logs/screen/DailyLogs';
 import CreateDailyLogNew from './student/daily-logs/new/screen/CreateDailyLogNew';
 import EditDailyLog from './student/daily-logs/edit/screen/EditDailyLog';
@@ -36,6 +36,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingScreen />} />
           <Route path="/login" element={<LoginScreen />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/review/:token" element={<IndustryReviewScreen />} />
           
           {/* Shared Routes */}
@@ -44,8 +45,7 @@ function App() {
           {/* Student Routes */}
           <Route path="/dashboard" element={<StudentDashboard />} />
           <Route path="/attachments" element={<MyAttachmentsWidget />} />
-          <Route path="/attachments/new" element={<CreateAttachment />} />
-          {/* <Route path="/logs" element={<DailyLogs />} /> */}
+                    <Route path="/logs" element={<DailyLogs />} />
           <Route path="/logs/new" element={<CreateDailyLogNew />} />
           <Route path="/logs/:id/edit" element={<EditDailyLog />} />
           <Route path="/reviews" element={<WeeklyReviewsNew />} />

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import styles from './CreateDailyLog.module.css';
 import WeekDots from '../../../../unisup/dashboard/widgets/WeekDots';
-import logoImage from '../../../../assets/IAMSlogo.png';
+import AppSidebar from '../../../../shared/components/AppSidebar/AppSidebar';
+import { studentNavigation } from '../../../../shared/components/AppSidebar/sidebarConfig';
 
 const CreateDailyLog = () => {
   const [mode, setMode] = useState('new');
@@ -136,42 +136,17 @@ const CreateDailyLog = () => {
     };
   }, []);
 
+  const user =  {
+    name: 'Student',
+    role: 'Student',
+    initials: 'ST'
+  };
+
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarLogo}>
-          <img src={logoImage} alt="IAMS" className={styles.logoImage} />
-          <span className={styles.logoLabel}>IAMS</span>
-        </div>
-        <span className={styles.navSectionLabel}>Main</span>
-        <Link to="/dashboard" className={styles.navItem}>
-          <span className={styles.navIcon}>▦</span> Dashboard
-        </Link>
-        <Link to="/attachments" className={styles.navItem}>
-          <span className={styles.navIcon}>◎</span> My Attachment
-        </Link>
-        <Link to="/logs" className={`${styles.navItem} ${styles.active}`}>
-          <span className={styles.navIcon}>✎</span> Daily Logs
-        </Link>
-        <Link to="/reviews" className={styles.navItem}>
-          <span className={styles.navIcon}>⊞</span> Weekly Reviews
-        </Link>
-        <span className={styles.navSectionLabel} style={{marginTop: '1rem'}}>Account</span>
-        <Link to="/profile" className={styles.navItem}>
-          <span className={styles.navIcon}>◉</span> Profile
-        </Link>
-        <div className={styles.sidebarBottom}>
-          <div className={styles.userChip}>
-            <div className={styles.avatar}>PS</div>
-            <div className={styles.userInfo}>
-              <div className={styles.name}>Purity Sang</div>
-              <div className={styles.role}>Student · BBIT</div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
+      <AppSidebar navigationItems={studentNavigation} user={user} />
+      
       {/* MAIN */}
       <div className={styles.main}>
         <div className={styles.topbar}>

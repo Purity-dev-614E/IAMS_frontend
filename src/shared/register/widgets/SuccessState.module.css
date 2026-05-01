@@ -1,0 +1,48 @@
+/* SUCCESS — STUDENT/ADMIN */
+.successPage {
+  display: block;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.successIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--gbg);
+  border: 0.5px solid var(--gb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 20px;
+}
+
+.successPage h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--navy);
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.successPage p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 320px;
+  margin: 0 auto 20px;
+}
+
+.loginBtn {
+  display: inline-block;
+  padding: 10px 28px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}

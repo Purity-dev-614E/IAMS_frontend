@@ -4,6 +4,7 @@ export const studentNavigation = [
     items: [
       { icon: '▦', label: 'Dashboard', to: '/dashboard' },
       { icon: '◎', label: 'My Attachment', to: '/attachments' },
+      { icon: '📋', label: 'My logs', to: '/logs' },
       { icon: '✎', label: 'Daily Logs', to: '/logs/new' },
       { icon: '⊞', label: 'Weekly Reviews', to: '/reviews' }
     ]

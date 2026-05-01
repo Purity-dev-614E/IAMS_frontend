@@ -42,6 +42,47 @@
   color: var(--muted);
 }
 
+.loadingState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+
+.loadingState p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.errorState {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.errorState p {
+  color: #dc2626;
+  font-size: 14px;
+  margin: 0 0 1rem 0;
+}
+
+.btnRetry {
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btnRetry:hover {
+  background: #1e293b;
+}
+
 @media (max-width: 768px) {
   .pageInner {
     max-width: 100%;

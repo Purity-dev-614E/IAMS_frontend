@@ -98,6 +98,46 @@ export const AuthProvider = ({ children }) => {
     return !!token && !!user;
   };
 
+  const register = async (userData) => {
+    setError(null);
+    setIsLoading(true);
+    
+    try {
+      // Import registerService dynamically to avoid circular dependency
+      const { registerService } = await import('../shared/register/services/registerService');
+      
+      const response = await registerService.registerUser(userData);
+      
+      if (response.success) {
+        const { user: userData, token: authToken } = response;
+        
+        // Store in localStorage (only if no approval required)
+        if (!response.requiresApproval) {
+          localStorage.setItem('iams_token', authToken);
+          localStorage.setItem('iams_user', JSON.stringify(userData));
+          
+          // Update state
+          setToken(authToken);
+          setUser(userData);
+        }
+        
+        return { 
+          success: true, 
+          user: userData, 
+          requiresApproval: response.requiresApproval 
+        };
+      } else {
+        throw new Error(response.message || 'Registration failed');
+      }
+    } catch (err) {
+      const errorMessage = err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const hasRole = (role) => {
     return user?.role === role;
   };
@@ -108,6 +148,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     error,
     login,
+    register,
     logout,
     updateUser,
     isAuthenticated,

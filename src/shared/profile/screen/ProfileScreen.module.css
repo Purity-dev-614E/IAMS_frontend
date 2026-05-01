@@ -39,6 +39,8 @@
 .content {
   padding: 28px 32px;
   flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .contentInner {
@@ -62,4 +64,30 @@
 
 .profile p {
   color: var(--muted);
+}
+
+.logoutButton {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.logoutButton:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.logoutButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }

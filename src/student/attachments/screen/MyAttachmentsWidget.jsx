@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './MyAttachmentsWidget.module.css';
-import AttachmentSidebar from '../widgets/AttachmentSidebar';
-import AttachmentTopbar from '../widgets/AttachmentTopbar';
-import EmptyState from '../widgets/EmptyState';
-import PendingNotice from '../widgets/PendingNotice';
-import AttachmentCard from '../widgets/AttachmentCard';
-import RegisterForm from '../widgets/RegisterForm';
+import { 
+  AttachmentSidebar,
+  AttachmentTopbar,
+  EmptyState,
+  PendingNotice,
+  AttachmentCard,
+  RegisterForm
+} from '../widgets';
+import { useAttachments } from '../services/useAttachments';
 
 const MyAttachments = () => {
-  const [activeView, setActiveView] = useState('active');
+  const [activeView, setActiveView] = useState('empty');
   const [formData, setFormData] = useState({
     organization: '',
-    supervisorName: '',
-    supervisorEmail: '',
-    startDate: '2025-04-07',
-    endDate: '2025-06-20'
+    department: '',
+    industrySupervisor: '',
+    industrySupervisorEmail: '',
+    startDate: '',
+    endDate: ''
   });
+
+  const { 
+    attachments, 
+    loading, 
+    error, 
+    createAttachment, 
+    getAttachmentLogs,
+    clearError 
+  } = useAttachments();
+
+  // Set initial view based on attachments
+  useEffect(() => {
+    if (attachments.length > 0) {
+      const latestAttachment = attachments[0];
+      if (latestAttachment.status === 'Active') {
+        setActiveView('active');
+      } else if (latestAttachment.status === 'Pending activation') {
+        setActiveView('pending');
+      } else {
+        setActiveView('empty');
+      }
+    }
+  }, [attachments]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -26,24 +53,62 @@ const MyAttachments = () => {
 
   const handleViewChange = (view) => {
     setActiveView(view);
+    clearError();
   };
 
-  const handleSubmitForm = () => {
-    console.log('Submitting attachment registration:', formData);
-    setActiveView('pending');
+  const handleSubmitForm = async () => {
+    try {
+      await createAttachment(formData);
+      setActiveView('pending');
+    } catch (err) {
+      // Error is handled by the hook
+    }
   };
 
-  const handleViewLogs = () => {
-    console.log('Navigate to logs page');
-    // Navigation logic here
+  const handleViewLogs = async () => {
+    if (attachments.length > 0) {
+      try {
+        await getAttachmentLogs(attachments[0].id);
+        // Navigate to logs page
+        console.log('Navigate to logs page');
+      } catch (err) {
+        // Error is handled by the hook
+      }
+    }
   };
 
   const handleRegister = () => {
     setActiveView('register');
+    clearError();
   };
 
   const handleCancel = () => {
     setActiveView('empty');
+    setFormData({
+      organization: '',
+      department: '',
+      industrySupervisor: '',
+      industrySupervisorEmail: '',
+      startDate: '',
+      endDate: ''
+    });
+    clearError();
+  };
+
+  // Helper to format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    });
+  };
+
+  // Get current attachment for display
+  const getCurrentAttachment = () => {
+    return attachments.length > 0 ? attachments[0] : null;
   };
 
   return (
@@ -63,51 +128,69 @@ const MyAttachments = () => {
               <p>Your industrial attachment details and progress for the 2025 cohort.</p>
             </div>
 
+            {/* LOADING STATE */}
+            {loading && (
+              <div className={styles.loadingState}>
+                <p>Loading your attachments...</p>
+              </div>
+            )}
+
+            {/* ERROR STATE */}
+            {error && (
+              <div className={styles.errorState}>
+                <p>{error}</p>
+                <button onClick={clearError} className={styles.btnRetry}>Retry</button>
+              </div>
+            )}
+
             {/* EMPTY STATE */}
-            {activeView === 'empty' && (
+            {!loading && !error && activeView === 'empty' && (
               <EmptyState onRegister={handleRegister} />
             )}
 
             {/* PENDING STATE */}
-            {activeView === 'pending' && (
-              <>
-                <PendingNotice />
-                <AttachmentCard
-                  organization="Kenya Airways"
-                  department="Nairobi · IT Department"
-                  status="Pending activation"
-                  industrySupervisor="Peter Njoroge"
-                  industrySupervisorEmail="p.njoroge@kenya-airways.com"
-                  universitySupervisor="Not yet assigned"
-                  startDate="1 April 2025"
-                  endDate="20 June 2025"
-                  submissionDate="Submitted for review 31 Mar 2025"
-                />
-              </>
-            )}
+            {!loading && !error && activeView === 'pending' && (() => {
+              const attachment = getCurrentAttachment();
+              return attachment ? (
+                <>
+                  <PendingNotice />
+                  <AttachmentCard
+                    organization={attachment.organization}
+                    department={`${attachment.department}`}
+                    status={attachment.status}
+                    industrySupervisor={attachment.industrySupervisor}
+                    industrySupervisorEmail={attachment.industrySupervisorEmail}
+                    universitySupervisor={attachment.universitySupervisor || 'Not yet assigned'}
+                    startDate={formatDate(attachment.startDate)}
+                    endDate={formatDate(attachment.endDate)}
+                    submissionDate={formatDate(attachment.submissionDate)}
+                  />
+                </>
+              ) : null;
+            })()}
 
             {/* ACTIVE STATE */}
-            {activeView === 'active' && (
-              <AttachmentCard
-                organization="Safaricom PLC"
-                department="Nairobi · Software Engineering Department"
-                status="Active"
-                industrySupervisor="James Mwangi"
-                industrySupervisorEmail="j.mwangi@safaricom.co.ke"
-                universitySupervisor="Dr. F. Kamau"
-                startDate="17 February 2025"
-                endDate="2 May 2025"
-                duration="11 weeks"
-                currentWeek="Week 6 of 11"
-                progress={{
-                  percentage: 74,
-                  currentLabel: "Today — Week 6"
-                }}
-                activationDate="Activated 17 Feb 2025"
-                lastLogDate="Last log submitted today"
-                onViewLogs={handleViewLogs}
-              />
-            )}
+            {!loading && !error && activeView === 'active' && (() => {
+              const attachment = getCurrentAttachment();
+              return attachment ? (
+                <AttachmentCard
+                  organization={attachment.organization}
+                  department={`${attachment.department}`}
+                  status={attachment.status}
+                  industrySupervisor={attachment.industrySupervisor}
+                  industrySupervisorEmail={attachment.industrySupervisorEmail}
+                  universitySupervisor={attachment.universitySupervisor}
+                  startDate={formatDate(attachment.startDate)}
+                  endDate={formatDate(attachment.endDate)}
+                  duration={attachment.duration}
+                  currentWeek={attachment.currentWeek}
+                  progress={attachment.progress}
+                  activationDate={formatDate(attachment.activationDate)}
+                  lastLogDate={attachment.lastLogDate}
+                  onViewLogs={handleViewLogs}
+                />
+              ) : null;
+            })()}
 
             {/* REGISTER FORM */}
             {activeView === 'register' && (

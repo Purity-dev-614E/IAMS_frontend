@@ -2,14 +2,16 @@ import React from 'react';
 import styles from './StudentDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import { studentNavigation } from '../../../shared/components/AppSidebar/sidebarConfig';
-import Topbar from '../widgets/Topbar';
-import AlertBanner from '../widgets/AlertBanner';
-import StatsGrid from '../widgets/StatsGrid';
-import LogCTA from '../widgets/LogCTA';
-import ThisWeekLogs from '../widgets/ThisWeekLogs';
-import WeeklyReviews from '../widgets/WeeklyReviews';
-import AttachmentInfo from '../widgets/AttachmentInfo';
-import Reminders from '../widgets/Reminders';
+import { 
+  Topbar,
+  AlertBanner,
+  StatsGrid,
+  LogCTA,
+  ThisWeekLogs,
+  WeeklyReviews,
+  AttachmentInfo,
+  Reminders
+} from '../widgets';
 
 const StudentDashboard = () => {
   const user = {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './ProfileScreen.module.css';
 import AppSidebar from '../../components/AppSidebar/AppSidebar';
 import DynamicProfileDetails from '../widgets/DynamicProfileDetails';
@@ -15,7 +16,8 @@ const ProfileScreen = () => {
   });
   const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const { user, updateUser, logout } = useAuth();
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -95,6 +97,20 @@ const ProfileScreen = () => {
     return await changePassword(passwordData);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      showToast('Logged out successfully', 'success');
+      // Navigate to login screen after successful logout
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000); // Small delay to show toast message
+    } catch (error) {
+      showToast('Failed to logout', 'error');
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
@@ -111,6 +127,13 @@ const ProfileScreen = () => {
             <div className={styles.topbarTitle}>Profile</div>
             <div className={styles.topbarSubtitle}>Manage your account details</div>
           </div>
+          <button 
+            className={styles.logoutButton}
+            onClick={handleLogout}
+            disabled={isLoading}
+          >
+            Logout
+          </button>
         </div>
         
         {/* CONTENT */}

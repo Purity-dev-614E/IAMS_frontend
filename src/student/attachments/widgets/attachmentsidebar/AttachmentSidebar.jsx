@@ -1,6 +1,6 @@
 import React from 'react';
-import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
-import { studentNavigation } from '../../../shared/components/AppSidebar/sidebarConfig';
+import AppSidebar from '../../../../shared/components/AppSidebar/AppSidebar';
+import { studentNavigation } from '../../../../shared/components/AppSidebar/sidebarConfig';
 
 const AttachmentSidebar = () => {
   const user = {

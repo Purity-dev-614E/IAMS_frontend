@@ -19,10 +19,10 @@ const LoginScreen = () => {
           navigate('/admin');
           break;
         case 'uni_supervisor':
-          navigate('/supervisor/dashboard');
+          navigate('/supervisor');
           break;
         case 'student':
-          navigate('/student/dashboard');
+          navigate('/dashboard');
           break;
         default:
           navigate('/dashboard');
@@ -85,7 +85,7 @@ const LoginScreen = () => {
           
           <div className={styles.loginFooter}>
             <p className={styles.supervisorText}>
-              New university supervisor? <a href="#" className={styles.link}>Register for access</a>
+              New to the system? <a href="/register" className={styles.link}>Register for access</a>
             </p>
             <p className={styles.industryText}>
               Industry supervisors access the system via the link in their weekly email.
