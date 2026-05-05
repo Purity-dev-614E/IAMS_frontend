@@ -5,12 +5,12 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
   const getRoleBadge = (role) => {
     const roleClasses = {
       student: styles.spBlue,
-      uni_sup: styles.spGreen,
+      uni_supervisor: styles.spGreen,
       admin: styles.spRed
     };
     const roleLabels = {
       student: 'Student',
-      uni_sup: 'Uni Supervisor',
+      uni_supervisor: 'Uni Supervisor',
       admin: 'Admin'
     };
     return (
@@ -24,12 +24,14 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
     const statusClasses = {
       active: styles.spGreen,
       pending: styles.spAmber,
-      deactivated: styles.spGray
+      rejected: styles.spRed,
+      inactive: styles.spGray
     };
     const statusLabels = {
       active: 'Active',
       pending: 'Pending',
-      deactivated: 'Deactivated'
+      rejected: 'Rejected',
+      inactive: 'Inactive'
     };
     return (
       <span className={`${styles.sp} ${statusClasses[status]}`}>
@@ -50,7 +52,7 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
           </button>
         </div>
       );
-    } else if (user.status === 'deactivated') {
+    } else if (user.status === 'inactive') {
       return (
         <div className={styles.actions}>
           <button className={`${styles.abtn} ${styles.abtnAct}`} onClick={() => onReactivate(user)}>
@@ -61,7 +63,7 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
           </button>
         </div>
       );
-    } else if (user.status === 'pending' && user.role === 'uni_sup') {
+    } else if (user.status === 'pending' && user.role === 'uni_supervisor') {
       return (
         <div className={styles.actions}>
           <button className={`${styles.abtn} ${styles.abtnAct}`} onClick={() => onApprove(user)}>
@@ -85,7 +87,6 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
             <th>Role</th>
             <th>Status</th>
             <th>Registered</th>
-            <th>Last active</th>
             <th></th>
           </tr>
         </thead>
@@ -99,7 +100,6 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
               <td>{getRoleBadge(user.role)}</td>
               <td>{getStatusBadge(user.status)}</td>
               <td style={{color: 'var(--muted)'}}>{user.registered}</td>
-              <td style={{color: 'var(--muted)'}}>{user.lastActive}</td>
               <td>{renderActions(user)}</td>
             </tr>
           ))}

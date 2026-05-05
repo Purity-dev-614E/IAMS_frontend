@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './StudentDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
-import { studentNavigation } from '../../../shared/components/AppSidebar/sidebarConfig';
+import { profileService } from '../../../shared/profile/profileService';
+import { useAuth } from '../../../contexts/AuthContext';
 import { 
   Topbar,
   AlertBanner,
@@ -14,16 +15,30 @@ import {
 } from '../widgets';
 
 const StudentDashboard = () => {
-  const user = {
-    name: 'Purity Sang',
-    role: 'Student · BBIT',
-    initials: 'PS'
+  const [profileData, setProfileData] = useState(null);
+  const { user } = useAuth();
+
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      const profile = await profileService.fetchProfile();
+      setProfileData(profile);
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+    }
   };
 
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
-      <AppSidebar navigationItems={studentNavigation} user={user} />
+      <AppSidebar 
+        navigationItems={profileService.getNavigationItems(profileData || user)} 
+        user={profileService.getUserDisplayInfo(profileData || user)}
+      />
       
       {/* MAIN */}
       <div className={styles.main}>

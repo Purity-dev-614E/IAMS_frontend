@@ -4,32 +4,33 @@ import styles from './AppSidebar.module.css';
 
 const AppSidebar = ({ navigationItems, user }) => {
   const location = useLocation();
-
+  
+  
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sidebarLogo}>
-        <img src={"./IAMSlogo.png"} alt="IAMS" className={styles.logoImage} />
+        <img src={"/IAMSlogo.png"} alt="IAMS" className={styles.logoImage} />
         <span className={styles.logoLabel}>IAMS</span>
       </div>
       
       {navigationItems.map((section, sectionIndex) => (
-        <div key={sectionIndex}>
-          <span className={styles.navSectionLabel}>{section.title}</span>
-          {section.items.map((item, itemIndex) => {
-            const isActive = location.pathname === item.to;
-            return (
-              <Link
-                key={itemIndex}
-                to={item.to}
-                className={`${styles.navItem} ${isActive ? styles.active : ''}`}
-              >
-                <span className={styles.navIcon}>{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      ))}
+          <div key={sectionIndex}>
+            <span className={styles.navSectionLabel}>{section.title}</span>
+            {section.items.map((item, itemIndex) => {
+              const isActive = location.pathname === item.to;
+              return (
+                <Link
+                  key={itemIndex}
+                  to={item.to}
+                  className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+                >
+                  <span className={styles.navIcon}>{item.icon}</span>
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       
       {user && (
         <div className={styles.sidebarBottom}>

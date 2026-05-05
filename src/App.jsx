@@ -47,7 +47,7 @@ function App() {
           <Route path="/attachments" element={<MyAttachmentsWidget />} />
                     <Route path="/logs" element={<DailyLogs />} />
           <Route path="/logs/new" element={<CreateDailyLogNew />} />
-          <Route path="/logs/:id/edit" element={<EditDailyLog />} />
+          <Route path="/logs/edit/:id" element={<CreateDailyLogNew />} />
           <Route path="/reviews" element={<WeeklyReviewsNew />} />
           
           {/* Admin Routes */}

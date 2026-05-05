@@ -20,9 +20,9 @@ const AttachmentCard = ({
 }) => {
   const getStatusPillClass = (status) => {
     switch (status) {
-      case 'Active': return styles.pillActive;
-      case 'Pending activation': return styles.pillPending;
-      case 'Complete': return styles.pillComplete;
+      case 'active': return styles.pillActive;
+      case 'pending': return styles.pillPending;
+      case 'complete': return styles.pillComplete;
       default: return '';
     }
   };
@@ -69,7 +69,7 @@ const AttachmentCard = ({
           {duration && (
             <div className={styles.infoItem}>
               <div className={styles.infoKey}>Duration</div>
-              <div className={styles.infoVal}>{duration}</div>
+              <div className={styles.infoVal}>{duration} days</div>
             </div>
           )}
           {currentWeek && (
@@ -99,10 +99,10 @@ const AttachmentCard = ({
       </div>
       <div className={styles.acFooter}>
         <p>
-          {status === 'Active' && `${activationDate} · ${lastLogDate}`}
-          {status === 'Pending activation' && `${submissionDate} · Awaiting admin activation`}
+          {status === 'active' && `${activationDate} · ${lastLogDate}`}
+          {status === 'pending' && `${submissionDate} · Awaiting admin activation`}
         </p>
-        {status === 'Active' && onViewLogs && (
+        {status === 'active' && onViewLogs && (
           <button className={styles.btnSmOutline} onClick={onViewLogs}>
             View all logs →
           </button>

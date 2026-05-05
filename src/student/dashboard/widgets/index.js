@@ -6,4 +6,3 @@ export { default as StatsGrid } from './statsgrid/StatsGrid';
 export { default as ThisWeekLogs } from './thisweeklogs/ThisWeekLogs';
 export { default as Topbar } from './topbar/Topbar';
 export { default as WeeklyReviews } from './weeklyreviews/WeeklyReviews';
-export { default as Sidebar } from './sidebar/Sidebar';

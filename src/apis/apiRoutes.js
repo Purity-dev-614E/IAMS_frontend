@@ -7,6 +7,7 @@ export const API_ROUTES = {
     updateProfile: "/auth/profile",
     changePassword: "/auth/change-password",
     logout: "/auth/logout",
+    refreshToken: "/auth/refresh-token",
   },
 
   // User Management Routes (Admin only)
@@ -28,7 +29,11 @@ export const API_ROUTES = {
     create: "/students",
     byId: (id) => `/students/${id}`,
     update: (id) => `/students/${id}`,
+    delete: (id) => `/students/${id}`,
     assignSupervisor: (id) => `/students/${id}/assign-supervisor`,
+    bulkAssign: "/students/bulk-assign-supervisors",
+    availableSupervisors: "/students/available-supervisors",
+    unassigned: "/students/unassigned",
     myStudents: "/students/my-students",
     profile: "/students/profile/me",
   },

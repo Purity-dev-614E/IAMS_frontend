@@ -1,16 +1,69 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import styles from './CreateDailyLog.module.css';
 import WeekDots from '../../../../unisup/dashboard/widgets/WeekDots';
 import AppSidebar from '../../../../shared/components/AppSidebar/AppSidebar';
-import { studentNavigation } from '../../../../shared/components/AppSidebar/sidebarConfig';
+import { profileService } from '../../../../shared/profile/profileService';
+import { useDailyLogs } from '../../services/useDailyLogs';
+import { attachmentService } from '../../../attachments/services/attachmentService';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 const CreateDailyLog = () => {
-  const [mode, setMode] = useState('new');
+  const { createLog, submitLog, getLog, updateLog } = useDailyLogs();
+  const { user } = useAuth();
+  const { id } = useParams();
+  const location = useLocation();
+  const [profileData, setProfileData] = useState(null);
+  const [mode, setMode] = useState(id ? 'edit' : 'new');
+  const [editLogId, setEditLogId] = useState(id || null);
   const [formData, setFormData] = useState({
     tasks: '',
     skills: '',
-    observations: ''
+    observations: '',
+    logDate: new Date().toISOString().split('T')[0]
   });
+
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  // Load log data if in edit mode
+  useEffect(() => {
+    if (mode === 'edit' && editLogId) {
+      loadLogData();
+    }
+  }, [mode, editLogId]);
+
+  const loadLogData = async () => {
+    try {
+      console.log('🔍 Loading log data for edit, editLogId:', editLogId);
+      const log = await getLog(editLogId);
+      console.log('🔍 Loaded log data:', log);
+      if (log) {
+        const formData = {
+          tasks: log.tasksPerformed || '',
+          skills: log.skillsAcquired || '',
+          observations: log.observations || '',
+          logDate: log.logDate ? new Date(log.logDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+        };
+        console.log('🔍 Setting form data:', formData);
+        setFormData(formData);
+      }
+    } catch (error) {
+      console.error('Error loading log data:', error);
+      setError('Failed to load log data for editing');
+    }
+  };
+
+  const fetchProfileData = async () => {
+    try {
+      const profile = await profileService.fetchProfile();
+      setProfileData(profile);
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+    }
+  };
   const [charCounts, setCharCounts] = useState({
     tasks: 0,
     skills: 0
@@ -18,15 +71,83 @@ const CreateDailyLog = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
-  const autosaveTimer = useRef(null);
+  const [attachment, setAttachment] = useState(null);
+  const [currentWeek, setCurrentWeek] = useState(1);
+  const [weekData, setWeekData] = useState([]);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const autosaveTimer = useRef(null); // Force refresh
 
-  const week6Data = [
-    { day: 'Mon', status: 'submitted' },
-    { day: 'Tue', status: 'submitted' },
-    { day: 'Wed', status: 'submitted' },
-    { day: 'Thu', status: 'draft' },
-    { day: 'Fri', status: 'upcoming' }
-  ];
+  // Fetch attachment data and current week logs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get attachment data
+        const attachments = await attachmentService.getMyAttachments();
+        
+        // Handle different response formats
+        let attachmentsArray = [];
+        if (Array.isArray(attachments)) {
+          attachmentsArray = attachments;
+        } else if (attachments && attachments.attachments && Array.isArray(attachments.attachments)) {
+          attachmentsArray = attachments.attachments;
+        } else if (attachments && attachments.data && Array.isArray(attachments.data)) {
+          attachmentsArray = attachments.data;
+        } else if (attachments && attachments.logs && Array.isArray(attachments.logs)) {
+          attachmentsArray = attachments.logs;
+        } else if (attachments && typeof attachments === 'object') {
+          attachmentsArray = [attachments]; // Single attachment object
+        }
+        
+        if (attachmentsArray && attachmentsArray.length > 0) {
+          const activeAttachment = attachmentsArray[0];
+          setAttachment(activeAttachment);
+          
+          // Calculate current week
+          const today = new Date();
+          const attachmentStart = new Date(activeAttachment.start_date);
+          const diffTime = Math.abs(today - attachmentStart);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const weekNumber = Math.max(1, Math.ceil(diffDays / 7));
+          setCurrentWeek(weekNumber);
+        } else {
+          setError('No attachments found. Please create an attachment first.');
+        }
+      } catch (error) {
+        console.error('Error fetching attachment data:', error);
+        setError('Failed to load attachment data: ' + error.message);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Debug modal state changes
+  useEffect(() => {
+    console.log('🔍 Modal state changed:', showModal);
+  }, [showModal]);
+
+  // Generate week data based on current week
+  const generateWeekData = () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const today = new Date();
+    const currentDayIndex = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const todayIndex = currentDayIndex === 0 ? 6 : currentDayIndex - 1; // Convert to Monday=0
+    
+    return days.map((day, index) => {
+      if (index < todayIndex) {
+        return { day, status: 'submitted' };
+      } else if (index === todayIndex) {
+        return { day, status: mode === 'submitted' ? 'submitted' : 'draft' };
+      } else {
+        return { day, status: 'upcoming' };
+      }
+    });
+  };
+
+  useEffect(() => {
+    setWeekData(generateWeekData());
+  }, [mode]);
 
   const limits = {
     tasks: 500,
@@ -64,43 +185,175 @@ const CreateDailyLog = () => {
     }, 1200);
   };
 
-  const saveDraft = () => {
-    triggerAutosave();
+  const saveDraft = async () => {
+    try {
+      setError(null);
+      
+      if (!attachment || !attachment.id) {
+        throw new Error('Attachment data not loaded. Please refresh the page and try again.');
+      }
+
+      const logData = {
+        tasks_performed: formData.tasks,
+        skills_acquired: formData.skills,
+        observations: formData.observations,
+        log_date: formData.logDate,
+        attachment_id: attachment.id,
+        status: 'draft'
+      };
+
+      if (mode === 'edit') {
+        await updateLog(editLogId, logData);
+        console.log('✅ Draft updated successfully');
+      } else {
+        await createLog(logData);
+        console.log('✅ Draft saved successfully');
+      }
+      
+      triggerAutosave();
+    } catch (error) {
+      console.error('❌ Save draft error:', error);
+      setError(error.message || 'Failed to save draft. Please try again.');
+    }
   };
 
   const validateForm = () => {
     const tasks = formData.tasks.trim();
     const skills = formData.skills.trim();
     
+    console.log('🔍 Validating form:', { tasks: !!tasks, skills: !!skills });
+    
     if (!tasks || !skills) {
-      // Highlight required fields
-      const tasksField = document.getElementById('tasks');
-      const skillsField = document.getElementById('skills');
-      tasksField.style.borderColor = tasks ? '' : '#DC2626';
-      skillsField.style.borderColor = skills ? '' : '#DC2626';
+      // Highlight required fields with better error handling
+      try {
+        const tasksField = document.getElementById('tasks');
+        const skillsField = document.getElementById('skills');
+        if (tasksField) {
+          tasksField.style.borderColor = tasks ? '' : '#DC2626';
+        }
+        if (skillsField) {
+          skillsField.style.borderColor = skills ? '' : '#DC2626';
+        }
+      } catch (error) {
+        console.error('Error highlighting fields:', error);
+      }
+      
+      // Show validation error message
+      setError('Please fill in both required fields: Tasks performed and Skills acquired');
+      console.log('❌ Form validation failed');
       return false;
     }
+    
+    // Clear any previous validation errors
+    setError(null);
+    console.log('✅ Form validation passed');
     return true;
   };
 
   const openModal = () => {
-    if (!validateForm()) return;
+    console.log('🔍 Opening modal...');
+    if (!validateForm()) {
+      console.log('❌ Form validation failed, modal not shown');
+      return;
+    }
+    console.log('✅ Form validation passed, showing modal');
     setShowModal(true);
   };
 
   const closeModal = () => {
+    console.log('🔍 Closing modal...');
     setShowModal(false);
   };
 
-  const confirmSubmit = () => {
+  const confirmSubmit = async () => {
+    console.log('🚀 Starting log submission...');
     closeModal();
     const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = mode === 'edit' ? 'Updating...' : 'Submitting...';
+    }
     
-    setTimeout(() => {
+    try {
+      setError(null);
+      
+      // Check if attachment data is available
+      if (!attachment || !attachment.id) {
+        console.error('❌ Missing attachment data:', attachment);
+        throw new Error('Attachment data not loaded. Please refresh the page and try again.');
+      }
+      console.log('✅ Attachment data available:', attachment.id);
+      
+      let logId = null;
+      
+      if (mode === 'edit') {
+        // Update existing log
+        const logData = {
+          tasks_performed: formData.tasks,
+          skills_acquired: formData.skills,
+          observations: formData.observations,
+          log_date: formData.logDate,
+          attachment_id: attachment.id,
+          status: 'draft'
+        };
+        
+        console.log('📤 Updating log with data:', logData);
+        const updatedLog = await updateLog(editLogId, logData);
+        console.log('✅ Log updated successfully:', updatedLog);
+        
+        logId = editLogId;
+      } else {
+        // Create new log
+        const logData = {
+          tasks_performed: formData.tasks,
+          skills_acquired: formData.skills,
+          observations: formData.observations,
+          log_date: formData.logDate,
+          attachment_id: attachment.id,
+          status: 'draft',
+          submitted_at: new Date().toISOString()
+        };
+        
+        console.log('📤 Creating log with data:', logData);
+        const createdLog = await createLog(logData);
+        console.log('✅ Log created successfully:', createdLog);
+        console.log('🔍 Response type:', typeof createdLog);
+        console.log('🔍 Response keys:', createdLog ? Object.keys(createdLog) : 'null');
+        console.log('🔍 Looking for ID in:', createdLog);
+        
+        // Handle different response formats
+        if (createdLog) {
+          // Extract ID from raw log object (service now returns data.log)
+          logId = createdLog.id ||           // Direct ID from raw log object
+                  createdLog.logId ||         // Fallback to logId field
+                  createdLog.log_id ||         // Snake_case fallback
+                  createdLog.data?.id ||       // Nested data object
+                  createdLog.data?.log_id ||    // Nested snake_case
+                  (createdLog.data && createdLog.data[0]?.id);  // Array fallback
+        }
+        
+        console.log('🔍 Extracted log ID:', logId);
+        
+        if (!logId) {
+          console.error('❌ No log ID found in response. Full response:', createdLog);
+          throw new Error('Invalid response from createLog - missing log ID');
+        }
+      }
+      
+      console.log('📤 Submitting log with ID:', logId);
+      await submitLog(logId);
+      console.log('✅ Log submitted successfully!');
+      
+      setSuccess(true);
       setMode('submitted');
-    }, 1000);
+    } catch (error) {
+      console.error('❌ Submit error:', error);
+      setError(error.message || 'Failed to submit log. Please try again.');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = mode === 'edit' ? 'Update and submit log' : 'Submit log for today';
+      }
+    }
   };
 
   const setModeHandler = (newMode) => {
@@ -136,16 +389,19 @@ const CreateDailyLog = () => {
     };
   }, []);
 
-  const user =  {
-    name: 'Student',
-    role: 'Student',
-    initials: 'ST'
+  const currentUser =  {
+    name: user?.name || 'Student',
+    role: user?.role || 'Student',
+    initials: user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ST'
   };
 
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
-      <AppSidebar navigationItems={studentNavigation} user={user} />
+      <AppSidebar 
+        navigationItems={profileService.getNavigationItems(profileData || user)} 
+        user={profileService.getUserDisplayInfo(profileData || user)}
+      />
       
       {/* MAIN */}
       <div className={styles.main}>
@@ -153,8 +409,8 @@ const CreateDailyLog = () => {
           <div className={styles.topbarLeft}>
             <button className={styles.backBtn}>‹</button>
             <div>
-              <div className={styles.topbarTitle}>Daily Log</div>
-              <div className={styles.topbarSub}>Thursday, 3 April 2025</div>
+              <div className={styles.topbarTitle}>{mode === 'edit' ? 'Edit Daily Log' : 'Daily Log'}</div>
+              <div className={styles.topbarSub}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
             </div>
           </div>
           <div className={styles.topbarRight}>
@@ -191,19 +447,35 @@ const CreateDailyLog = () => {
               </div>
             )}
 
-            {/* SUBMITTED BANNER */}
-            {mode === 'submitted' && (
+            {/* ERROR BANNER */}
+            {error && (
+              <div className={styles.offlineBanner} style={{background: '#FEE2E2', border: '1px solid #FCA5A5'}}>
+                <span style={{color: '#DC2626'}}>⚠</span>
+                <p style={{color: '#DC2626'}}><strong>Error:</strong> {error}</p>
+              </div>
+            )}
+
+            {/* SUCCESS BANNER */}
+            {success && (
               <div className={styles.submittedBanner} id="submitted-banner">
                 <span style={{fontSize: '14px'}}>✓</span>
-                <p><strong>This log has been submitted.</strong> Submitted logs cannot be edited. Your industry supervisor will review it as part of your Week 6 review.</p>
+                <p><strong>Log submitted successfully!</strong> Your daily log has been saved and submitted for review.</p>
+              </div>
+            )}
+
+            {/* SUBMITTED BANNER */}
+            {mode === 'submitted' && !success && (
+              <div className={styles.submittedBanner} id="submitted-banner">
+                <span style={{fontSize: '14px'}}>✓</span>
+                <p><strong>This log has been submitted.</strong> Submitted logs cannot be edited. Your industry supervisor will review it as part of your Week {currentWeek} review.</p>
               </div>
             )}
 
             {/* AUTOSAVE */}
-            {(mode === 'new' || mode === 'offline') && (
+            {(mode === 'new' || mode === 'offline' || mode === 'edit') && (
               <div className={styles.autosaveBar} id="autosave-bar">
                 <div className={styles.breadcrumb}>
-                  Daily Logs <span>›</span> New entry
+                  Daily Logs <span>›</span> {mode === 'edit' ? 'Edit entry' : 'New entry'}
                 </div>
                 <div className={styles.autosaveChip}>
                   <div className={`${styles.autosaveDot} ${isSaving ? styles.saving : ''}`}></div>
@@ -220,25 +492,25 @@ const CreateDailyLog = () => {
               <div className={styles.wcLeft}>
                 <div className={styles.wcIcon}>📅</div>
                 <div>
-                  <div className={styles.wcTitle}>Week 6 of your attachment</div>
-                  <div className={styles.wcSub}>31 Mar – 4 Apr 2025 · Safaricom PLC</div>
+                  <div className={styles.wcTitle}>Week {currentWeek} of your attachment</div>
+                  <div className={styles.wcSub}>{attachment ? `${attachment.organization_name || 'Your Organization'} · ${attachment.start_date ? new Date(attachment.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''} – ${attachment.end_date ? new Date(attachment.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}` : 'Loading attachment data...'}</div>
                 </div>
               </div>
               <div>
                 <div style={{fontSize: '10px', color: 'var(--subtle)', marginBottom: '4px', textAlign: 'right'}}>
                   This week
                 </div>
-                <WeekDots data={week6Data} />
+                <WeekDots data={weekData} />
               </div>
             </div>
 
             {/* FORM CARD */}
-            {(mode === 'new' || mode === 'offline') && (
+            {(mode === 'new' || mode === 'offline' || mode === 'edit') && (
               <div className={styles.formCard} id="form-card">
                 <div className={styles.formCardHeader}>
                   <div className={styles.fchLeft}>
-                    <h2>Thursday, 3 April 2025</h2>
-                    <p>Week 6 · Day 4 of 5 · Safaricom PLC</p>
+                    <h2>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h2>
+                    <p>Week {currentWeek} · {attachment ? `${attachment.organization_name || 'Your Organization'}` : 'Loading...'}</p>
                   </div>
                   <div className={styles.dateChip}>Today</div>
                 </div>
@@ -299,8 +571,8 @@ const CreateDailyLog = () => {
               <div className={styles.formCard} id="readonly-card">
                 <div className={styles.formCardHeader}>
                   <div className={styles.fchLeft}>
-                    <h2>Thursday, 3 April 2025</h2>
-                    <p>Week 6 · Day 4 of 5 · Safaricom PLC</p>
+                    <h2>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h2>
+                    <p>Week {currentWeek} · {attachment ? `${attachment.organization_name || 'Your Organization'}` : 'Loading...'}</p>
                   </div>
                   <div className={styles.dateChip} style={{background: 'var(--green)'}}>
                     Submitted
@@ -310,19 +582,19 @@ const CreateDailyLog = () => {
                   <div className={styles.field}>
                     <label>Tasks performed</label>
                     <div className={styles.readonlyField}>
-                      Continued working on the API integration for payments module. Attended a sprint review meeting in the afternoon where I presented progress on the authentication service. Reviewed pull request comments from senior engineer and made the suggested refactors.
+                      {formData.tasks || 'No tasks recorded'}
                     </div>
                   </div>
                   <div className={styles.field}>
                     <label>Skills acquired</label>
                     <div className={styles.readonlyField}>
-                      REST API integration patterns, sprint review presentation skills, code review best practices, Git rebase workflow.
+                      {formData.skills || 'No skills recorded'}
                     </div>
                   </div>
                   <div className={styles.field}>
                     <label>Observations</label>
                     <div className={styles.readonlyField}>
-                      The team uses a trunk-based development approach which is different from what I learned in class. Worth asking about branching strategies in tomorrow's stand-up.
+                      {formData.observations || 'No observations recorded'}
                     </div>
                   </div>
                 </div>
@@ -330,13 +602,13 @@ const CreateDailyLog = () => {
             )}
 
             {/* SUBMIT SECTION */}
-            {(mode === 'new' || mode === 'offline') && (
+            {(mode === 'new' || mode === 'offline' || mode === 'edit') && (
               <div className={styles.submitSection} id="submit-section">
                 <div className={styles.submitTop}>
                   <span className={styles.warnIcon}>⚠</span>
                   <div className={styles.warnText}>
                     <h3>Ready to submit?</h3>
-                    <p>Once submitted this log cannot be edited. It will be included in your Week 6 review which both supervisors will receive at the end of the week.</p>
+                    <p>Once submitted this log cannot be edited. It will be included in your Week {currentWeek} review which both supervisors will receive at the end of the week.</p>
                   </div>
                 </div>
                 <div className={styles.submitBtns}>
@@ -348,7 +620,7 @@ const CreateDailyLog = () => {
                     id="submit-btn"
                     onClick={openModal}
                   >
-                    Submit log for today
+                    {mode === 'edit' ? 'Update and submit log' : 'Submit log for today'}
                   </button>
                 </div>
               </div>
@@ -359,12 +631,23 @@ const CreateDailyLog = () => {
               <div className={styles.successCard} id="success-card">
                 <div className={styles.successIcon}>✓</div>
                 <h2>Log submitted</h2>
-                <p>Your Thursday 3 April log has been saved. It will be bundled with the rest of your Week 6 logs and sent to your supervisors on Friday.</p>
+                <p>Your {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} log has been saved. It will be bundled with the rest of your Week {currentWeek} logs and sent to your supervisors for review.</p>
                 <button 
                   className={styles.btnBack} 
-                  onClick={() => setModeHandler('new')}
+                  onClick={() => {
+                    setModeHandler('new');
+                    setFormData({
+                      tasks: '',
+                      skills: '',
+                      observations: '',
+                      logDate: new Date().toISOString().split('T')[0]
+                    });
+                    setCharCounts({ tasks: 0, skills: 0 });
+                    setError(null);
+                    setSuccess(false);
+                  }}
                 >
-                  Back to logs
+                  Create new log
                 </button>
               </div>
             )}
@@ -374,20 +657,23 @@ const CreateDailyLog = () => {
 
       {/* CONFIRM MODAL */}
       {showModal && (
-        <div className={styles.modalOverlay} id="modal">
-          <div className={styles.modal}>
-            <h3>Submit this log?</h3>
-            <p>You're about to submit your log for <strong>Thursday 3 April</strong>. Once submitted it cannot be edited. Your supervisors will review it at the end of Week 6.</p>
-            <div className={styles.modalBtns}>
-              <button className={styles.btnCancel} onClick={closeModal}>
-                Go back
-              </button>
-              <button className={styles.btnConfirm} onClick={confirmSubmit}>
-                Yes, submit log
-              </button>
+        <>
+          {console.log('🔍 Modal JSX is rendering!')}
+          <div className={`${styles.modalOverlay} ${styles.open}`} id="modal">
+            <div className={styles.modal}>
+              <h3>Submit this log?</h3>
+              <p>You're about to submit your log for <strong>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>. Once submitted it cannot be edited. Your supervisors will review it at the end of Week {currentWeek}.</p>
+              <div className={styles.modalBtns}>
+                <button className={styles.btnCancel} onClick={closeModal}>
+                  Go back
+                </button>
+                <button className={styles.btnConfirm} onClick={confirmSubmit}>
+                  Yes, submit log
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

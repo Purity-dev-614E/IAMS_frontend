@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiClient } from '../apis';
+import { apiClient, tokenStorage } from '../apis';
 import { API_ROUTES } from '../apis/apiRoutes';
+import { User, transformToModel, transformError } from '../models';
 
 const AuthContext = createContext();
 
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('iams_token');
+    const storedToken = tokenStorage.getAccessToken();
     const storedUser = localStorage.getItem('iams_user');
     
     if (storedToken && storedUser) {
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         setToken(storedToken);
       } catch (err) {
         console.error('Failed to parse stored user data:', err);
-        localStorage.removeItem('iams_token');
+        tokenStorage.clearTokens();
         localStorage.removeItem('iams_user');
       }
     }
@@ -48,17 +49,20 @@ export const AuthProvider = ({ children }) => {
       });
       
       if (response.success) {
-        const { token: authToken, user: userData } = response;
+        const { token: authToken, refreshToken, user: userData } = response;
         
-        // Store in localStorage
-        localStorage.setItem('iams_token', authToken);
-        localStorage.setItem('iams_user', JSON.stringify(userData));
+        // Transform user data using User model
+        const userModel = transformToModel(userData, User);
+        
+        // Store tokens using tokenStorage
+        tokenStorage.setTokens(authToken, refreshToken);
+        localStorage.setItem('iams_user', JSON.stringify(userModel));
         
         // Update state
         setToken(authToken);
-        setUser(userData);
+        setUser(userModel);
         
-        return { success: true, user: userData };
+        return { success: true, user: userModel };
       } else {
         throw new Error(response.message || 'Login failed');
       }
@@ -73,15 +77,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Call logout API if available
-      if (token) {
-        await apiClient.post(API_ROUTES.auth.logout);
-      }
+      // Use the apiClient logout method which handles token clearing
+      await apiClient.logout();
     } catch (err) {
       console.error('Logout API call failed:', err);
     } finally {
       // Clear local storage and state
-      localStorage.removeItem('iams_token');
+      tokenStorage.clearTokens();
       localStorage.removeItem('iams_user');
       setUser(null);
       setToken(null);
@@ -109,21 +111,24 @@ export const AuthProvider = ({ children }) => {
       const response = await registerService.registerUser(userData);
       
       if (response.success) {
-        const { user: userData, token: authToken } = response;
+        const { user: userData, token: authToken, refreshToken } = response;
         
-        // Store in localStorage (only if no approval required)
+        // Transform user data using User model
+        const userModel = transformToModel(userData, User);
+        
+        // Store tokens (only if no approval required)
         if (!response.requiresApproval) {
-          localStorage.setItem('iams_token', authToken);
-          localStorage.setItem('iams_user', JSON.stringify(userData));
+          tokenStorage.setTokens(authToken, refreshToken);
+          localStorage.setItem('iams_user', JSON.stringify(userModel));
           
           // Update state
           setToken(authToken);
-          setUser(userData);
+          setUser(userModel);
         }
         
         return { 
           success: true, 
-          user: userData, 
+          user: userModel, 
           requiresApproval: response.requiresApproval 
         };
       } else {

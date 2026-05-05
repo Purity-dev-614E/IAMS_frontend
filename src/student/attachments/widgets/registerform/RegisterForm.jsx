@@ -24,7 +24,7 @@ const RegisterForm = ({
           <input 
             type="text" 
             placeholder="e.g. Safaricom PLC, KCB Group, Nation Media Group"
-            value={formData.organization}
+            value={formData.organization || ''}
             onChange={(e) => onInputChange('organization', e.target.value)}
           />
         </div>
@@ -37,7 +37,7 @@ const RegisterForm = ({
             <input 
               type="text" 
               placeholder="Full name"
-              value={formData.supervisorName}
+              value={formData.supervisorName || ''}
               onChange={(e) => onInputChange('supervisorName', e.target.value)}
             />
           </div>
@@ -49,7 +49,7 @@ const RegisterForm = ({
             <input 
               type="email" 
               placeholder="supervisor@company.com"
-              value={formData.supervisorEmail}
+              value={formData.supervisorEmail || ''}
               onChange={(e) => onInputChange('supervisorEmail', e.target.value)}
             />
           </div>
@@ -66,7 +66,7 @@ const RegisterForm = ({
             </label>
             <input 
               type="date" 
-              value={formData.startDate}
+              value={formData.startDate || ''}
               onChange={(e) => onInputChange('startDate', e.target.value)}
             />
           </div>
@@ -77,7 +77,7 @@ const RegisterForm = ({
             </label>
             <input 
               type="date" 
-              value={formData.endDate}
+              value={formData.endDate || ''}
               onChange={(e) => onInputChange('endDate', e.target.value)}
             />
           </div>

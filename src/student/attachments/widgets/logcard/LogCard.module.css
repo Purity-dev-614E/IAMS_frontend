@@ -1,0 +1,169 @@
+.logCard {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.logCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.lcHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lcDate {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.statusPill {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.pillDraft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pillSubmitted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.pillReviewed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.lcBody {
+  padding: 1.5rem;
+}
+
+.logSection {
+  margin-bottom: 1.5rem;
+}
+
+.logSection:last-child {
+  margin-bottom: 0;
+}
+
+.logSection h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.logSection p {
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.lcFooter {
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lcMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.organizationName {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.submittedDate {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.lcActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btnEdit,
+.btnSubmit,
+.btnDelete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnEdit {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btnEdit:hover {
+  background: #e5e7eb;
+}
+
+.btnSubmit {
+  background: #3b82f6;
+  color: white;
+}
+
+.btnSubmit:hover {
+  background: #2563eb;
+}
+
+.btnDelete {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.btnDelete:hover {
+  background: #fee2e2;
+}
+
+@media (max-width: 768px) {
+  .lcHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .lcFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .lcActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

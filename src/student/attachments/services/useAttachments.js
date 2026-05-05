@@ -12,7 +12,9 @@ export const useAttachments = () => {
     setError(null);
     try {
       const data = await attachmentService.getMyAttachments();
-      setAttachments(data.map(attachment => 
+      // Handle different response structures
+      const attachmentsArray = Array.isArray(data) ? data : data.attachments || data.data || [];
+      setAttachments(attachmentsArray.map(attachment => 
         attachmentService.formatAttachmentForDisplay(attachment)
       ));
     } catch (err) {

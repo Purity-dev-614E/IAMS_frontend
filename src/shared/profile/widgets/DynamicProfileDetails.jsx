@@ -125,7 +125,7 @@ const DynamicProfileDetails = ({ user, onSave, isLoading }) => {
           <div className={styles.fieldLabel}>
             Email address <span className={styles.fieldHint}>Read only</span>
           </div>
-          <div className={styles.readOnly}>{formData.email}</div>
+          <div className={styles.readOnly}><span>{formData.email}</span></div>
         </div>
         <div className={styles.field}>
           <div className={styles.fieldLabel}>

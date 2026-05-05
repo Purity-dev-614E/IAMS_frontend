@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './AdminDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import AdminTopbar from '../widgets/AdminTopbar';
@@ -11,39 +11,32 @@ import SubmissionDonut from '../widgets/SubmissionDonut';
 import QuickActions from '../widgets/QuickActions';
 import RecentActivity from '../widgets/RecentActivity';
 import { useAuth } from '../../../contexts/AuthContext';
+import { profileService } from '../../../shared/profile/profileService';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const [profileData, setProfileData] = useState(null);
 
-  const adminNavigationItems = [
-    {
-      title: 'System',
-      items: [
-        { to: '/admin', label: 'Dashboard', icon: '▦' },
-        { to: '/admin/users', label: 'Users', icon: '◉' },
-        { to: '/admin/students', label: 'Students', icon: '⊞' },
-        { to: '/admin/attachments', label: 'Attachments', icon: '◎' },
-      ]
-    },
-    {
-      title: 'Actions',
-      items: [
-        { to: '/admin/supervisors/pending', label: 'Supervisor Approval', icon: '✓' },
-        { to: '/admin/reports', label: 'Reports', icon: '↓' },
-      ]
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      const profile = await profileService.fetchProfile();
+      setProfileData(profile);
+    } catch (error) {
+      console.error('Profile fetch error:', error);
     }
-  ];
+  };
 
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
       <AppSidebar 
-        navigationItems={adminNavigationItems} 
-        user={user ? {
-          initials: 'AD',
-          name: user.name || 'Admin',
-          role: 'System Administrator'
-        } : null}
+        navigationItems={profileService.getNavigationItems(profileData || user)} 
+        user={profileService.getUserDisplayInfo(profileData || user)}
       />
       
       {/* MAIN */}

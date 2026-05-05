@@ -1,15 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './UserModal.module.css';
+import { userApi } from '../services/userApi';
 
-const UserModal = ({ isOpen, onClose, mode = 'create', user = null }) => {
+const UserModal = ({ isOpen, onClose, mode = 'create', user = null, onUserUpdated }) => {
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    role: user?.role || 'student',
-    status: user?.status || 'active',
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: 'student',
+    status: 'active',
     tempPassword: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Initialize form data when user prop changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (mode === 'edit' && user) {
+        setFormData({
+          firstName: user.firstName || user.name?.split(' ')[0] || '',
+          lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
+          email: user.email || '',
+          role: user.role || 'student',
+          status: user.status || 'active',
+          tempPassword: ''
+        });
+      } else {
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          role: 'student',
+          status: 'active',
+          tempPassword: ''
+        });
+      }
+      setError('');
+    }
+  }, [isOpen, mode, user]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -18,10 +47,47 @@ const UserModal = ({ isOpen, onClose, mode = 'create', user = null }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log('Form data:', formData);
-    onClose();
+  const handleSubmit = async () => {
+    // Basic validation
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      setError('First name and last name are required');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (mode === 'create' && !formData.tempPassword.trim()) {
+      setError('Temporary password is required for new users');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const userData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        role: formData.role,
+        status: formData.status
+      };
+
+      if (mode === 'create') {
+        userData.tempPassword = formData.tempPassword.trim();
+        await userApi.createUser(userData);
+      } else {
+        await userApi.updateUser(user.id, userData);
+      }
+
+      onUserUpdated?.();
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Failed to save user');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -38,6 +104,11 @@ const UserModal = ({ isOpen, onClose, mode = 'create', user = null }) => {
           </button>
         </div>
         <div className={styles.modalBody}>
+          {error && (
+            <div className={styles.errorMessage}>
+              {error}
+            </div>
+          )}
           <div className={styles.modalRow}>
             <div className={styles.modalField}>
               <div className={styles.modalFieldLabel}>First name</div>
@@ -107,11 +178,19 @@ const UserModal = ({ isOpen, onClose, mode = 'create', user = null }) => {
           </div>
         </div>
         <div className={styles.modalFooter}>
-          <button className={styles.btnGhost} onClick={onClose}>
+          <button 
+            className={styles.btnGhost} 
+            onClick={onClose}
+            disabled={loading}
+          >
             Cancel
           </button>
-          <button className={styles.btnPrimary} onClick={handleSubmit}>
-            {mode === 'create' ? 'Create user' : 'Save changes'}
+          <button 
+            className={styles.btnPrimary} 
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : (mode === 'create' ? 'Create user' : 'Save changes')}
           </button>
         </div>
       </div>

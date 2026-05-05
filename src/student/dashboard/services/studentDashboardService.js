@@ -1,4 +1,6 @@
-// import { apiClient } from '../../../apis';
+import { apiClient } from '../../../apis';
+import { API_ROUTES } from '../../../apis/apiRoutes';
+import { Student, Attachment, DailyLog, WeeklyReview, transformToModel, transformToAPI, validateModel, transformError } from '../../../models';
 
 // API integration service for student dashboard
 // Commented out for now - will be re-enabled when backend integration is ready
@@ -20,18 +22,19 @@ export const studentDashboardService = {
     }
   },
 
-  // Transform student data for components
+  // Transform student data for components using Student model
   transformStudentData(student) {
+    const studentModel = transformToModel(student, Student);
     return {
-      id: student.id,
-      name: student.student_name,
-      email: student.student_email,
-      regNumber: student.reg_number,
-      program: student.program,
-      yearOfStudy: student.year_of_study,
+      id: studentModel.studentId,
+      name: student.userName || student.student_name,
+      email: student.userEmail || student.student_email,
+      regNumber: studentModel.registrationNumber,
+      program: studentModel.program,
+      yearOfStudy: studentModel.yearOfStudy,
       supervisorName: student.supervisor_name,
       supervisorEmail: student.supervisor_email,
-      initials: student.student_name
+      initials: studentModel.getDisplayName()
         .split(' ')
         .map(word => word[0])
         .join('')
@@ -40,19 +43,20 @@ export const studentDashboardService = {
     };
   },
 
-  // Transform attachment data for components
+  // Transform attachment data for components using Attachment model
   transformAttachmentData(attachment) {
     if (!attachment) return null;
 
+    const attachmentModel = transformToModel(attachment, Attachment);
     return {
-      id: attachment.id,
-      organizationName: attachment.organization_name,
-      industrySupervisorName: attachment.industry_supervisor_name,
-      industrySupervisorEmail: attachment.industry_supervisor_email,
-      startDate: new Date(attachment.start_date),
-      endDate: new Date(attachment.end_date),
-      status: attachment.status,
-      duration: this.calculateDuration(attachment.start_date, attachment.end_date)
+      id: attachmentModel.attachmentId,
+      organizationName: attachmentModel.organizationName,
+      industrySupervisorName: attachmentModel.industrySupervisorName,
+      industrySupervisorEmail: attachmentModel.industrySupervisorEmail,
+      startDate: new Date(attachmentModel.startDate),
+      endDate: new Date(attachmentModel.endDate),
+      status: attachmentModel.status,
+      duration: attachmentModel.getDurationInDays()
     };
   },
 
@@ -75,39 +79,40 @@ export const studentDashboardService = {
     };
   },
 
-  // Transform weekly reviews for components
+  // Transform weekly reviews for components using WeeklyReview model
   transformWeeklyReviews(reviews) {
-    return reviews.map(review => ({
-      id: review.id,
-      weekNumber: review.week_number,
-      weekStartDate: new Date(review.week_start_date),
-      weekEndDate: new Date(review.week_end_date),
-      status: review.status,
-      industryApproval: review.industry_approval,
-      industryComments: review.industry_comments,
-      industryFeedbackDate: review.industry_feedback_date ? new Date(review.industry_feedback_date) : null,
-      uniRating: review.uni_rating,
-      uniComments: review.uni_comments,
-      uniSupervisorName: review.uni_supervisor_name
-    }));
+    return reviews.map(review => {
+      const reviewModel = transformToModel(review, WeeklyReview);
+      return {
+        id: reviewModel.reviewId,
+        weekNumber: reviewModel.weekNumber,
+        weekStartDate: new Date(reviewModel.weekStartDate),
+        weekEndDate: new Date(reviewModel.weekEndDate),
+        status: reviewModel.status,
+        industryApproval: reviewModel.industryApproval,
+        industryComments: reviewModel.industryComments,
+        industryFeedbackDate: reviewModel.industryFeedbackDate ? new Date(reviewModel.industryFeedbackDate) : null,
+        uniRating: reviewModel.uniRating,
+        uniComments: reviewModel.uniComments,
+        uniSupervisorName: reviewModel.uniSupervisorName
+      };
+    });
   },
 
-  // Calculate duration between two dates
+  // Calculate duration between two dates using Attachment model
   calculateDuration(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const diffWeeks = Math.floor(diffDays / 7);
-    const remainingDays = diffDays % 7;
+    const attachment = new Attachment({ startDate, endDate });
+    const days = attachment.getDurationInDays();
+    const weeks = Math.floor(days / 7);
+    const remainingDays = days % 7;
 
-    if (diffWeeks > 0) {
-      return `${diffWeeks} week${diffWeeks > 1 ? 's' : ''}${remainingDays > 0 ? ` ${remainingDays} day${remainingDays > 1 ? 's' : ''}` : ''}`;
+    if (weeks > 0) {
+      return `${weeks} week${weeks > 1 ? 's' : ''}${remainingDays > 0 ? ` ${remainingDays} day${remainingDays > 1 ? 's' : ''}` : ''}`;
     }
-    return `${diffDays} day${diffDays > 1 ? 's' : ''}`;
+    return `${days} day${days > 1 ? 's' : ''}`;
   },
 
-  // Check if log is due today
+  // Check if log is due today using DailyLog model
   isLogDueToday(lastLogDate) {
     if (!lastLogDate) return true;
     

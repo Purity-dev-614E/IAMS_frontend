@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './MyAttachmentsWidget.module.css';
 import { 
   AttachmentSidebar,
@@ -11,12 +12,12 @@ import {
 import { useAttachments } from '../services/useAttachments';
 
 const MyAttachments = () => {
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState('empty');
   const [formData, setFormData] = useState({
     organization: '',
-    department: '',
-    industrySupervisor: '',
-    industrySupervisorEmail: '',
+    supervisorName: '',
+    supervisorEmail: '',
     startDate: '',
     endDate: ''
   });
@@ -34,9 +35,9 @@ const MyAttachments = () => {
   useEffect(() => {
     if (attachments.length > 0) {
       const latestAttachment = attachments[0];
-      if (latestAttachment.status === 'Active') {
+      if (latestAttachment.status === 'active') {
         setActiveView('active');
-      } else if (latestAttachment.status === 'Pending activation') {
+      } else if (latestAttachment.status === 'pending') {
         setActiveView('pending');
       } else {
         setActiveView('empty');
@@ -68,9 +69,8 @@ const MyAttachments = () => {
   const handleViewLogs = async () => {
     if (attachments.length > 0) {
       try {
-        await getAttachmentLogs(attachments[0].id);
-        // Navigate to logs page
-        console.log('Navigate to logs page');
+        // Navigate to logs page for this attachment
+        navigate('/logs');
       } catch (err) {
         // Error is handled by the hook
       }
@@ -86,9 +86,8 @@ const MyAttachments = () => {
     setActiveView('empty');
     setFormData({
       organization: '',
-      department: '',
-      industrySupervisor: '',
-      industrySupervisorEmail: '',
+      supervisorName: '',
+      supervisorEmail: '',
       startDate: '',
       endDate: ''
     });

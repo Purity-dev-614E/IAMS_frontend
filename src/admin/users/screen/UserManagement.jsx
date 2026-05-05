@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './UserManagement.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import UserTable from '../widgets/UserTable';
@@ -6,6 +6,8 @@ import UserModal from '../widgets/UserModal';
 import ConfirmModal from '../widgets/ConfirmModal';
 import Toast from '../../../shared/widgets/Toast';
 import { useAuth } from '../../../contexts/AuthContext';
+import { userApi } from '../services/userApi';
+import { FiDownload, FiSearch } from 'react-icons/fi';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,77 +43,53 @@ const UserManagement = () => {
     isVisible: false
   });
 
-  // Mock user data
-  const [users] = useState([
-    {
-      name: 'Purity Chelagat Sang',
-      email: 'purity.sang@students.jkuat.ac.ke',
-      role: 'student',
-      status: 'active',
-      registered: '17 Feb 2025',
-      lastActive: 'Today'
-    },
-    {
-      name: 'Grace Wanjiru',
-      email: 'grace.wanjiru@students.jkuat.ac.ke',
-      role: 'student',
-      status: 'active',
-      registered: '17 Feb 2025',
-      lastActive: '2 hrs ago'
-    },
-    {
-      name: 'Dr. Francis Kamau',
-      email: 'f.kamau@jkuat.ac.ke',
-      role: 'uni_sup',
-      status: 'active',
-      registered: '10 Jan 2025',
-      lastActive: 'Yesterday'
-    },
-    {
-      name: 'Dr. Alice Njoroge',
-      email: 'a.njoroge@jkuat.ac.ke',
-      role: 'uni_sup',
-      status: 'pending',
-      registered: '1 Apr 2025',
-      lastActive: 'â'
-    },
-    {
-      name: 'Mr. Samuel Kibet',
-      email: 's.kibet@jkuat.ac.ke',
-      role: 'uni_sup',
-      status: 'pending',
-      registered: '30 Mar 2025',
-      lastActive: 'â'
-    },
-    {
-      name: 'Kevin Mutua',
-      email: 'kevin.mutua@students.jkuat.ac.ke',
-      role: 'student',
-      status: 'active',
-      registered: '17 Feb 2025',
-      lastActive: '3 days ago'
-    },
-    {
-      name: 'Amina Hassan',
-      email: 'amina.hassan@students.jkuat.ac.ke',
-      role: 'student',
-      status: 'deactivated',
-      registered: '17 Feb 2025',
-      lastActive: '2 weeks ago'
-    },
-    {
-      name: 'System Administrator',
-      email: 'admin@jkuat.ac.ke',
-      role: 'admin',
-      status: 'active',
-      registered: '1 Jan 2025',
-      lastActive: 'Today'
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch users from API
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const filters = {
+        role: roleFilter !== 'all' ? roleFilter : undefined,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        search: searchTerm || undefined
+      };
+      const response = await userApi.getUsers(filters);
+      // Map backend response to frontend format
+      const mappedUsers = response.users.map(user => ({
+        ...user,
+        registered: new Date(user.updated_at).toLocaleDateString('en-GB', { 
+          day: 'numeric', 
+          month: 'short', 
+          year: 'numeric' 
+        }),
+        status: user.status || 'active', // Default to active if not provided
+        active: user.active !== false // Default to true if not provided
+      }));
+      setUsers(mappedUsers || []);
+    } catch (err) {
+      if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+        setError('Please login with admin credentials to access user management');
+      } else {
+        setError(err.message);
+        showToast('Failed to fetch users', 'error');
+      }
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [roleFilter, statusFilter, searchTerm]);
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     
@@ -150,26 +128,57 @@ const UserManagement = () => {
     setIsConfirmModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    showToast('Account deleted');
-    setIsConfirmModalOpen(false);
-    setSelectedUser(null);
+  const handleConfirmDelete = async () => {
+    try {
+      await userApi.deleteUser(selectedUser.id);
+      showToast('Account deleted');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      showToast('Failed to delete user', 'error');
+    } finally {
+      setIsConfirmModalOpen(false);
+      setSelectedUser(null);
+    }
   };
 
-  const handleDeactivate = (user) => {
-    showToast('Account deactivated');
+  const handleDeactivate = async (user) => {
+    try {
+      await userApi.deactivateUser(user.id);
+      showToast('Account deactivated');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      showToast('Failed to deactivate user', 'error');
+    }
   };
 
-  const handleReactivate = (user) => {
-    showToast('Account reactivated');
+  const handleReactivate = async (user) => {
+    try {
+      await userApi.reactivateUser(user.id);
+      showToast('Account reactivated');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      showToast('Failed to reactivate user', 'error');
+    }
   };
 
-  const handleApprove = (user) => {
-    showToast('Account approved');
+  const handleApprove = async (user) => {
+    try {
+      await userApi.approveSupervisor(user.id);
+      showToast('Account approved');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      showToast('Failed to approve user', 'error');
+    }
   };
 
-  const handleReject = (user) => {
-    showToast('Account rejected');
+  const handleReject = async (user) => {
+    try {
+      await userApi.rejectSupervisor(user.id);
+      showToast('Account rejected');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      showToast('Failed to reject user', 'error');
+    }
   };
 
   return (
@@ -190,7 +199,10 @@ const UserManagement = () => {
             <div className={styles.topbarSubtitle}>84 users across all roles</div>
           </div>
           <div className={styles.topbarRight}>
-            <button className={styles.btnGhost}>â Export</button>
+            <button className={styles.btnGhost}>
+              <FiDownload style={{marginRight: '6px'}} />
+              Export
+            </button>
             <button className={styles.btnPrimary} onClick={handleCreate}>
               + Create user
             </button>
@@ -201,7 +213,7 @@ const UserManagement = () => {
           <div className={styles.toolbar}>
             <div style={{display: 'flex', gap: '8px', alignItems: 'center', flex: 1, flexWrap: 'wrap'}}>
               <div className={styles.searchWrap}>
-                <span className={styles.searchIcon}>â</span>
+                <FiSearch className={styles.searchIcon} />
                 <input 
                   type="text" 
                   placeholder="Search name or email..."
@@ -217,7 +229,7 @@ const UserManagement = () => {
                 >
                   <option value="all">All roles</option>
                   <option value="student">Students</option>
-                  <option value="uni_sup">Uni supervisors</option>
+                  <option value="uni_supervisor">Uni supervisors</option>
                   <option value="admin">Admins</option>
                 </select>
                 <select 
@@ -228,7 +240,8 @@ const UserManagement = () => {
                   <option value="all">All status</option>
                   <option value="active">Active</option>
                   <option value="pending">Pending</option>
-                  <option value="deactivated">Deactivated</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>
@@ -237,15 +250,25 @@ const UserManagement = () => {
             </div>
           </div>
 
-          <UserTable 
-            users={filteredUsers}
-            onEdit={handleEdit}
-            onDeactivate={handleDeactivate}
-            onReactivate={handleReactivate}
-            onDelete={handleDelete}
-            onApprove={handleApprove}
-            onReject={handleReject}
-          />
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
+              Loading users...
+            </div>
+          ) : error ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--error)' }}>
+              Error: {error}
+            </div>
+          ) : (
+            <UserTable 
+              users={filteredUsers}
+              onEdit={handleEdit}
+              onDeactivate={handleDeactivate}
+              onReactivate={handleReactivate}
+              onDelete={handleDelete}
+              onApprove={handleApprove}
+              onReject={handleReject}
+            />
+          )}
         </div>
       </div>
 
@@ -254,6 +277,7 @@ const UserManagement = () => {
         onClose={() => setIsUserModalOpen(false)}
         mode={modalMode}
         user={selectedUser}
+        onUserUpdated={fetchUsers}
       />
 
       <ConfirmModal 

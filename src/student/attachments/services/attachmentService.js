@@ -1,15 +1,19 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
+import { Attachment, transformToModel, transformToAPI, validateModel, transformError } from '../../../models';
 
 class StudentAttachmentService {
   // Get current student's attachments
   async getMyAttachments() {
     try {
       const data = await apiClient.get(API_ROUTES.attachments.myAttachments);
-      return data;
+      return {
+        ...data,
+        data: transformToModel(data.data || data, Attachment)
+      };
     } catch (error) {
       console.error('Error fetching my attachments:', error);
-      throw new Error('Failed to load your attachments. Please try again.');
+      throw transformError(error);
     }
   }
 
@@ -17,37 +21,50 @@ class StudentAttachmentService {
   async getAttachmentById(id) {
     try {
       const data = await apiClient.get(API_ROUTES.attachments.byId(id));
-      return data;
+      return transformToModel(data, Attachment);
     } catch (error) {
       console.error('Error fetching attachment:', error);
-      if (error.message.includes('404') || error.message.includes('not found')) {
-        throw new Error('Attachment not found');
-      }
-      throw error;
+      throw transformError(error);
     }
   }
 
   // Create new attachment
   async createAttachment(attachmentData) {
     try {
-      const sanitizedData = this.sanitizeAttachmentData(attachmentData);
-      const data = await apiClient.post(API_ROUTES.attachments.create, sanitizedData);
-      return data;
+      const attachment = new Attachment(attachmentData);
+      
+      // Validate the model
+      const validation = validateModel(attachment);
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
+      const apiData = transformToAPI(attachment);
+      const data = await apiClient.post(API_ROUTES.attachments.create, apiData);
+      return transformToModel(data, Attachment);
     } catch (error) {
       console.error('Error creating attachment:', error);
-      throw new Error('Failed to submit attachment. Please check your information and try again.');
+      throw transformError(error);
     }
   }
 
   // Update attachment
   async updateAttachment(id, attachmentData) {
     try {
-      const sanitizedData = this.sanitizeAttachmentData(attachmentData);
-      const data = await apiClient.put(API_ROUTES.attachments.update(id), sanitizedData);
-      return data;
+      const attachment = new Attachment({ ...attachmentData, attachmentId: id });
+      
+      // Validate the model
+      const validation = validateModel(attachment);
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
+      const apiData = transformToAPI(attachment);
+      const data = await apiClient.put(API_ROUTES.attachments.update(id), apiData);
+      return transformToModel(data, Attachment);
     } catch (error) {
       console.error('Error updating attachment:', error);
-      throw new Error('Failed to update attachment. Please try again.');
+      throw transformError(error);
     }
   }
 
@@ -77,10 +94,13 @@ class StudentAttachmentService {
   async getAttachmentLogs(id) {
     try {
       const data = await apiClient.get(API_ROUTES.dailyLogs.byAttachment(id));
-      return data;
+      return {
+        ...data,
+        data: data.data || data // Will be transformed by DailyLog service if needed
+      };
     } catch (error) {
       console.error('Error fetching attachment logs:', error);
-      throw new Error('Failed to load attachment logs.');
+      throw transformError(error);
     }
   }
 
@@ -88,88 +108,55 @@ class StudentAttachmentService {
   async getAttachmentReviews(id) {
     try {
       const data = await apiClient.get(API_ROUTES.weeklyReviews.byAttachment(id));
-      return data;
+      return {
+        ...data,
+        data: data.data || data // Will be transformed by WeeklyReview service if needed
+      };
     } catch (error) {
       console.error('Error fetching attachment reviews:', error);
-      throw new Error('Failed to load attachment reviews.');
+      throw transformError(error);
     }
   }
 
-  // Helper method to sanitize attachment data
+  // Legacy method - kept for backward compatibility
+  // Use Attachment model instead for new code
   sanitizeAttachmentData(data) {
-    const sanitized = { ...data };
-    
-    // Remove any unwanted fields
-    delete sanitized.id;
-    delete sanitized.createdAt;
-    delete sanitized.updatedAt;
-    delete sanitized.status;
-    
-    // Debug logging
-    console.log('Sanitizing attachment data:', sanitized);
-    
-    // Map frontend field names to backend field names
-    const mapped = {
-      organization_name: sanitized.organization,
-      department: sanitized.department,
-      industry_supervisor_name: sanitized.industrySupervisor,
-      industry_supervisor_email: sanitized.industrySupervisorEmail,
-      start_date: sanitized.startDate,
-      end_date: sanitized.endDate
-    };
-    
-    console.log('Mapped attachment data:', mapped);
-    
-    // Ensure required fields are present
-    if (!mapped.organization_name) {
-      throw new Error('Organization name is required');
-    }
-    if (!mapped.department) {
-      throw new Error('Department is required');
-    }
-    if (!mapped.start_date) {
-      throw new Error('Start date is required');
-    }
-    if (!mapped.end_date) {
-      throw new Error('End date is required');
-    }
-    
-    return mapped;
+    const attachment = new Attachment(data);
+    return transformToAPI(attachment);
   }
 
-  // Validate attachment dates
+  // Validate attachment dates using Attachment model
   validateDates(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const today = new Date();
-    
-    if (start > end) {
-      throw new Error('Start date cannot be after end date');
-    }
-    
-    if (start < today.setHours(0, 0, 0, 0)) {
-      throw new Error('Start date cannot be in the past');
-    }
-    
-    return true;
+    const attachment = new Attachment({ startDate, endDate });
+    return attachment.getDurationInDays() >= 0;
   }
 
-  // Calculate attachment duration in weeks
+  // Calculate attachment duration using Attachment model
   calculateDuration(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end - start);
-    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
-    return diffWeeks;
+    const attachment = new Attachment({ startDate, endDate });
+    return attachment.getDurationInDays();
   }
 
-  // Format attachment data for display
+  // Format attachment data for display using Attachment model
   formatAttachmentForDisplay(attachment) {
+    const attachmentModel = new Attachment(attachment);
     return {
       ...attachment,
-      duration: attachment.duration || this.calculateDuration(attachment.startDate, attachment.endDate),
-      status: attachment.status || 'Draft',
-      submissionDate: attachment.submissionDate || new Date().toISOString(),
+      // Map API field names to frontend component prop names using model
+      organization: attachmentModel.organizationName,
+      industrySupervisor: attachmentModel.industrySupervisorName,
+      industrySupervisorEmail: attachmentModel.industrySupervisorEmail,
+      startDate: attachmentModel.startDate,
+      endDate: attachmentModel.endDate,
+      department: attachment.department || '',
+      universitySupervisor: attachment.university_supervisor || 'Not yet assigned',
+      duration: attachment.duration || attachmentModel.getDurationInDays(),
+      status: attachmentModel.status || 'Draft',
+      submissionDate: attachment.created_at || new Date().toISOString(),
+      activationDate: attachment.activation_date,
+      lastLogDate: attachment.last_log_date,
+      currentWeek: attachment.current_week,
+      progress: attachment.progress
     };
   }
 }

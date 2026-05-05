@@ -100,13 +100,13 @@ const StudentTable = ({
                 <div className={styles.sreg}>{student.regNumber}</div>
               </td>
               <td style={{color: 'var(--muted)'}}>
-                {student.program} · Year {student.year}
+                {student.program} · Year {student.year || 'N/A'}
               </td>
               <td>
                 {student.supervisor ? (
                   <span style={{fontSize: '12px'}}>{student.supervisor}</span>
                 ) : (
-                  <span className={styles.warnText}>â Unassigned</span>
+                  <span className={styles.warnText}> Unassigned</span>
                 )}
               </td>
               <td>{getAttachmentBadge(student.attachmentStatus)}</td>

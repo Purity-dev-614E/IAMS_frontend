@@ -1,5 +1,6 @@
 import { apiClient } from '../../apis';
 import { API_ROUTES } from '../../apis/apiRoutes';
+import { User, Student, transformToModel, transformToAPI, validateModel, transformError } from '../../models';
 
 export const profileService = {
   // Fetch user profile data based on role
@@ -14,16 +15,25 @@ export const profileService = {
           // Students have a different endpoint and response structure
           response = await apiClient.get(API_ROUTES.students.profile);
           if (response?.student) {
-            // Transform student response to match user structure
+            // Transform student response using Student model
+            const student = transformToModel(response.student, Student);
+            const user = new User({
+              userId: student.userId,
+              userName: response.student.student_name,
+              userEmail: response.student.student_email,
+              userRole: 'student'
+            });
+            
             return {
-              ...response.student,
-              id: response.student.id,
-              name: response.student.student_name,
-              email: response.student.student_email,
-              role: 'student',
-              regNumber: response.student.reg_number,
-              program: response.student.program,
-              yearOfStudy: response.student.year_of_study,
+              ...student,
+              ...user,
+              id: student.studentId,
+              name: user.userName,
+              email: user.userEmail,
+              role: user.userRole,
+              regNumber: student.registrationNumber,
+              program: student.program,
+              yearOfStudy: student.yearOfStudy,
               supervisorName: response.student.supervisor_name,
               supervisorEmail: response.student.supervisor_email,
               attachmentCount: response.student.attachment_count
@@ -37,7 +47,7 @@ export const profileService = {
           // Admin and uni_supervisor use the generic auth/me endpoint
           response = await apiClient.get(API_ROUTES.auth.profile);
           if (response?.user) {
-            return response.user;
+            return transformToModel(response.user, User);
           }
           break;
       }
@@ -45,7 +55,7 @@ export const profileService = {
       throw new Error('Invalid profile response structure');
     } catch (error) {
       console.error('Profile fetch error:', error);
-      throw error;
+      throw transformError(error);
     }
   },
 
@@ -61,12 +71,18 @@ export const profileService = {
         case 'student':
           // Students might have a different update endpoint
           endpoint = API_ROUTES.students.profile;
-          // Transform update data for student structure
+          // Transform update data for student structure using models
+          const user = new User({
+            userName: updateData.name,
+            userEmail: updateData.email
+          });
+          
           const studentUpdateData = {
-            student_name: updateData.name,
-            student_email: updateData.email,
+            student_name: user.userName,
+            student_email: user.userEmail,
             phone: updateData.phone
           };
+          
           response = await apiClient.put(endpoint, studentUpdateData);
           break;
           
@@ -75,7 +91,16 @@ export const profileService = {
         default:
           // Admin and uni_supervisor use generic auth/profile endpoint
           endpoint = API_ROUTES.auth.updateProfile;
-          response = await apiClient.put(endpoint, updateData);
+          const userUpdateData = new User(updateData);
+          
+          // Validate the model
+          const validation = validateModel(userUpdateData);
+          if (!validation.isValid) {
+            throw new Error(validation.errors.join(', '));
+          }
+          
+          const apiData = transformToAPI(userUpdateData);
+          response = await apiClient.put(endpoint, apiData);
           break;
       }
       
@@ -87,7 +112,7 @@ export const profileService = {
       throw new Error('Profile update failed');
     } catch (error) {
       console.error('Profile update error:', error);
-      throw error;
+      throw transformError(error);
     }
   },
 
@@ -98,36 +123,45 @@ export const profileService = {
       return response?.success || false;
     } catch (error) {
       console.error('Password change error:', error);
-      throw error;
+      throw transformError(error);
     }
   },
 
-  // Get user display information for sidebar
+  // Get user display information for sidebar using User model
   getUserDisplayInfo(user) {
     if (!user) return { initials: 'U', name: 'User', role: 'User' };
     
-    const initials = user.name 
-      ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-      : 'U';
+    const userModel = new User(user);
+    const initials = userModel.getDisplayName()
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
     
-    let roleDisplay = user.role;
-    if (user.role === 'uni_supervisor') roleDisplay = 'University Supervisor';
-    if (user.role === 'student' && user.program) {
+    let roleDisplay = userModel.userRole;
+    if (userModel.isUniSupervisor()) roleDisplay = 'University Supervisor';
+    if (userModel.isStudent() && user.program) {
       roleDisplay = `Student · ${user.program}`;
     }
     
     return {
       initials,
-      name: user.name || 'User',
+      name: userModel.getDisplayName(),
       role: roleDisplay
     };
   },
 
   // Get navigation items based on user role
   getNavigationItems(user) {
-    if (!user) return [];
+    // Check for both role and userRole properties
+    const userRole = user?.role || user?.userRole;
+    
+    if (!user) {
+      return [];
+    }
 
-    switch (user.role) {
+    switch (userRole) {
       case 'admin':
         return [
           {
@@ -173,6 +207,7 @@ export const profileService = {
             items: [
               { to: '/dashboard', label: 'Dashboard', icon: '▦' },
               { to: '/attachments', label: 'My Attachments', icon: '⊞' },
+              { to: '/logs', label: 'My Logs', icon: '📋' },
               { to: '/logs/new', label: 'Daily Logs', icon: '📝' },
               { to: '/reviews', label: 'Weekly Reviews', icon: '📊' },
             ]

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProfileScreen.module.css';
 import AppSidebar from '../../components/AppSidebar/AppSidebar';
-import DynamicProfileDetails from '../widgets/DynamicProfileDetails';
+import ProfileCard from '../widgets/ProfileCard';
 import PasswordChange from '../../../student/profile/widgets/PasswordChange';
 import Toast from '../../widgets/Toast';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -39,23 +39,6 @@ const ProfileScreen = () => {
     }
   };
 
-  const updateProfileData = async (updateData) => {
-    setIsLoading(true);
-    try {
-      const updatedProfile = await profileService.updateProfile(updateData);
-      setProfileData(updatedProfile);
-      updateUser(updatedProfile);
-      showToast('Profile updated successfully');
-      return true;
-    } catch (error) {
-      showToast('Failed to update profile', 'error');
-      console.error('Profile update error:', error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const changePassword = async (passwordData) => {
     setIsLoading(true);
     try {
@@ -87,10 +70,6 @@ const ProfileScreen = () => {
       ...prev,
       isVisible: false
     }));
-  };
-
-  const handleProfileUpdate = async (updateData) => {
-    return await updateProfileData(updateData);
   };
 
   const handlePasswordChange = async (passwordData) => {
@@ -139,11 +118,7 @@ const ProfileScreen = () => {
         {/* CONTENT */}
         <div className={styles.content}>
           <div className={styles.contentInner}>
-            <DynamicProfileDetails 
-              user={profileData || user} 
-              onSave={handleProfileUpdate}
-              isLoading={isLoading}
-            />
+            <ProfileCard user={profileData || user} />
             <PasswordChange 
               onSave={handlePasswordChange}
               isLoading={isLoading}

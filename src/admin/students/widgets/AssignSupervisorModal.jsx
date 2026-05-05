@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './AssignSupervisorModal.module.css';
+import Button from '../../../shared/components/Button/Button';
+import { studentApi } from '../services/studentServices';
 
 const AssignSupervisorModal = ({ 
   isOpen, 
@@ -9,19 +11,58 @@ const AssignSupervisorModal = ({
   onAssign 
 }) => {
   const [supervisor, setSupervisor] = useState('');
+  const [availableSupervisors, setAvailableSupervisors] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const supervisors = [
-    { id: 1, name: 'Dr. Francis Kamau', load: 8 },
-    { id: 2, name: 'Dr. Omondi', load: 7 },
-    { id: 3, name: 'Dr. Waweru', load: 6 },
-    { id: 4, name: 'Dr. Alice Njoroge', load: 0, pending: true }
-  ];
+  // Fetch available supervisors
+  useEffect(() => {
+    const fetchSupervisors = async () => {
+      try {
+        const response = await studentApi.getAvailableSupervisors();
+        // Handle the new response structure
+        const supervisors = response.supervisors || [];
+        setAvailableSupervisors(Array.isArray(supervisors) ? supervisors : []);
+      } catch (error) {
+        console.error('Failed to fetch supervisors:', error);
+        setAvailableSupervisors([]);
+      }
+    };
+    
+    if (isOpen) {
+      fetchSupervisors();
+    }
+  }, [isOpen]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!supervisor) return;
-    onAssign(supervisor);
-    onClose();
-    setSupervisor('');
+    
+    console.log('Assigning supervisor:', supervisor);
+    console.log('Selected students:', selectedStudents);
+    
+    setLoading(true);
+    try {
+      if (mode === 'single') {
+        const studentId = selectedStudents[0]?.id;
+        console.log('Single assignment - Student ID:', studentId, 'Supervisor ID:', supervisor);
+        if (studentId) {
+          await studentApi.assignSupervisor(studentId, supervisor);
+        }
+      } else {
+        const assignments = selectedStudents.map(student => ({
+          studentId: student.id,
+          supervisorId: supervisor
+        }));
+        console.log('Bulk assignment:', assignments);
+        await studentApi.bulkAssignSupervisors(assignments);
+      }
+      
+      onAssign(supervisor);
+      setSupervisor('');
+    } catch (error) {
+      console.error('Assignment failed:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -33,16 +74,23 @@ const AssignSupervisorModal = ({
           <span className={styles.modalTitle}>
             {mode === 'bulk' ? 'Bulk assign supervisor' : 'Assign supervisor'}
           </span>
-          <button className={styles.modalClose} onClick={onClose}>
+          <Button 
+            variant="ghost" 
+            size="small"
+            onClick={onClose}
+            className={styles.modalClose}
+          >
             ×
-          </button>
+          </Button>
         </div>
         <div className={styles.modalBody}>
           {mode === 'single' ? (
             <div className={styles.modalField}>
               <div className={styles.modalFieldLabel}>Student</div>
               <div className={styles.studentDisplay}>
-                Brian Otieno â HDB212-0112/2022
+                {selectedStudents.length > 0 && selectedStudents[0]?.name}
+                {selectedStudents.length > 0 && ' • '}
+                {selectedStudents.length > 0 && selectedStudents[0]?.regNumber}
               </div>
             </div>
           ) : (
@@ -59,34 +107,37 @@ const AssignSupervisorModal = ({
           )}
           
           <div className={styles.modalField}>
-            <div className={styles.modalFieldLabel}>Assign university supervisor</div>
+            <div className={styles.modalFieldLabel}>Supervisor</div>
             <select 
+              className={styles.modalSelect}
               value={supervisor}
               onChange={(e) => setSupervisor(e.target.value)}
+              disabled={loading}
             >
               <option value="">Select supervisor...</option>
-              {supervisors.map((sup) => (
-                <option key={sup.id} value={sup.id}>
-                  {sup.name} ({sup.load} students{sup.pending ? ' â pending approval' : ''})
+              {availableSupervisors.map(supervisor => (
+                <option 
+                  key={supervisor.id} 
+                  value={supervisor.id}
+                  disabled={!supervisor.is_available}
+                >
+                  {supervisor.name} ({supervisor.current_student_count}/{supervisor.max_student_limit} students) 
+                  {!supervisor.is_available && ' - FULL'}
                 </option>
               ))}
             </select>
-            <div className={styles.modalFieldHint}>
-              Current load shown in brackets. Pending supervisors cannot be assigned until approved.
-            </div>
           </div>
         </div>
+        
         <div className={styles.modalFooter}>
-          <button className={styles.btnGhost} onClick={onClose}>
-            Cancel
-          </button>
-          <button 
-            className={styles.btnPrimary} 
+          <Button 
+            variant="primary"
             onClick={handleSubmit}
-            disabled={!supervisor}
+            disabled={loading || !supervisor}
+            loading={loading}
           >
-            {mode === 'bulk' ? 'Confirm assignment' : 'Save assignment'}
-          </button>
+            {mode === 'bulk' ? 'Assign to all' : 'Assign'}
+          </Button>
         </div>
       </div>
     </div>

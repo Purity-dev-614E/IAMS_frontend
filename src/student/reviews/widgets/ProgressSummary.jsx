@@ -1,21 +1,26 @@
 import React from 'react';
 import styles from './ProgressSummary.module.css';
 
-const ProgressSummary = () => {
+const ProgressSummary = ({ weeklyReviews = [] }) => {
+  // Calculate real statistics from the reviews data
+  const weeksElapsed = weeklyReviews.length || 0;
+  const completedReviews = weeklyReviews.filter(review => review.status === 'complete').length;
+  const inProgressReviews = weeklyReviews.filter(review => review.status === 'in-progress').length;
+  
   return (
     <div className={styles.progressSummary}>
       <div className={styles.psStat}>
-        <div className={styles.psNum}>6</div>
+        <div className={styles.psNum}>{weeksElapsed}</div>
         <div className={styles.psLabel}>Weeks elapsed</div>
       </div>
       <div className={styles.psDivider}></div>
       <div className={styles.psStat}>
-        <div className={styles.psNum}>5</div>
+        <div className={styles.psNum}>{completedReviews}</div>
         <div className={styles.psLabel}>Reviews complete</div>
       </div>
       <div className={styles.psDivider}></div>
       <div className={styles.psStat}>
-        <div className={styles.psNum}>1</div>
+        <div className={styles.psNum}>{inProgressReviews}</div>
         <div className={styles.psLabel}>In progress</div>
       </div>
       <div className={styles.psDivider}></div>

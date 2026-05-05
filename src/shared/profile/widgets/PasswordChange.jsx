@@ -7,7 +7,10 @@ const PasswordChange = ({ onSave }) => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [showPasswords, setShowPasswords] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    new: false,
+    confirm: false
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,8 +44,12 @@ const PasswordChange = ({ onSave }) => {
     });
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPasswords(!showPasswords);
+  const togglePasswordVisibility = (field) => {
+    // Only allow toggling for new and confirm passwords, not current password for security
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
   };
 
   return (
@@ -56,20 +63,13 @@ const PasswordChange = ({ onSave }) => {
           <label>Current Password</label>
           <div className={styles.passwordInput}>
             <input
-              type={showPasswords ? 'text' : 'password'}
+              type="password"
               name="currentPassword"
               value={formData.currentPassword}
               onChange={handleChange}
               className={styles.input}
               required
             />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className={styles.toggleButton}
-            >
-              {showPasswords ? '👁️' : '👁️‍🗨️'}
-            </button>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ const PasswordChange = ({ onSave }) => {
           <label>New Password</label>
           <div className={styles.passwordInput}>
             <input
-              type={showPasswords ? 'text' : 'password'}
+              type={showPasswords.new ? 'text' : 'password'}
               name="newPassword"
               value={formData.newPassword}
               onChange={handleChange}
@@ -86,10 +86,10 @@ const PasswordChange = ({ onSave }) => {
             />
             <button
               type="button"
-              onClick={togglePasswordVisibility}
+              onClick={() => togglePasswordVisibility('new')}
               className={styles.toggleButton}
             >
-              {showPasswords ? '👁️' : '👁️‍🗨️'}
+              {showPasswords.new ? '👁️' : '👁️‍🗨️'}
             </button>
           </div>
           <div className={styles.requirements}>
@@ -101,7 +101,7 @@ const PasswordChange = ({ onSave }) => {
           <label>Confirm New Password</label>
           <div className={styles.passwordInput}>
             <input
-              type={showPasswords ? 'text' : 'password'}
+              type={showPasswords.confirm ? 'text' : 'password'}
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
@@ -110,10 +110,10 @@ const PasswordChange = ({ onSave }) => {
             />
             <button
               type="button"
-              onClick={togglePasswordVisibility}
+              onClick={() => togglePasswordVisibility('confirm')}
               className={styles.toggleButton}
             >
-              {showPasswords ? '👁️' : '👁️‍🗨️'}
+              {showPasswords.confirm ? '👁️' : '👁️‍🗨️'}
             </button>
           </div>
         </div>

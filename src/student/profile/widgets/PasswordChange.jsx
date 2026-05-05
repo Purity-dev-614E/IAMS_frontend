@@ -11,7 +11,6 @@ const PasswordChange = ({ onSave, isLoading }) => {
 
   const [errors, setErrors] = useState({});
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
     new: false,
     confirm: false
   });
@@ -40,6 +39,9 @@ const PasswordChange = ({ onSave, isLoading }) => {
   };
 
   const togglePasswordVisibility = (field) => {
+    // Only allow toggling for new and confirm passwords, not current password for security
+    if (field === 'current') return;
+    
     setShowPasswords(prev => ({
       ...prev,
       [field]: !prev[field]
@@ -92,6 +94,9 @@ const PasswordChange = ({ onSave, isLoading }) => {
       <div className={styles.sectionHeader}>
         <div className={styles.sectionTitle}>Change password</div>
         <div className={styles.sectionSubtitle}>Choose a strong password of at least 8 characters</div>
+        <div className={styles.securityNote}>
+          ⚠️ For security, your current password will never be visible. Never share your password with anyone.
+        </div>
       </div>
       <div className={styles.sectionBody}>
         <div className={styles.field}>
@@ -100,18 +105,12 @@ const PasswordChange = ({ onSave, isLoading }) => {
           </div>
           <div className={styles.passwordWrap}>
             <input 
-              type={showPasswords.current ? 'text' : 'password'}
+              type="password"
               value={formData.currentPassword}
               onChange={(e) => handleInputChange('currentPassword', e.target.value)}
               placeholder="Enter your current password"
               className={`${styles.input} ${errors.currentPassword ? styles.error : ''}`}
             />
-            <button 
-              className={styles.passwordEye}
-              onClick={() => togglePasswordVisibility('current')}
-            >
-              {showPasswords.current ? 'ð' : 'ð'}
-            </button>
           </div>
         </div>
         

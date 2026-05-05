@@ -1,16 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './WeeklyReviewsNew.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
-import { studentNavigation } from '../../../shared/components/AppSidebar/sidebarConfig';
+import { profileService } from '../../../shared/profile/profileService';
+import { useAuth } from '../../../contexts/AuthContext';
 import ReviewsTopbar from '../widgets/ReviewsTopbar';
 import ProgressSummary from '../widgets/ProgressSummary';
 import ReviewCard from '../widgets/ReviewCard';
+import { weeklyReviewService } from '../services/weeklyReviewService';
 
 const WeeklyReviews = () => {
-  const user = {
-    name: 'Purity Sang',
-    role: 'Student · BBIT',
-    initials: 'PS'
+  const [profileData, setProfileData] = useState(null);
+  const [weeklyReviews, setWeeklyReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState(null);
+  const { user } = useAuth();
+
+  // Fetch profile data and weekly reviews on component mount
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Fetching weekly reviews data...');
+      
+      const [profile, reviewsResponse] = await Promise.all([
+        profileService.fetchProfile(),
+        weeklyReviewService.getMyReviews()
+      ]);
+      
+      console.log('📊 API Response:', reviewsResponse);
+      console.log('📋 Profile Data:', profile);
+      
+      setProfileData(profile);
+      
+      // Extract reviews data from API response (API returns {success, reviews, pagination})
+      const reviewsData = reviewsResponse.reviews || [];
+      console.log('📝 Reviews Data:', reviewsData);
+      console.log('📄 Pagination:', reviewsResponse.pagination);
+      
+      // Set pagination info
+      setPagination(reviewsResponse.pagination);
+      
+      // Transform API data to match component format
+      const transformedReviews = reviewsData.map(review => 
+        weeklyReviewService.transformReviewData(review)
+      );
+      console.log('🔄 Transformed Reviews:', transformedReviews);
+      
+      setWeeklyReviews(transformedReviews);
+    } catch (error) {
+      console.error('❌ Data fetch error:', error);
+      console.log('🔄 Falling back to mock data...');
+      // Fallback to mock data if API fails
+      setWeeklyReviews(getMockData());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMockData = () => {
+    // Return the existing mock data as fallback
+    return [week6Data, week5Data, week4Data, week3Data];
   };
 
   const week6Data = {
@@ -131,21 +183,61 @@ const WeeklyReviews = () => {
     status: 'complete'
   };
 
+  if (loading) {
+    console.log('⏳ Loading state - weeklyReviews:', weeklyReviews.length);
+    return (
+      <div className={styles.shell}>
+        <AppSidebar 
+          navigationItems={profileService.getNavigationItems(profileData || user)} 
+          user={profileService.getUserDisplayInfo(profileData || user)}
+        />
+        
+        <div className={styles.main}>
+          <ReviewsTopbar />
+          
+          <div className={styles.content}>
+            <div className={styles.pageInner}>
+              <div>Loading weekly reviews...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('🎯 Rendering - weeklyReviews count:', weeklyReviews.length);
+  console.log('📋 weeklyReviews data:', weeklyReviews);
+  
   return (
     <div className={styles.shell}>
-      <AppSidebar navigationItems={studentNavigation} user={user} />
+      <AppSidebar 
+        navigationItems={profileService.getNavigationItems(profileData || user)} 
+        user={profileService.getUserDisplayInfo(profileData || user)}
+      />
       
       <div className={styles.main}>
         <ReviewsTopbar />
         
         <div className={styles.content}>
           <div className={styles.pageInner}>
-            <ProgressSummary />
+            <ProgressSummary weeklyReviews={weeklyReviews} />
             
-            <ReviewCard {...week6Data} />
-            <ReviewCard {...week5Data} />
-            <ReviewCard {...week4Data} />
-            <ReviewCard {...week3Data} />
+            {weeklyReviews.length === 0 ? (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>📋</div>
+                <div className={styles.emptyStateTitle}>No weekly reviews yet</div>
+                <div className={styles.emptyStateText}>
+                  Weekly reviews will appear here once you have submitted daily logs and your supervisors have provided feedback.
+                </div>
+                <div className={styles.emptyStateSubtext}>
+                  Keep submitting your daily logs to generate weekly reviews.
+                </div>
+              </div>
+            ) : (
+              weeklyReviews.map((review, index) => (
+                <ReviewCard key={review.reviewId || index} {...review} />
+              ))
+            )}
           </div>
         </div>
       </div>
