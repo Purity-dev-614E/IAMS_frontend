@@ -1,0 +1,85 @@
+.checklist {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.clHeader {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+.clTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.clSub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.clItems {
+  padding: 4px 0;
+}
+
+.clItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.clItem:last-child {
+  border-bottom: none;
+}
+
+.clCheck {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.clCheck.done {
+  background: var(--gbg);
+  border-color: var(--gb);
+  color: var(--green);
+}
+
+.clCheck.pending {
+  background: var(--abg);
+  border-color: var(--ab);
+  color: var(--amber);
+}
+
+.clCheck.locked {
+  background: var(--surface);
+  color: var(--subtle);
+}
+
+.clLabel {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+}
+
+.clLabel.lockedLabel {
+  color: var(--muted);
+}
+
+.clMeta {
+  font-size: 11px;
+  color: var(--subtle);
+}

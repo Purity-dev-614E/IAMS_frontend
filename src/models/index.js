@@ -12,5 +12,6 @@ export { WeeklyReview } from './WeeklyReview';
 export { IndustryFeedback } from './IndustryFeedback';
 export { UniFeedback } from './UniFeedback';
 export { Report } from './Report';
+export { EndOfAttachmentReport } from './EndOfAttachmentReport';
 export { RefreshToken } from './RefreshToken';
 export { ModelTransformer, transformToModel, transformToAPI, transformPaginated, validateModel, transformError, createSuccessResponse, createErrorResponse } from './ModelTransformer';

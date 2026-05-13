@@ -1,0 +1,40 @@
+.filterTabs {
+  display: flex;
+  gap: 4px;
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.filterTab {
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filterTab:hover:not(.active) {
+  background: var(--surface);
+}
+
+.filterTab.active {
+  background: var(--navy);
+  color: #fff;
+}
+
+.filterTabBadge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 5px;
+  border-radius: 100px;
+}

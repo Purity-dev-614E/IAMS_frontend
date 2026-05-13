@@ -1,0 +1,95 @@
+.svBanner {
+  background: var(--gbg);
+  border: 0.5px solid var(--gb);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.svBanner p {
+  font-size: 13px;
+  color: var(--green);
+  flex: 1;
+  line-height: 1.5;
+}
+
+.svBanner strong {
+  font-weight: 500;
+}
+
+.submittedCard {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scHeader {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.sp {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.scBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.srRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.srLabel {
+  font-size: 11px;
+  color: var(--subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.srVal {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.srValMuted {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.scDivider {
+  height: 0.5px;
+  background: var(--border);
+}

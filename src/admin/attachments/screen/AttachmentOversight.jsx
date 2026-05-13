@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './AttachmentOversight.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import StatsCards from '../widgets/StatsCards';
@@ -8,12 +8,16 @@ import DetailDrawer from '../widgets/DetailDrawer';
 import ActivateConfirmModal from '../widgets/ActivateConfirmModal';
 import Toast from '../../../shared/widgets/Toast';
 import { useAuth } from '../../../contexts/AuthContext';
+import attachmentApi from '../services/attachmentServices';
 
 const AttachmentOversight = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isActivateModalOpen, setIsActivateModalOpen] = useState(false);
   const [selectedAttachment, setSelectedAttachment] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { user } = useAuth();
 
   const adminNavigationItems = [
@@ -40,122 +44,33 @@ const AttachmentOversight = () => {
     isVisible: false
   });
 
-  // Mock attachment data
-  const [attachments] = useState([
-    {
-      id: 1,
-      studentName: 'Kevin Mutua',
-      regNumber: 'HDB212-0089/2022',
-      organization: 'Safaricom PLC',
-      orgLocation: 'Nairobi',
-      orgDept: 'IT Dept',
-      industrySupervisor: 'james.mwangi@safaricom.co.ke',
-      industrySupervisorName: 'James Mwangi',
-      period: '7 Apr – 20 Jun',
-      status: 'pending',
-      logs: 0,
-      startDate: '7 Apr 2025',
-      endDate: '20 Jun 2025',
-      uniSupervisor: 'Dr. F. Kamau',
-      assignedDate: '7 Apr 2025',
-      lastLogDate: '—'
-    },
-    {
-      id: 2,
-      studentName: 'James Kariuki',
-      regNumber: 'HDB212-0091/2022',
-      organization: 'NCBA Bank',
-      orgLocation: 'Nairobi',
-      orgDept: 'Technology',
-      industrySupervisor: 'tech.hr@ncbagroup.com',
-      industrySupervisorName: 'Tech HR Team',
-      period: '7 Apr – 20 Jun',
-      status: 'pending',
-      logs: 0,
-      startDate: '7 Apr 2025',
-      endDate: '20 Jun 2025',
-      uniSupervisor: 'Dr. Omondi',
-      assignedDate: '7 Apr 2025',
-      lastLogDate: '—'
-    },
-    {
-      id: 3,
-      studentName: 'Purity Chelagat Sang',
-      regNumber: 'HDB212-0324/2022',
-      organization: 'Safaricom PLC',
-      orgLocation: 'Nairobi',
-      orgDept: 'Software Eng',
-      industrySupervisor: 'j.mwangi@safaricom.co.ke',
-      industrySupervisorName: 'James Mwangi',
-      period: '17 Feb – 2 May',
-      status: 'active',
-      logs: 27,
-      startDate: '17 Feb 2025',
-      endDate: '2 May 2025',
-      uniSupervisor: 'Dr. F. Kamau',
-      assignedDate: '17 Feb 2025',
-      lastLogDate: 'Today, 3 April 2025'
-    },
-    {
-      id: 4,
-      studentName: 'Grace Wanjiru',
-      regNumber: 'HDB212-0204/2022',
-      organization: 'KCB Group',
-      orgLocation: 'Nairobi',
-      orgDept: 'IT',
-      industrySupervisor: 'it.intern@kcbgroup.com',
-      industrySupervisorName: 'IT Department',
-      period: '17 Feb – 2 May',
-      status: 'active',
-      logs: 9,
-      startDate: '17 Feb 2025',
-      endDate: '2 May 2025',
-      uniSupervisor: 'Dr. Omondi',
-      assignedDate: '17 Feb 2025',
-      lastLogDate: '2 days ago'
-    },
-    {
-      id: 5,
-      studentName: 'Amina Hassan',
-      regNumber: 'HDB212-0317/2022',
-      organization: 'Nation Media Group',
-      orgLocation: 'Nairobi',
-      orgDept: 'Digital',
-      industrySupervisor: 'digital@nationmedia.com',
-      industrySupervisorName: 'Digital Team',
-      period: '17 Feb – 2 May',
-      status: 'active',
-      logs: 24,
-      startDate: '17 Feb 2025',
-      endDate: '2 May 2025',
-      uniSupervisor: 'Dr. Waweru',
-      assignedDate: '17 Feb 2025',
-      lastLogDate: 'Yesterday'
-    },
-    {
-      id: 6,
-      studentName: 'Brian Otieno',
-      regNumber: 'HDB212-0112/2022',
-      organization: 'Kenya Power',
-      orgLocation: 'Nairobi',
-      orgDept: 'ICT',
-      industrySupervisor: 'ict@kplc.co.ke',
-      industrySupervisorName: 'ICT Department',
-      period: 'Jan – Mar 2025',
-      status: 'completed',
-      logs: 55,
-      startDate: '6 Jan 2025',
-      endDate: '28 Mar 2025',
-      uniSupervisor: 'Dr. F. Kamau',
-      assignedDate: '6 Jan 2025',
-      lastLogDate: '28 Mar 2025'
+  // Fetch attachments from API
+  const fetchAttachments = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const filters = {
+        status: activeTab === 'all' ? undefined : activeTab,
+        page: 1,
+        limit: 50
+      };
+      const response = await attachmentApi.getAttachments(filters);
+      setAttachments(response.data?.attachments || response.attachments || []);
+    } catch (err) {
+      setError(err.message);
+      showToast('Failed to fetch attachments', 'error');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  const filteredAttachments = attachments.filter(attachment => {
-    if (activeTab === 'all') return true;
-    return attachment.status === activeTab;
-  });
+  // Initial data fetch
+  useEffect(() => {
+    fetchAttachments();
+  }, [activeTab]);
+
+  // Since we fetch data based on activeTab, no need for additional filtering
+  const filteredAttachments = attachments;
 
   const pendingCount = attachments.filter(a => a.status === 'pending').length;
   const activeCount = attachments.filter(a => a.status === 'active').length;
@@ -186,27 +101,63 @@ const AttachmentOversight = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleResend = (attachment) => {
-    showToast('Review email resent');
+  const handleResend = async (attachment) => {
+    try {
+      await attachmentApi.resendReviewEmail(attachment.id);
+      showToast('Review email resent successfully');
+    } catch (error) {
+      showToast('Failed to resend review email', 'error');
+    }
   };
 
-  const handleConfirmActivate = () => {
-    showToast('Attachment activated');
-    setIsActivateModalOpen(false);
-    setSelectedAttachment(null);
+  const handleConfirmActivate = async () => {
+    if (!selectedAttachment) return;
+    
+    try {
+      await attachmentApi.activateAttachment(selectedAttachment.id);
+      showToast('Attachment activated successfully');
+      setIsActivateModalOpen(false);
+      setSelectedAttachment(null);
+      // Refresh the data
+      fetchAttachments();
+    } catch (error) {
+      showToast('Failed to activate attachment', 'error');
+    }
   };
 
-  const handleStatusChange = (attachment, action) => {
-    const actionMessages = {
-      activate: 'Attachment activated',
-      complete: 'Marked as complete',
-      deact: 'Attachment deactivated'
-    };
-    showToast(actionMessages[action] || 'Status changed');
+  const handleStatusChange = async (attachment, action) => {
+    try {
+      let response;
+      switch (action) {
+        case 'activate':
+          response = await attachmentApi.activateAttachment(attachment.id);
+          showToast('Attachment activated successfully');
+          break;
+        case 'complete':
+          response = await attachmentApi.completeAttachment(attachment.id);
+          showToast('Attachment marked as complete');
+          break;
+        case 'deact':
+          response = await attachmentApi.deactivateAttachment(attachment.id);
+          showToast('Attachment deactivated');
+          break;
+        default:
+          showToast('Status changed');
+      }
+      // Refresh the data
+      fetchAttachments();
+    } catch (error) {
+      showToast('Failed to update attachment status', 'error');
+    }
   };
 
-  const handleResendEmail = (attachment) => {
-    showToast('Review email resent to industry supervisor');
+  const handleResendEmail = async (attachment) => {
+    try {
+      await attachmentApi.resendReviewEmail(attachment.id);
+      showToast('Review email resent to industry supervisor');
+    } catch (error) {
+      showToast('Failed to resend review email', 'error');
+    }
   };
 
   return (
@@ -224,7 +175,9 @@ const AttachmentOversight = () => {
         <div className={styles.topbar}>
           <div>
             <div className={styles.topbarTitle}>Attachment Oversight</div>
-            <div className={styles.topbarSubtitle}>{attachments.length} attachments · {pendingCount} pending activation</div>
+            <div className={styles.topbarSubtitle}>
+              {loading ? 'Loading...' : `${attachments.length} attachments · ${pendingCount} pending activation`}
+            </div>
           </div>
           <div className={styles.topbarRight}>
             <button className={styles.btnGhost}>â Export</button>
@@ -252,6 +205,7 @@ const AttachmentOversight = () => {
             onActivate={handleActivate}
             onView={handleView}
             onResend={handleResend}
+            loading={loading}
           />
 
           {/* PAGINATION */}
@@ -280,8 +234,8 @@ const AttachmentOversight = () => {
         isOpen={isActivateModalOpen}
         onClose={() => setIsActivateModalOpen(false)}
         onConfirm={handleConfirmActivate}
-        studentName={selectedAttachment?.studentName}
-        organization={selectedAttachment?.organization}
+        studentName={selectedAttachment?.student_name}
+        organization={selectedAttachment?.organization_name}
       />
 
       <Toast 

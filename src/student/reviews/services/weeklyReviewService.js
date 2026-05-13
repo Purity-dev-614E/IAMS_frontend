@@ -4,26 +4,84 @@ import { API_ROUTES } from '../../../apis/apiRoutes';
 class WeeklyReviewService {
   async getMyReviews(page = 1, limit = 20) {
     try {
-      console.log('🌐 Making API call to:', `${API_ROUTES.weeklyReviews.myReviews}?page=${page}&limit=${limit}`);
-      const response = await apiClient.get(`${API_ROUTES.weeklyReviews.myReviews}?page=${page}&limit=${limit}`);
+      const endpoint = `${API_ROUTES.weeklyReviews.myReviews}?page=${page}&limit=${limit}`;
+      console.log('🌐 Making API call to:', endpoint);
+      console.log('🔑 Auth token:', sessionStorage.getItem('iams_token') ? 'Present' : 'Missing');
+      
+      const response = await apiClient.get(endpoint);
       console.log('📡 Raw API response:', response);
+      console.log('📊 Response type:', typeof response);
+      console.log('📋 Response keys:', response ? Object.keys(response) : 'No response');
+      
+      // Check if response has expected structure
+      if (response && response.reviews) {
+        console.log('✅ Found reviews array:', response.reviews.length, 'items');
+      } else if (response && response.data) {
+        console.log('� Found nested data structure');
+      } else {
+        console.log('⚠️ No reviews found in response');
+      }
+      
+      // Handle different possible response structures
+      let reviews = [];
+      let pagination = null;
+      let success = false;
+      
+      if (response && typeof response === 'object') {
+        // Try different possible structures
+        if (Array.isArray(response)) {
+          // Direct array response
+          reviews = response;
+          success = true;
+        } else if (response.data && Array.isArray(response.data)) {
+          // Nested data array
+          reviews = response.data;
+          success = true;
+        } else if (response.reviews && Array.isArray(response.reviews)) {
+          // Expected structure
+          reviews = response.reviews;
+          pagination = response.pagination || null;
+          success = response.success !== false;
+        } else if (response.data && response.data.reviews && Array.isArray(response.data.reviews)) {
+          // Nested structure
+          reviews = response.data.reviews;
+          pagination = response.data.pagination || null;
+          success = response.data.success !== false;
+        } else {
+          console.warn('⚠️ Unexpected response structure:', response);
+          reviews = [];
+          success = false;
+        }
+      }
       
       const processedResponse = {
-        reviews: response.reviews || [],
-        pagination: response.pagination || {
-          page: 1,
-          limit: 20,
-          total: 0,
-          pages: 0
+        reviews: reviews,
+        pagination: pagination || {
+          page: page,
+          limit: limit,
+          total: reviews.length,
+          pages: Math.ceil(reviews.length / limit)
         },
-        success: response.success || false
+        success: success
       };
       console.log('✅ Processed response:', processedResponse);
       
       return processedResponse;
     } catch (error) {
       console.error('❌ Error fetching weekly reviews:', error);
-      throw error;
+      console.log('🔄 Falling back to empty array...');
+      
+      // Return empty structure instead of throwing to avoid breaking the UI
+      return {
+        reviews: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          pages: 0
+        },
+        success: false
+      };
     }
   }
 

@@ -89,6 +89,21 @@ export const API_ROUTES = {
     byId: (id) => `/reports/${id}`,
   },
 
+  // End of Attachment Reports Routes
+  endOfAttachmentReports: {
+    // Student endpoints
+    submitText: "/end-of-attachment-reports/text",
+    submitPdf: "/end-of-attachment-reports/pdf",
+    myReports: "/end-of-attachment-reports/my-reports",
+    download: (id) => `/end-of-attachment-reports/${id}/download`,
+    
+    // Staff endpoints (Admin/University Supervisor)
+    list: "/end-of-attachment-reports",
+    byId: (id) => `/end-of-attachment-reports/${id}`,
+    review: (id) => `/end-of-attachment-reports/${id}/review`,
+    staffDownload: (id) => `/end-of-attachment-reports/${id}/download`,
+  },
+
   // Industry Supervisor Routes (Token-based)
   industry: {
     review: (token) => `/industry/review/${token}`,

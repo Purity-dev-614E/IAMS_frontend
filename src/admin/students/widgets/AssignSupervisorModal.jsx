@@ -50,7 +50,7 @@ const AssignSupervisorModal = ({
       } else {
         const assignments = selectedStudents.map(student => ({
           studentId: student.id,
-          supervisorId: supervisor
+          uni_supervisor_id: supervisor
         }));
         console.log('Bulk assignment:', assignments);
         await studentApi.bulkAssignSupervisors(assignments);

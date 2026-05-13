@@ -1,0 +1,130 @@
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.viewAll {
+  font-size: 12px;
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--subtle);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.table td {
+  font-size: 12px;
+  color: var(--text);
+  padding: 11px 16px;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #FAFBFF;
+}
+
+.sp {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spPurple {
+  background: var(--pbg);
+  color: var(--purple);
+}
+
+.reportName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.reportDescription {
+  font-size: 11px;
+  color: var(--subtle);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.downloadBtn {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--muted);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.downloadBtn:hover {
+  background: var(--bl);
+  border-color: rgba(27, 79, 216, 0.3);
+  color: var(--blue);
+}

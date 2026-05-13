@@ -46,4 +46,9 @@ export class User extends BaseModel {
   getDisplayName() {
     return this.userName || 'Unknown User';
   }
+
+  // Add role getter for backward compatibility
+  get role() {
+    return this.userRole;
+  }
 }

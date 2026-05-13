@@ -42,13 +42,13 @@ const LoginForm = ({ showPassword, setShowPassword, rememberMe, setRememberMe })
         const userRole = result.user.role;
         switch (userRole) {
           case 'admin':
-            navigate('/admin/dashboard');
+            navigate('/admin');
             break;
           case 'uni_supervisor':
-            navigate('/supervisor/dashboard');
+            navigate('/supervisor');
             break;
           case 'student':
-            navigate('/student/dashboard');
+            navigate('/dashboard');
             break;
           default:
             navigate('/dashboard');

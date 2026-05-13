@@ -1,0 +1,175 @@
+.studentCard {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: sticky;
+  top: 24px;
+}
+
+.scHeader {
+  background: var(--navy);
+  padding: 16px 18px;
+}
+
+.scAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(96, 165, 250, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #60A5FA;
+  margin-bottom: 10px;
+}
+
+.scName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.scReg {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.scBody {
+  padding: 14px 18px;
+}
+
+.scRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.scRow:last-child {
+  margin-bottom: 0;
+}
+
+.scKey {
+  font-size: 11px;
+  color: var(--subtle);
+  flex-shrink: 0;
+  width: 80px;
+}
+
+.scVal {
+  font-size: 12px;
+  color: var(--text);
+  text-align: right;
+}
+
+.scProgress {
+  padding: 12px 18px;
+  border-top: 0.5px solid var(--border);
+}
+
+.spLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.spLabel strong {
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.spTrack {
+  height: 5px;
+  background: var(--surface);
+  border-radius: 100px;
+  border: 0.5px solid var(--border);
+}
+
+.spFill {
+  height: 100%;
+  border-radius: 100px;
+  background: var(--blue);
+}
+
+.scChart {
+  padding: 12px 18px;
+  border-top: 0.5px solid var(--border);
+}
+
+.scChartLabel {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-bottom: 8px;
+}
+
+.chartBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+  transition: height 0.3s;
+}
+
+.chartWeeks {
+  display: flex;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.cw {
+  flex: 1;
+  font-size: 9px;
+  color: var(--subtle);
+  text-align: center;
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
+}
+
+.spRed {
+  background: var(--rbg);
+  color: var(--red);
+}
+
+.spPurple {
+  background: var(--pbg);
+  color: var(--purple);
+}

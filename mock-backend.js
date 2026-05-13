@@ -71,6 +71,66 @@ let users = [
 
 let nextId = 6;
 
+// Mock attachments data
+let attachments = [
+  {
+    id: "uuid-001",
+    organization_name: "Tech Company Ltd",
+    industry_supervisor_name: "John Smith",
+    industry_supervisor_email: "john@techcompany.com",
+    start_date: "2024-01-15T00:00:00.000Z",
+    end_date: "2024-06-15T00:00:00.000Z",
+    status: "active",
+    created_at: "2024-01-10T10:30:00.000Z",
+    student_name: "Alice Johnson",
+    student_email: "alice@university.edu",
+    reg_number: "STD001",
+    program: "Computer Science",
+    year_of_study: 3,
+    supervisor_name: "Dr. Jane Doe",
+    supervisor_email: "jane@university.edu",
+    logs: 15
+  },
+  {
+    id: "uuid-002",
+    organization_name: "Digital Solutions Inc",
+    industry_supervisor_name: "Sarah Williams",
+    industry_supervisor_email: "sarah@digitalsolutions.com",
+    start_date: "2024-02-01T00:00:00.000Z",
+    end_date: "2024-07-01T00:00:00.000Z",
+    status: "pending",
+    created_at: "2024-01-25T14:20:00.000Z",
+    student_name: "Bob Martinez",
+    student_email: "bob@university.edu",
+    reg_number: "STD002",
+    program: "Software Engineering",
+    year_of_study: 3,
+    supervisor_name: "Dr. Robert Chen",
+    supervisor_email: "robert@university.edu",
+    logs: 0
+  },
+  {
+    id: "uuid-003",
+    organization_name: "Innovation Labs",
+    industry_supervisor_name: "Michael Davis",
+    industry_supervisor_email: "michael@innovationlabs.com",
+    start_date: "2023-09-01T00:00:00.000Z",
+    end_date: "2024-02-01T00:00:00.000Z",
+    status: "completed",
+    created_at: "2023-08-20T09:15:00.000Z",
+    student_name: "Carol White",
+    student_email: "carol@university.edu",
+    reg_number: "STD003",
+    program: "Information Technology",
+    year_of_study: 4,
+    supervisor_name: "Dr. Emily Brown",
+    supervisor_email: "emily@university.edu",
+    logs: 45
+  }
+];
+
+let nextAttachmentId = 4;
+
 // Helper function to filter users
 const filterUsers = (users, filters) => {
   return users.filter(user => {

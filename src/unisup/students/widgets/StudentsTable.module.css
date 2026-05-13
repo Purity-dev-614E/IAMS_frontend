@@ -1,0 +1,183 @@
+.card {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--subtle);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.table td {
+  font-size: 12px;
+  color: var(--text);
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #FAFBFF;
+  cursor: pointer;
+}
+
+.studentName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.studentReg {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 1px;
+}
+
+.studentOrg {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.spRed {
+  background: var(--rbg);
+  color: var(--red);
+}
+
+.spPurple {
+  background: var(--pbg);
+  color: var(--purple);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
+}
+
+.flagBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--subtle);
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.flagBtn:hover {
+  background: var(--rbg);
+  border-color: var(--rb);
+  color: var(--red);
+}
+
+.flagBtn.flagged {
+  background: var(--rbg);
+  border-color: var(--rb);
+  color: var(--red);
+}
+
+.viewBtn {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.viewBtn:hover {
+  background: var(--bl);
+  border-color: rgba(27, 79, 216, 0.3);
+  color: var(--blue);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+.paginationInfo {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.paginationButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.paginationBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+  background: var(--w);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.paginationBtn.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}

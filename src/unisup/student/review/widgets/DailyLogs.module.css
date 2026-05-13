@@ -1,0 +1,99 @@
+.logsSection {
+  padding: 14px 18px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.secTitle {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--subtle);
+  margin-bottom: 10px;
+}
+
+.logEntry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.logEntry:last-child {
+  border-bottom: none;
+}
+
+.leDate {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.leDay {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.leDatestr {
+  font-size: 10px;
+  color: var(--subtle);
+}
+
+.leContent {
+  flex: 1;
+}
+
+.leField {
+  margin-bottom: 4px;
+}
+
+.leField:last-child {
+  margin-bottom: 0;
+}
+
+.leFl {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--subtle);
+  margin-bottom: 1px;
+}
+
+.leFt {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.leMissing {
+  font-size: 12px;
+  color: var(--subtle);
+  font-style: italic;
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
+}

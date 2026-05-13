@@ -2,15 +2,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 
 // Token storage management
 export const tokenStorage = {
-  getAccessToken: () => localStorage.getItem('iams_token'),
-  getRefreshToken: () => localStorage.getItem('iams_refresh_token'),
+  getAccessToken: () => sessionStorage.getItem('iams_token'),
+  getRefreshToken: () => sessionStorage.getItem('iams_refresh_token'),
   setTokens: (token, refreshToken) => {
-    if (token) localStorage.setItem('iams_token', token);
-    if (refreshToken) localStorage.setItem('iams_refresh_token', refreshToken);
+    if (token) sessionStorage.setItem('iams_token', token);
+    if (refreshToken) sessionStorage.setItem('iams_refresh_token', refreshToken);
   },
   clearTokens: () => {
-    localStorage.removeItem('iams_token');
-    localStorage.removeItem('iams_refresh_token');
+    sessionStorage.removeItem('iams_token');
+    sessionStorage.removeItem('iams_refresh_token');
   }
 };
 

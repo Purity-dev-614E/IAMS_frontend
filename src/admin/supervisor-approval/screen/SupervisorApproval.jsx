@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { profileService } from '../../../shared/profile/profileService';
+import supervisorApprovalService from '../services/supervisorApprovalService';
 import styles from './SupervisorApproval.module.css';
 import UrgencyBanner from '../widgets/UrgencyBanner';
 import SupervisorCard from '../widgets/SupervisorCard';
@@ -7,61 +10,46 @@ import RejectModal from '../widgets/RejectModal';
 import HistoryTable from '../widgets/HistoryTable';
 import EmptyState from '../widgets/EmptyState';
 import Toast from '../../../shared/widgets/Toast';
+import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 
 const SupervisorApproval = () => {
-  const [pendingSupervisors, setPendingSupervisors] = useState([
-    {
-      id: 1,
-      name: 'Dr. Alice Njoroge',
-      email: 'a.njoroge@jkuat.ac.ke',
-      department: 'ETLM',
-      registeredDate: 'Tuesday 1 Apr 2025',
-      waitingDays: 2,
-      staffId: 'JKUAT/2019/0441'
-    },
-    {
-      id: 2,
-      name: 'Mr. Samuel Kibet',
-      email: 's.kibet@jkuat.ac.ke',
-      department: 'Computing',
-      registeredDate: 'Sunday 30 Mar 2025',
-      waitingDays: 4,
-      staffId: 'JKUAT/2021/0118'
-    },
-    {
-      id: 3,
-      name: 'Dr. Mary Achieng',
-      email: 'm.achieng@jkuat.ac.ke',
-      department: 'ETLM',
-      registeredDate: 'Wednesday 27 Mar 2025',
-      waitingDays: 7,
-      staffId: 'JKUAT/2016/0072'
-    }
-  ]);
+  const { user } = useAuth();
+  const [navigationItems, setNavigationItems] = useState([]);
+  const [userDisplayInfo, setUserDisplayInfo] = useState({});
 
-  const [history, setHistory] = useState([
-    {
-      name: 'Dr. Francis Kamau',
-      email: 'f.kamau@jkuat.ac.ke',
-      department: 'ETLM',
-      actionedDate: '10 Jan 2025',
-      decision: 'Approved'
-    },
-    {
-      name: 'Dr. Omondi',
-      email: 'omondi@jkuat.ac.ke',
-      department: 'Computing',
-      actionedDate: '10 Jan 2025',
-      decision: 'Approved'
-    },
-    {
-      name: 'Prof. Wanjiku',
-      email: 'wanjiku@jkuat.ac.ke',
-      department: 'ETLM',
-      actionedDate: '9 Jan 2025',
-      decision: 'Rejected'
+  // Fetch pending supervisors from API
+  const fetchPendingSupervisors = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await supervisorApprovalService.getPendingSupervisors();
+      
+      const formattedSupervisors = response.supervisors.map(supervisor => 
+        supervisorApprovalService.formatSupervisorForDisplay(supervisor)
+      );
+      
+      setPendingSupervisors(formattedSupervisors);
+    } catch (error) {
+      console.error('Error fetching pending supervisors:', error);
+      setError(error.message);
+      showToast(error.message, 'error');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setNavigationItems(profileService.getNavigationItems(user));
+      setUserDisplayInfo(profileService.getUserDisplayInfo(user));
+      fetchPendingSupervisors();
+    }
+  }, [user]);
+
+  const [pendingSupervisors, setPendingSupervisors] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [removingIds, setRemovingIds] = useState(new Set());
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -98,70 +86,88 @@ const SupervisorApproval = () => {
     setIsRejectModalOpen(true);
   };
 
-  const handleConfirmApprove = () => {
+  const handleConfirmApprove = async () => {
     if (!selectedSupervisor) return;
 
-    // Add to removing animation
-    setRemovingIds(prev => new Set(prev).add(selectedSupervisor.id));
+    try {
+      // Add to removing animation
+      setRemovingIds(prev => new Set(prev).add(selectedSupervisor.id));
 
-    // Remove card after animation
-    setTimeout(() => {
-      setPendingSupervisors(prev => prev.filter(s => s.id !== selectedSupervisor.id));
+      // Call API to approve supervisor
+      await supervisorApprovalService.approveSupervisor(selectedSupervisor.id);
+
+      // Remove card after animation
+      setTimeout(() => {
+        setPendingSupervisors(prev => prev.filter(s => s.id !== selectedSupervisor.id));
+        setRemovingIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(selectedSupervisor.id);
+          return newSet;
+        });
+
+        // Add to history
+        const historyEntry = supervisorApprovalService.formatHistoryEntry(
+          selectedSupervisor, 
+          'approved'
+        );
+        setHistory(prev => [historyEntry, ...prev]);
+
+        showToast(`${selectedSupervisor.name} approved successfully`, 'success');
+        setIsApproveModalOpen(false);
+        setSelectedSupervisor(null);
+      }, 250);
+    } catch (error) {
+      console.error('Error approving supervisor:', error);
+      showToast(error.message, 'error');
+      // Remove from removing set if API call fails
       setRemovingIds(prev => {
         const newSet = new Set(prev);
         newSet.delete(selectedSupervisor.id);
         return newSet;
       });
-
-      // Add to history
-      setHistory(prev => [
-        {
-          name: selectedSupervisor.name,
-          email: selectedSupervisor.email,
-          department: selectedSupervisor.department,
-          actionedDate: 'Today',
-          decision: 'Approved'
-        },
-        ...prev
-      ]);
-
-      showToast(`${selectedSupervisor.name} approved — email sent`, 'success');
-      setIsApproveModalOpen(false);
-      setSelectedSupervisor(null);
-    }, 250);
+    }
   };
 
-  const handleConfirmReject = (reason) => {
+  const handleConfirmReject = async (reason) => {
     if (!selectedSupervisor) return;
 
-    // Add to removing animation
-    setRemovingIds(prev => new Set(prev).add(selectedSupervisor.id));
+    try {
+      // Add to removing animation
+      setRemovingIds(prev => new Set(prev).add(selectedSupervisor.id));
 
-    // Remove card after animation
-    setTimeout(() => {
-      setPendingSupervisors(prev => prev.filter(s => s.id !== selectedSupervisor.id));
+      // Call API to reject supervisor
+      await supervisorApprovalService.rejectSupervisor(selectedSupervisor.id);
+
+      // Remove card after animation
+      setTimeout(() => {
+        setPendingSupervisors(prev => prev.filter(s => s.id !== selectedSupervisor.id));
+        setRemovingIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(selectedSupervisor.id);
+          return newSet;
+        });
+
+        // Add to history
+        const historyEntry = supervisorApprovalService.formatHistoryEntry(
+          selectedSupervisor, 
+          'rejected'
+        );
+        setHistory(prev => [historyEntry, ...prev]);
+
+        showToast(`${selectedSupervisor.name} rejected successfully`, 'error');
+        setIsRejectModalOpen(false);
+        setSelectedSupervisor(null);
+      }, 250);
+    } catch (error) {
+      console.error('Error rejecting supervisor:', error);
+      showToast(error.message, 'error');
+      // Remove from removing set if API call fails
       setRemovingIds(prev => {
         const newSet = new Set(prev);
         newSet.delete(selectedSupervisor.id);
         return newSet;
       });
-
-      // Add to history
-      setHistory(prev => [
-        {
-          name: selectedSupervisor.name,
-          email: selectedSupervisor.email,
-          department: selectedSupervisor.department,
-          actionedDate: 'Today',
-          decision: 'Rejected'
-        },
-        ...prev
-      ]);
-
-      showToast(`${selectedSupervisor.name} rejected — email sent`, 'error');
-      setIsRejectModalOpen(false);
-      setSelectedSupervisor(null);
-    }, 250);
+    }
   };
 
   const handleCloseApproveModal = () => {
@@ -176,7 +182,11 @@ const SupervisorApproval = () => {
 
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
+       <AppSidebar 
+        navigationItems={navigationItems} 
+        user={userDisplayInfo}
+      />
+      {/* <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
           <div className={styles.logoMark}>IA</div>
           <span className={styles.logoLabel}>IAMS · Admin</span>
@@ -225,22 +235,36 @@ const SupervisorApproval = () => {
             </div>
           </div>
         </div>
-      </aside>
+      </aside> */}
 
       <div className={styles.main}>
         <div className={styles.topbar}>
           <div>
             <div className={styles.topbarTitle}>Supervisor Approval</div>
             <div className={styles.topbarSubtitle}>
-              {pendingSupervisors.length} pending · supervisors cannot log in until approved
+              {loading ? 'Loading...' : `${pendingSupervisors.length} pending · supervisors cannot log in until approved`}
             </div>
           </div>
         </div>
 
         <div className={styles.content}>
+          {error && (
+            <div className={styles.errorMessage}>
+              Error: {error}
+              <button 
+                onClick={fetchPendingSupervisors}
+                className={styles.retryButton}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          
           <UrgencyBanner pendingCount={pendingSupervisors.length} />
 
-          {pendingSupervisors.length === 0 ? (
+          {loading ? (
+            <div className={styles.loadingState}>Loading pending supervisors...</div>
+          ) : pendingSupervisors.length === 0 ? (
             <EmptyState />
           ) : (
             <div className={styles.grid}>

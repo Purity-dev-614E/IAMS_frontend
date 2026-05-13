@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   // Load user from localStorage on mount
   useEffect(() => {
     const storedToken = tokenStorage.getAccessToken();
-    const storedUser = localStorage.getItem('iams_user');
+    const storedUser = sessionStorage.getItem('iams_user');
     
     if (storedToken && storedUser) {
       try {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         console.error('Failed to parse stored user data:', err);
         tokenStorage.clearTokens();
-        localStorage.removeItem('iams_user');
+        sessionStorage.removeItem('iams_user');
       }
     }
     setIsLoading(false);
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         
         // Store tokens using tokenStorage
         tokenStorage.setTokens(authToken, refreshToken);
-        localStorage.setItem('iams_user', JSON.stringify(userModel));
+        sessionStorage.setItem('iams_user', JSON.stringify(userModel));
         
         // Update state
         setToken(authToken);
@@ -82,9 +82,9 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout API call failed:', err);
     } finally {
-      // Clear local storage and state
+      // Clear session storage and state
       tokenStorage.clearTokens();
-      localStorage.removeItem('iams_user');
+      sessionStorage.removeItem('iams_user');
       setUser(null);
       setToken(null);
       setError(null);
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = (userData) => {
     setUser(userData);
-    localStorage.setItem('iams_user', JSON.stringify(userData));
+    sessionStorage.setItem('iams_user', JSON.stringify(userData));
   };
 
   const isAuthenticated = () => {
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
         // Store tokens (only if no approval required)
         if (!response.requiresApproval) {
           tokenStorage.setTokens(authToken, refreshToken);
-          localStorage.setItem('iams_user', JSON.stringify(userModel));
+          sessionStorage.setItem('iams_user', JSON.stringify(userModel));
           
           // Update state
           setToken(authToken);

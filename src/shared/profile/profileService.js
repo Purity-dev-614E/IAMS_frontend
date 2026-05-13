@@ -210,6 +210,7 @@ export const profileService = {
               { to: '/logs', label: 'My Logs', icon: '📋' },
               { to: '/logs/new', label: 'Daily Logs', icon: '📝' },
               { to: '/reviews', label: 'Weekly Reviews', icon: '📊' },
+              { to: '/reports', label: 'Final Report', icon: '📄' },
             ]
           },
           {

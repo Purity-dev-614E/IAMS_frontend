@@ -1,6 +1,20 @@
 import React from 'react';
 import styles from './DetailDrawer.module.css';
 
+// Helper function to format date to local readable format
+const formatLocalDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
 const DetailDrawer = ({ 
   isOpen, 
   onClose, 
@@ -46,8 +60,8 @@ const DetailDrawer = ({
         <div className={styles.drow}>
           <div className={styles.di}>
             <div className={styles.dil}>Student</div>
-            <div className={styles.div2}>{attachment.studentName}</div>
-            <div className={styles.divs}>{attachment.regNumber}</div>
+            <div className={styles.div2}>{attachment.student_name}</div>
+            <div className={styles.divs}>{attachment.reg_number}</div>
           </div>
           <div className={styles.di}>
             <div className={styles.dil}>Status</div>
@@ -61,33 +75,33 @@ const DetailDrawer = ({
         </div>
         <div className={styles.di}>
           <div className={styles.dil}>Organization</div>
-          <div className={styles.div2}>{attachment.organization}</div>
-          <div className={styles.divs}>{attachment.orgLocation} · {attachment.orgDept}</div>
+          <div className={styles.div2}>{attachment.organization_name}</div>
+          <div className={styles.divs}>{attachment.start_date} · {attachment.end_date}</div>
         </div>
         <div className={styles.drow}>
           <div className={styles.di}>
             <div className={styles.dil}>Start date</div>
-            <div className={styles.div2}>{attachment.startDate}</div>
+            <div className={styles.div2}>{formatLocalDate(attachment.start_date)}</div>
           </div>
           <div className={styles.di}>
             <div className={styles.dil}>End date</div>
-            <div className={styles.div2}>{attachment.endDate}</div>
+            <div className={styles.div2}>{formatLocalDate(attachment.end_date)}</div>
           </div>
         </div>
         <div className={styles.di}>
           <div className={styles.dil}>Industry supervisor</div>
-          <div className={styles.div2}>{attachment.industrySupervisorName}</div>
-          <div className={styles.divs}>{attachment.industrySupervisor}</div>
+          <div className={styles.div2}>{attachment.industry_supervisor_name}</div>
+          <div className={styles.divs}>{attachment.industry_supervisor_email}</div>
         </div>
         <div className={styles.di}>
           <div className={styles.dil}>University supervisor</div>
-          <div className={styles.div2}>{attachment.uniSupervisor}</div>
-          <div className={styles.divs}>Assigned {attachment.assignedDate}</div>
+          <div className={styles.div2}>{attachment.supervisor_name}</div>
+          <div className={styles.divs}>Assigned {formatLocalDate(attachment.created_at)}</div>
         </div>
         <div className={styles.drow}>
           <div className={styles.di}>
             <div className={styles.dil}>Total logs</div>
-            <div className={styles.div2}>{attachment.logs} submitted</div>
+            <div className={styles.div2}>{attachment.logs || 0} submitted</div>
           </div>
           <div className={styles.di}>
             <div className={styles.dil}>Progress</div>
@@ -110,7 +124,7 @@ const DetailDrawer = ({
         </div>
         <div className={styles.di}>
           <div className={styles.dil}>Last log submitted</div>
-          <div className={styles.div2}>{attachment.lastLogDate}</div>
+          <div className={styles.div2}>{formatLocalDate(attachment.created_at)}</div>
         </div>
         <div className={styles.dsep}></div>
         <div className={styles.statusChange}>

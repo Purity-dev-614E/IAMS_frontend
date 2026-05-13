@@ -1,11 +1,36 @@
 import React from 'react';
 import styles from './AttachmentTable.module.css';
 
+// Helper function to format date to local readable format
+const formatLocalDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
+// Helper function to calculate duration in weeks
+const calculateWeeks = (startDate, endDate) => {
+  if (!startDate || !endDate) return 'N/A';
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end - start);
+  const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+  return `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`;
+};
+
 const AttachmentTable = ({ 
   attachments, 
   onActivate, 
   onView, 
-  onResend 
+  onResend,
+  loading = false
 }) => {
   const getStatusBadge = (status) => {
     const statusClasses = {
@@ -100,27 +125,35 @@ const AttachmentTable = ({
           </tr>
         </thead>
         <tbody>
-          {attachments.map((attachment) => (
-            <tr key={attachment.id}>
-              <td>
-                <div className={styles.sname}>{attachment.studentName}</div>
-                <div className={styles.sreg}>{attachment.regNumber}</div>
+          {loading ? (
+            <tr>
+              <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
+                Loading attachments...
               </td>
-              <td>
-                <div className={styles.org}>{attachment.organization}</div>
-                <div className={styles.orgSup}>{attachment.orgLocation} · {attachment.orgDept}</div>
-              </td>
-              <td style={{fontSize: '12px', color: 'var(--muted)'}}>
-                {attachment.industrySupervisor}
-              </td>
-              <td style={{fontSize: '12px', color: 'var(--muted)', whiteSpace: 'nowrap'}}>
-                {attachment.period}
-              </td>
-              <td>{getStatusBadge(attachment.status)}</td>
-              <td>{getLogsBadge(attachment.logs, attachment.status)}</td>
-              <td>{getActionButtons(attachment)}</td>
             </tr>
-          ))}
+          ) : (
+            attachments.map((attachment) => (
+              <tr key={attachment.id}>
+                <td>
+                  <div className={styles.sname}>{attachment.student_name}</div>
+                  <div className={styles.sreg}>{attachment.reg_number}</div>
+                </td>
+                <td>
+                  <div className={styles.org}>{attachment.organization_name}</div>
+                  <div className={styles.orgSup}>{formatLocalDate(attachment.start_date)} · {formatLocalDate(attachment.end_date)}</div>
+                </td>
+                <td style={{fontSize: '12px', color: 'var(--muted)'}}>
+                  {attachment.industry_supervisor_name}
+                </td>
+                <td style={{fontSize: '12px', color: 'var(--muted)', whiteSpace: 'nowrap'}}>
+                  {calculateWeeks(attachment.start_date, attachment.end_date)}
+                </td>
+                <td>{getStatusBadge(attachment.status)}</td>
+                <td>{getLogsBadge(attachment.logs || 0, attachment.status)}</td>
+                <td>{getActionButtons(attachment)}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

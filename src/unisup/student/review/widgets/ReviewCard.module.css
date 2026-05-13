@@ -1,0 +1,173 @@
+.reviewCard {
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.reviewCard.needsFeedback {
+  border-color: rgba(27, 79, 216, 0.3);
+  box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.06);
+}
+
+/* REVIEW HEADER */
+.rh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: background 0.12s;
+  gap: 12px;
+}
+
+.rh:hover {
+  background: var(--surface);
+}
+
+.rhLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weekBadge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wbNum {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #fff;
+  line-height: 1;
+}
+
+.wbLbl {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+}
+
+.rhTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.rhDates {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 2px;
+}
+
+.rhRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.stages {
+  display: flex;
+  gap: 5px;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 100px;
+}
+
+.sDone {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.sWait {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.sNone {
+  background: var(--surface);
+  color: var(--subtle);
+  border: 0.5px solid var(--border);
+}
+
+.sDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chev {
+  font-size: 14px;
+  color: var(--subtle);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chev.open {
+  transform: rotate(90deg);
+}
+
+/* REVIEW BODY */
+.rb {
+  display: none;
+  border-top: 0.5px solid var(--border);
+}
+
+.rb.open {
+  display: block;
+}
+
+.statusPill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.spGreen {
+  background: var(--gbg);
+  color: var(--green);
+}
+
+.spAmber {
+  background: var(--abg);
+  color: var(--amber);
+}
+
+.spBlue {
+  background: var(--bl);
+  color: var(--blue);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
+}
+
+.spRed {
+  background: var(--rbg);
+  color: var(--red);
+}
+
+.spPurple {
+  background: var(--pbg);
+  color: var(--purple);
+}

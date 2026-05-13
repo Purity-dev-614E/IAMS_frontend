@@ -86,10 +86,10 @@ export const studentApi = {
   },
 
   // Assign supervisor to student
-  assignSupervisor: async (studentId, supervisorId) => {
+  assignSupervisor: async (studentId, uni_supervisor_id) => {
     try {
       const response = await apiClient.put(API_ROUTES.students.assignSupervisor(studentId), {
-        supervisorId
+        uni_supervisor_id
       });
       return response;
     } catch (error) {
@@ -130,9 +130,9 @@ export const studentApi = {
   },
 
   // Get students by supervisor
-  getStudentsBySupervisor: async (supervisorId) => {
+  getStudentsBySupervisor: async (uni_supervisor_id) => {
     try {
-      const response = await apiClient.get(API_ROUTES.students.bySupervisor(supervisorId));
+      const response = await apiClient.get(API_ROUTES.students.bySupervisor(uni_supervisor_id));
       return response;
     } catch (error) {
       handleApiError(error, 'Failed to fetch students by supervisor');
