@@ -57,11 +57,11 @@ const attachmentApi = {
     }
   },
 
-  // Deactivate attachment
+  // Deactivate attachment (sets status to pending)
   deactivateAttachment: async (id) => {
     try {
       const response = await apiClient.put(API_ROUTES.attachments.updateStatus(id), {
-        status: 'inactive'
+        status: 'pending'
       });
       return response;
     } catch (error) {

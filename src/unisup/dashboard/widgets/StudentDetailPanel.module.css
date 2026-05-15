@@ -332,6 +332,15 @@ textarea:focus {
   color: var(--green);
 }
 
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .statusPill {
   font-size: 10px;
   font-weight: 500;

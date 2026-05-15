@@ -42,6 +42,22 @@
   border-bottom: none;
 }
 
+.dayGroup {
+  border-bottom: 1px solid var(--border);
+}
+
+.dayGroup:last-child {
+  border-bottom: none;
+}
+
+.dayGroup .logRow {
+  border-bottom: 0.5px dashed var(--border);
+}
+
+.dayGroup .logRow:last-child {
+  border-bottom: none;
+}
+
 .logDateCol {
   width: 70px;
   flex-shrink: 0;
@@ -96,6 +112,13 @@
 .pillVerified {
   background: var(--green-bg);
   color: var(--green);
+}
+
+.pillIrrelevant {
+  background: var(--surface);
+  color: var(--subtle);
+  border: 0.5px solid var(--border);
+  opacity: 0.6;
 }
 
 .pillPending {

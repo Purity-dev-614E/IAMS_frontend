@@ -1,45 +1,7 @@
 import React from 'react';
 import styles from './AdminStatsGrid.module.css';
 
-const AdminStatsGrid = () => {
-  const stats = [
-    {
-      label: 'Total students',
-      value: '84',
-      sub: 'registered this cohort',
-      trend: 'up',
-      trendText: '↑ 12 from last cohort'
-    },
-    {
-      label: 'Active attachments',
-      value: '71',
-      sub: 'of 84 students',
-      trend: 'warn',
-      trendText: '13 pending activation'
-    },
-    {
-      label: 'Logs this week',
-      value: '289',
-      sub: 'across all students',
-      trend: 'up',
-      trendText: '↑ 94% submission rate'
-    },
-    {
-      label: 'Pending approvals',
-      value: '3',
-      sub: 'supervisors waiting',
-      trend: 'red',
-      trendText: 'Action required'
-    },
-    {
-      label: 'Reviews complete',
-      value: '67%',
-      sub: 'of Week 5 reviews',
-      trend: 'warn',
-      trendText: '33% still pending'
-    }
-  ];
-
+const AdminStatsGrid = ({ stats = [] }) => {
   const getTrendClass = (trend) => {
     switch (trend) {
       case 'up': return styles.trendUp;
@@ -48,6 +10,10 @@ const AdminStatsGrid = () => {
       default: return '';
     }
   };
+
+  if (stats.length === 0) {
+    return <div className={styles.loadingStats}>No stats available</div>;
+  }
 
   return (
     <div className={styles.statsGrid}>

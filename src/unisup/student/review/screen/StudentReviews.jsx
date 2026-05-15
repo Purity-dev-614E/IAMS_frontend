@@ -31,18 +31,43 @@ const StudentReviews = () => {
       
       // Get student data
       const studentResponse = await studentDataService.getStudentById(id);
-      const formattedStudent = studentDataService.formatStudentForDisplay(studentResponse.student);
+      const rawStudent = studentResponse.student;
+      
+      // Get student's attachments to find active attachment
+      const attachmentsResponse = await studentDataService.getStudentAttachments(id);
+      const activeAttachment = attachmentsResponse.attachments?.find(att => att.status === 'active') || attachmentsResponse.attachments?.[0];
+      
+      // Get daily logs count for the active attachment
+      let logsCount = 0;
+      if (activeAttachment) {
+        try {
+          const logsResponse = await studentDataService.getDailyLogs({ attachmentId: activeAttachment.id });
+          logsCount = logsResponse.logs?.length || 0;
+        } catch (logErr) {
+          console.error('Error fetching logs for count:', logErr);
+        }
+      }
+
+      // Format student for the StudentCard widget
+      const formattedStudent = {
+        ...studentDataService.formatStudentForDisplay(rawStudent),
+        name: rawStudent.student_name,
+        registration: rawStudent.reg_number,
+        initials: rawStudent.student_name ? rawStudent.student_name.split(' ').map(n => n[0]).join('').toUpperCase() : '??',
+        organization: activeAttachment ? activeAttachment.organization_name : 'Not assigned',
+        industrySupervisor: activeAttachment ? activeAttachment.industry_supervisor_name : 'Not assigned',
+        period: activeAttachment ? `${new Date(activeAttachment.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} - ${new Date(activeAttachment.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}` : 'N/A',
+        status: activeAttachment ? (activeAttachment.status.charAt(0).toUpperCase() + activeAttachment.status.slice(1)) : 'Pending',
+        totalLogs: logsCount,
+        progress: activeAttachment ? calculateProgress(activeAttachment.start_date, activeAttachment.end_date) : 0
+      };
+      
       setStudent(formattedStudent);
       
       // Get weekly reviews for this student (supervisor view)
       let reviewsResponse;
       
       try {
-        // For supervisor view, we need to get reviews by attachment
-        // First get student's attachments to find active attachment
-        const attachmentsResponse = await studentDataService.getStudentAttachments(id);
-        const activeAttachment = attachmentsResponse.attachments?.find(att => att.status === 'active');
-        
         if (activeAttachment) {
           reviewsResponse = await studentDataService.getWeeklyReviews({ 
             attachmentId: activeAttachment.id 
@@ -71,6 +96,20 @@ const StudentReviews = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateProgress = (startDate, endDate) => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    
+    if (today < start) return 0;
+    if (today > end) return 100;
+    
+    const total = end - start;
+    const elapsed = today - start;
+    return Math.round((elapsed / total) * 100);
   };
 
   useEffect(() => {

@@ -189,7 +189,7 @@ export const profileService = {
             items: [
               { to: '/supervisor', label: 'Dashboard', icon: '▦' },
               { to: '/supervisor/students', label: 'My Students', icon: '⊞' },
-              { to: '/supervisor/students/:id/reviews', label: 'Weekly Reviews', icon: '⊞' },
+              // { to: '/supervisor/students/:id/reviews', label: 'Weekly Reviews', icon: '⊞' },
             ]
           },
           {

@@ -6,10 +6,14 @@ class StudentAttachmentService {
   // Get current student's attachments
   async getMyAttachments() {
     try {
-      const data = await apiClient.get(API_ROUTES.attachments.myAttachments);
+      const response = await apiClient.get(API_ROUTES.attachments.myAttachments);
+      // The API returns { success: true, attachments: [...] }
+      // We want to transform the attachments array
+      const rawAttachments = response.attachments || (response.data && response.data.attachments) || (Array.isArray(response) ? response : []);
+      
       return {
-        ...data,
-        data: transformToModel(data.data || data, Attachment)
+        ...response,
+        data: transformToModel(rawAttachments, Attachment)
       };
     } catch (error) {
       console.error('Error fetching my attachments:', error);

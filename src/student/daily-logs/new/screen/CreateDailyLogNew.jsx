@@ -16,12 +16,34 @@ const CreateDailyLog = () => {
   const [profileData, setProfileData] = useState(null);
   const [mode, setMode] = useState(id ? 'edit' : 'new');
   const [editLogId, setEditLogId] = useState(id || null);
+  const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     tasks: '',
     skills: '',
     observations: '',
-    logDate: new Date().toISOString().split('T')[0]
+    logDate: location.state?.date || getLocalDateString()
   });
+
+  // Sync logDate when location state changes (for batch logging different days)
+  useEffect(() => {
+    if (location.state?.date && mode === 'new') {
+      setFormData({
+        tasks: '',
+        skills: '',
+        observations: '',
+        logDate: location.state.date
+      });
+      setCharCounts({ tasks: 0, skills: 0 });
+      setError(null);
+      setSuccess(false);
+    }
+  }, [location.state, mode]);
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -389,10 +411,15 @@ const CreateDailyLog = () => {
     };
   }, []);
 
-  const currentUser =  {
-    name: user?.name || 'Student',
-    role: user?.role || 'Student',
-    initials: user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ST'
+  const getFormattedDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const isToday = (dateStr) => {
+    if (!dateStr) return false;
+    return new Date(dateStr).toDateString() === new Date().toDateString();
   };
 
   return (
@@ -410,7 +437,7 @@ const CreateDailyLog = () => {
             <button className={styles.backBtn}>‹</button>
             <div>
               <div className={styles.topbarTitle}>{mode === 'edit' ? 'Edit Daily Log' : 'Daily Log'}</div>
-              <div className={styles.topbarSub}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div className={styles.topbarSub}>{getFormattedDate(formData.logDate)}</div>
             </div>
           </div>
           <div className={styles.topbarRight}>
@@ -509,10 +536,10 @@ const CreateDailyLog = () => {
               <div className={styles.formCard} id="form-card">
                 <div className={styles.formCardHeader}>
                   <div className={styles.fchLeft}>
-                    <h2>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h2>
+                    <h2>{getFormattedDate(formData.logDate)}</h2>
                     <p>Week {currentWeek} · {attachment ? `${attachment.organization_name || 'Your Organization'}` : 'Loading...'}</p>
                   </div>
-                  <div className={styles.dateChip}>Today</div>
+                  <div className={styles.dateChip}>{isToday(formData.logDate) ? 'Today' : 'Past Date'}</div>
                 </div>
                 <div className={styles.formCardBody}>
                   <div className={styles.field}>
@@ -571,7 +598,7 @@ const CreateDailyLog = () => {
               <div className={styles.formCard} id="readonly-card">
                 <div className={styles.formCardHeader}>
                   <div className={styles.fchLeft}>
-                    <h2>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h2>
+                    <h2>{getFormattedDate(formData.logDate)}</h2>
                     <p>Week {currentWeek} · {attachment ? `${attachment.organization_name || 'Your Organization'}` : 'Loading...'}</p>
                   </div>
                   <div className={styles.dateChip} style={{background: 'var(--green)'}}>
@@ -631,7 +658,7 @@ const CreateDailyLog = () => {
               <div className={styles.successCard} id="success-card">
                 <div className={styles.successIcon}>✓</div>
                 <h2>Log submitted</h2>
-                <p>Your {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} log has been saved. It will be bundled with the rest of your Week {currentWeek} logs and sent to your supervisors for review.</p>
+                <p>Your {getFormattedDate(formData.logDate)} log has been saved. It will be bundled with the rest of your Week {currentWeek} logs and sent to your supervisors for review.</p>
                 <button 
                   className={styles.btnBack} 
                   onClick={() => {
@@ -640,14 +667,14 @@ const CreateDailyLog = () => {
                       tasks: '',
                       skills: '',
                       observations: '',
-                      logDate: new Date().toISOString().split('T')[0]
+                      logDate: getLocalDateString()
                     });
                     setCharCounts({ tasks: 0, skills: 0 });
                     setError(null);
                     setSuccess(false);
                   }}
                 >
-                  Create new log
+                  Create another log
                 </button>
               </div>
             )}
@@ -662,7 +689,7 @@ const CreateDailyLog = () => {
           <div className={`${styles.modalOverlay} ${styles.open}`} id="modal">
             <div className={styles.modal}>
               <h3>Submit this log?</h3>
-              <p>You're about to submit your log for <strong>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>. Once submitted it cannot be edited. Your supervisors will review it at the end of Week {currentWeek}.</p>
+              <p>You're about to submit your log for <strong>{getFormattedDate(formData.logDate)}</strong>. Once submitted it cannot be edited. Your supervisors will review it at the end of Week {currentWeek}.</p>
               <div className={styles.modalBtns}>
                 <button className={styles.btnCancel} onClick={closeModal}>
                   Go back

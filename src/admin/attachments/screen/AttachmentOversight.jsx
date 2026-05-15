@@ -17,6 +17,7 @@ const AttachmentOversight = () => {
   const [selectedAttachment, setSelectedAttachment] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activating, setActivating] = useState(false);
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
@@ -112,16 +113,22 @@ const AttachmentOversight = () => {
 
   const handleConfirmActivate = async () => {
     if (!selectedAttachment) return;
-    
+    seActivating(tue);
+    tr
     try {
-      await attachmentApi.activateAttachment(selectedAttachment.id);
+      console.log('Activating attachment:', selectedAttachment.id);
+      const response = await attachmentApi.activateAttachment(selectedAttachment.id);
+      console.log('Activation response:', response);
       showToast('Attachment activated successfully');
       setIsActivateModalOpen(false);
       setSelectedAttachment(null);
-      // Refresh the data
+      await // Refresh the data
       fetchAttachments();
     } catch (error) {
-      showToast('Failed to activate attachment', 'error');
+      console.error('Activation error:', error););
+    } finally {
+      setActivating(false
+      showToast(error.message || 'Failed to activate attachment', 'error');
     }
   };
 
@@ -232,6 +239,7 @@ const AttachmentOversight = () => {
 
       <ActivateConfirmModal 
         isOpen={isActivateModalOpen}
+        isActivating={activating}
         onClose={() => setIsActivateModalOpen(false)}
         onConfirm={handleConfirmActivate}
         studentName={selectedAttachment?.student_name}

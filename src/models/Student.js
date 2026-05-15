@@ -23,7 +23,7 @@ export class Student extends BaseModel {
   }
 
   getRequiredFields() {
-    return ['userId', 'registrationNumber', 'program', 'yearOfStudy'];
+    return ['registrationNumber', 'program', 'yearOfStudy'];
   }
 
   // Helper methods

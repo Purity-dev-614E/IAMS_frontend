@@ -1,54 +1,62 @@
 import React from 'react';
 import styles from './ThisWeekLogs.module.css';
 
-const ThisWeekLogs = () => {
-  const logs = [
-    { day: 'Mon', date: '31 Mar', tasks: 'Attended morning stand-up, reviewed codebase documentation, set up local dev environment', status: 'verified' },
-    { day: 'Tue', date: '1 Apr', tasks: 'Implemented user authentication module, fixed session timeout bug', status: 'submitted' },
-    { day: 'Wed', date: '2 Apr', tasks: 'Wrote unit tests for API endpoints, attended code review session', status: 'submitted' },
-    { day: 'Thu', date: '3 Apr', tasks: '—', status: 'missing' },
-    { day: 'Fri', date: '4 Apr', tasks: '—', status: 'upcoming' }
-  ];
-
+const ThisWeekLogs = ({ logs = [] }) => {
   const getStatusPill = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'verified': return styles.pillVerified;
       case 'submitted': return styles.pillSubmitted;
-      case 'missing': return styles.pillMissing;
-      case 'upcoming': return styles.pillUpcoming;
-      default: return '';
+      case 'draft': return styles.pillMissing; // Using missing style for draft
+      default: return styles.pillUpcoming;
     }
   };
 
   const getStatusText = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'verified': return 'Verified';
       case 'submitted': return 'Submitted';
-      case 'missing': return 'Not logged';
-      case 'upcoming': return 'Upcoming';
-      default: return '';
+      case 'draft': return 'Draft';
+      default: return 'Pending';
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  };
+
+  const getDayName = (dateString) => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { weekday: 'short' });
   };
 
   return (
     <div className={styles.card} style={{marginBottom: '1.25rem'}}>
       <div className={styles.cardHeader}>
-        <span className={styles.cardTitle}>This week's logs — Week 6</span>
-        <a href="#" className={styles.cardAction}>View all logs</a>
+        <span className={styles.cardTitle}>Recent daily logs</span>
+        <a href="/student/daily-logs" className={styles.cardAction}>View all logs</a>
       </div>
       <div className={styles.cardBody} style={{padding: '0.5rem 1.25rem'}}>
-        {logs.map((log, index) => (
-          <div key={index} className={styles.logRow}>
-            <div className={styles.logDateCol}>
-              <div className={styles.logDay}>{log.day}</div>
-              <div className={styles.logDate}>{log.date}</div>
+        {logs.length === 0 ? (
+          <div className={styles.emptyState}>No logs submitted recently.</div>
+        ) : (
+          logs.map((log, index) => (
+            <div key={log.id || index} className={styles.logRow}>
+              <div className={styles.logDateCol}>
+                <div className={styles.logDay}>{getDayName(log.log_date)}</div>
+                <div className={styles.logDate}>{formatDate(log.log_date)}</div>
+              </div>
+              <div className={styles.logTasks}>
+                {log.tasks_performed || 'No tasks recorded'}
+              </div>
+              <span className={`${styles.statusPill} ${getStatusPill(log.status)}`}>
+                {getStatusText(log.status)}
+              </span>
             </div>
-            <div className={styles.logTasks}>{log.tasks}</div>
-            <span className={`${styles.statusPill} ${getStatusPill(log.status)}`}>
-              {getStatusText(log.status)}
-            </span>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

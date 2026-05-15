@@ -1,15 +1,13 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
-import { Student, Attachment, DailyLog, WeeklyReview, transformToModel, transformToAPI, validateModel, transformError } from '../../../models';
+import { Student, Attachment, WeeklyReview, transformToModel } from '../../../models';
 
 // API integration service for student dashboard
-// Commented out for now - will be re-enabled when backend integration is ready
-/*
 export const studentDashboardService = {
   // Fetch student dashboard data
   async fetchDashboardData() {
     try {
-      const data = await apiClient.get('/dashboard/student');
+      const data = await apiClient.get(API_ROUTES.dashboard.student);
       
       if (!data.success) {
         throw new Error(data.message || 'Failed to fetch dashboard data');
@@ -24,22 +22,27 @@ export const studentDashboardService = {
 
   // Transform student data for components using Student model
   transformStudentData(student) {
+    if (!student) return null;
+    
+    // The backend returns snake_case fields, Student model handles them
     const studentModel = transformToModel(student, Student);
+    
     return {
       id: studentModel.studentId,
-      name: student.userName || student.student_name,
-      email: student.userEmail || student.student_email,
+      name: student.student_name,
+      email: student.student_email,
       regNumber: studentModel.registrationNumber,
       program: studentModel.program,
       yearOfStudy: studentModel.yearOfStudy,
       supervisorName: student.supervisor_name,
       supervisorEmail: student.supervisor_email,
-      initials: studentModel.getDisplayName()
+      attachmentCount: student.attachment_count,
+      initials: (student.student_name || '')
         .split(' ')
         .map(word => word[0])
         .join('')
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2) || '??'
     };
   },
 
@@ -53,41 +56,45 @@ export const studentDashboardService = {
       organizationName: attachmentModel.organizationName,
       industrySupervisorName: attachmentModel.industrySupervisorName,
       industrySupervisorEmail: attachmentModel.industrySupervisorEmail,
-      startDate: new Date(attachmentModel.startDate),
-      endDate: new Date(attachmentModel.endDate),
+      startDate: attachmentModel.startDate ? new Date(attachmentModel.startDate) : null,
+      endDate: attachmentModel.endDate ? new Date(attachmentModel.endDate) : null,
       status: attachmentModel.status,
-      duration: attachmentModel.getDurationInDays()
+      duration: attachmentModel.getDurationInDays ? attachmentModel.getDurationInDays() : 0
     };
   },
 
   // Transform statistics for components
   transformStatistics(stats) {
+    if (!stats) return null;
+    
     return {
       dailyLogs: {
-        total: parseInt(stats.dailyLogs.total_logs) || 0,
-        draft: parseInt(stats.dailyLogs.draft_logs) || 0,
-        submitted: parseInt(stats.dailyLogs.submitted_logs) || 0,
-        lastLogDate: stats.dailyLogs.last_log_date ? new Date(stats.dailyLogs.last_log_date) : null
+        total: parseInt(stats.dailyLogs?.total_logs) || 0,
+        draft: parseInt(stats.dailyLogs?.draft_logs) || 0,
+        submitted: parseInt(stats.dailyLogs?.submitted_logs) || 0,
+        lastLogDate: stats.dailyLogs?.last_log_date ? new Date(stats.dailyLogs.last_log_date) : null
       },
       weeklyReviews: {
-        total: stats.weeklyReviews.total || 0,
-        pending: stats.weeklyReviews.pending || 0,
-        industryReviewed: stats.weeklyReviews.industry_reviewed || 0,
-        uniReviewed: stats.weeklyReviews.uni_reviewed || 0,
-        complete: stats.weeklyReviews.complete || 0
+        total: stats.weeklyReviews?.total || 0,
+        pending: stats.weeklyReviews?.pending || 0,
+        industryReviewed: stats.weeklyReviews?.industry_reviewed || 0,
+        uniReviewed: stats.weeklyReviews?.uni_reviewed || 0,
+        complete: stats.weeklyReviews?.complete || 0
       }
     };
   },
 
   // Transform weekly reviews for components using WeeklyReview model
   transformWeeklyReviews(reviews) {
+    if (!reviews || !Array.isArray(reviews)) return [];
+    
     return reviews.map(review => {
       const reviewModel = transformToModel(review, WeeklyReview);
       return {
         id: reviewModel.reviewId,
         weekNumber: reviewModel.weekNumber,
-        weekStartDate: new Date(reviewModel.weekStartDate),
-        weekEndDate: new Date(reviewModel.weekEndDate),
+        weekStartDate: reviewModel.weekStartDate ? new Date(reviewModel.weekStartDate) : null,
+        weekEndDate: reviewModel.weekEndDate ? new Date(reviewModel.weekEndDate) : null,
         status: reviewModel.status,
         industryApproval: reviewModel.industryApproval,
         industryComments: reviewModel.industryComments,
@@ -101,6 +108,7 @@ export const studentDashboardService = {
 
   // Calculate duration between two dates using Attachment model
   calculateDuration(startDate, endDate) {
+    if (!startDate || !endDate) return 'N/A';
     const attachment = new Attachment({ startDate, endDate });
     const days = attachment.getDurationInDays();
     const weeks = Math.floor(days / 7);
@@ -124,6 +132,7 @@ export const studentDashboardService = {
 
   // Get completion percentage for weekly reviews
   getReviewCompletionPercentage(stats) {
+    if (!stats || !stats.weeklyReviews) return 0;
     const total = stats.weeklyReviews.total || 0;
     const complete = stats.weeklyReviews.complete || 0;
     
@@ -131,4 +140,3 @@ export const studentDashboardService = {
     return Math.round((complete / total) * 100);
   }
 };
-*/

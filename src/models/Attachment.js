@@ -5,9 +5,9 @@ export class Attachment extends BaseModel {
     super(data);
     this.attachmentId = data.attachmentId || data.id;
     this.studentId = data.studentId || data.student_id;
-    this.organizationName = data.organizationName || data.organization_name;
-    this.industrySupervisorName = data.industrySupervisorName || data.industry_supervisor_name;
-    this.industrySupervisorEmail = data.industrySupervisorEmail || data.industry_supervisor_email;
+    this.organizationName = data.organizationName || data.organization_name || data.organization;
+    this.industrySupervisorName = data.industrySupervisorName || data.industry_supervisor_name || data.supervisorName;
+    this.industrySupervisorEmail = data.industrySupervisorEmail || data.industry_supervisor_email || data.supervisorEmail;
     this.startDate = data.startDate || data.start_date;
     this.endDate = data.endDate || data.end_date;
     this.status = data.status;
@@ -27,7 +27,7 @@ export class Attachment extends BaseModel {
   }
 
   getRequiredFields() {
-    return ['studentId', 'organizationName', 'startDate', 'endDate'];
+    return ['organizationName', 'startDate', 'endDate'];
   }
 
   // Helper methods

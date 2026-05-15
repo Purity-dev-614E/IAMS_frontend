@@ -3,6 +3,9 @@ import styles from './StudentDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import { profileService } from '../../../shared/profile/profileService';
 import { useAuth } from '../../../contexts/AuthContext';
+import { studentDashboardService } from '../services/studentDashboardService';
+import { apiClient } from '../../../apis';
+import { API_ROUTES } from '../../../apis/apiRoutes';
 import { 
   Topbar,
   AlertBanner,
@@ -15,61 +18,122 @@ import {
 } from '../widgets';
 
 const StudentDashboard = () => {
-  const [profileData, setProfileData] = useState(null);
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Dashboard data state
+  const [dashboardData, setDashboardData] = useState({
+    student: null,
+    activeAttachment: null,
+    statistics: null,
+    weeklyReviews: [],
+    thisWeekLogs: []
+  });
 
-  // Fetch profile data on component mount
+  // Fetch dashboard data on component mount
   useEffect(() => {
-    fetchProfileData();
-  }, []);
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
 
-  const fetchProfileData = async () => {
+  const loadDashboardData = async () => {
     try {
-      const profile = await profileService.fetchProfile();
-      setProfileData(profile);
-    } catch (error) {
-      console.error('Profile fetch error:', error);
+      setLoading(true);
+      setError(null);
+      
+      const rawData = await studentDashboardService.fetchDashboardData();
+      
+      // Also fetch logs for the current week
+      let weekLogs = [];
+      try {
+        const logsResponse = await apiClient.get(`${API_ROUTES.dailyLogs.myLogs}?limit=5`);
+        if (logsResponse.success) {
+          weekLogs = logsResponse.logs || [];
+        }
+      } catch (logErr) {
+        console.error('Error fetching logs for dashboard:', logErr);
+      }
+      
+      setDashboardData({
+        student: studentDashboardService.transformStudentData(rawData.student),
+        activeAttachment: studentDashboardService.transformAttachmentData(rawData.activeAttachment),
+        statistics: studentDashboardService.transformStatistics(rawData.statistics),
+        weeklyReviews: studentDashboardService.transformWeeklyReviews(rawData.weeklyReviews),
+        thisWeekLogs: weekLogs
+      });
+      
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+      setError(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading && !dashboardData.student) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loader}>Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
       <AppSidebar 
-        navigationItems={profileService.getNavigationItems(profileData || user)} 
-        user={profileService.getUserDisplayInfo(profileData || user)}
+        navigationItems={profileService.getNavigationItems(user)} 
+        user={profileService.getUserDisplayInfo(user)}
       />
       
       {/* MAIN */}
       <div className={styles.main}>
         {/* TOPBAR */}
-        <Topbar />
+        <Topbar student={dashboardData.student} />
         
         {/* CONTENT */}
         <div className={styles.content}>
+          {error && (
+            <div className={styles.errorBanner}>
+              {error}
+              <button onClick={loadDashboardData} className={styles.retryBtn}>Retry</button>
+            </div>
+          )}
+
           {/* Alert: today's log missing */}
-          <AlertBanner />
+          <AlertBanner statistics={dashboardData.statistics} />
           
           {/* STATS */}
-          <StatsGrid />
+          <StatsGrid 
+            statistics={dashboardData.statistics} 
+            activeAttachment={dashboardData.activeAttachment} 
+          />
           
           {/* LOG CTA */}
-          <LogCTA />
+          <LogCTA activeAttachment={dashboardData.activeAttachment} />
           
           {/* MAIN GRID */}
           <div className={styles.mainGrid}>
             {/* LEFT: This week's logs */}
             <div>
-              <ThisWeekLogs />
+              <ThisWeekLogs 
+                logs={dashboardData.thisWeekLogs} 
+                statistics={dashboardData.statistics} 
+              />
               
               {/* Weekly reviews */}
-              <WeeklyReviews />
+              <WeeklyReviews reviews={dashboardData.weeklyReviews} />
             </div>
             
             {/* RIGHT COLUMN */}
             <div style={{display: 'flex', flexDirection: 'column', gap: '1.25rem'}}>
               {/* Attachment details */}
-              <AttachmentInfo />
+              <AttachmentInfo 
+                student={dashboardData.student}
+                attachment={dashboardData.activeAttachment} 
+              />
               
               {/* Quick tips */}
               <Reminders />

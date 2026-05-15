@@ -6,7 +6,8 @@ const ActivateConfirmModal = ({
   onClose, 
   onConfirm,
   studentName,
-  organization 
+  organization,
+  isActivating = false
 }) => {
   if (!isOpen) return null;
 
@@ -15,7 +16,7 @@ const ActivateConfirmModal = ({
       <div className={styles.modal}>
         <div className={styles.mh2}>
           <span className={styles.mht}>Activate attachment</span>
-          <button className={styles.mclose} onClick={onClose}>
+          <button className={styles.mclose} onClick={onClose} disabled={isActivating}>
             ×
           </button>
         </div>
@@ -29,11 +30,19 @@ const ActivateConfirmModal = ({
             Make sure a university supervisor has been assigned before activating.
           </p>
           <div className={styles.cbts}>
-            <button className={styles.bcl} onClick={onClose}>
+            <button className={styles.bcl} onClick={onClose} disabled={isActivating}>
               Cancel
             </button>
-            <button className={styles.bca} onClick={onConfirm}>
-              Yes, activate
+            <button 
+              className={styles.bca} 
+              onClick={onConfirm}
+              disabled={isActivating}
+              style={{
+                opacity: isActivating ? 0.7 : 1,
+                cursor: isActivating ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isActivating ? 'Activating...' : 'Yes, activate'}
             </button>
           </div>
         </div>

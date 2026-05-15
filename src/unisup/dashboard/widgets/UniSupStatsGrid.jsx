@@ -1,39 +1,39 @@
 import React from 'react';
 import styles from './UniSupStatsGrid.module.css';
 
-const UniSupStatsGrid = () => {
+const UniSupStatsGrid = ({ overview, statistics }) => {
   const stats = [
     {
       label: 'Assigned students',
-      value: '8',
-      sub: 'this cohort',
-      pill: 'All active',
+      value: overview?.totalStudents || 0,
+      sub: `${overview?.activeAttachments || 0} active, ${overview?.pendingAttachments || 0} pending`,
+      pill: 'Cohort Overview',
       pillColor: 'var(--blue-light)',
       pillTextColor: 'var(--blue)'
     },
     {
       label: 'Need feedback',
-      value: '2',
-      sub: 'Week 6 reviews pending',
-      pill: 'Action needed',
-      pillColor: 'var(--amber-bg)',
-      pillTextColor: 'var(--amber)'
+      value: statistics?.pending || 0,
+      sub: 'Reviews awaiting your action',
+      pill: statistics?.pending > 0 ? 'Action needed' : 'All caught up',
+      pillColor: statistics?.pending > 0 ? 'var(--amber-bg)' : 'var(--green-bg)',
+      pillTextColor: statistics?.pending > 0 ? 'var(--amber)' : 'var(--green)'
     },
     {
-      label: 'Fully reviewed',
-      value: '5',
-      sub: 'of 8 students this week',
+      label: 'Industry reviewed',
+      value: statistics?.industryReviewed || 0,
+      sub: 'of total weekly reviews',
+      pill: 'Supervisor ready',
+      pillColor: 'var(--purple-bg)',
+      pillTextColor: 'var(--purple)'
+    },
+    {
+      label: 'Complete reviews',
+      value: statistics?.complete || 0,
+      sub: `of ${statistics?.total || 0} total reviews`,
       pill: 'On track',
       pillColor: 'var(--green-bg)',
       pillTextColor: 'var(--green)'
-    },
-    {
-      label: 'Flagged',
-      value: '1',
-      sub: 'student needs attention',
-      pill: 'Grace Wanjiru',
-      pillColor: 'var(--red-bg)',
-      pillTextColor: 'var(--red)'
     }
   ];
 

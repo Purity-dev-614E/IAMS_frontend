@@ -76,7 +76,7 @@ async function request(endpoint, options = {}) {
         ...(authToken && { "Authorization": `Bearer ${authToken}` }),
         ...(options.headers || {}),
       },
-      credentials: "include", 
+      // credentials: "include", // Commented out - using token-based auth only
       ...options,
     });
 

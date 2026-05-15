@@ -1,291 +1,158 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './StudentList.module.css';
 import WeekDots from './WeekDots';
+import { supervisorStudentsService } from '../../students/services/supervisorStudentsService';
 
-const StudentList = ({ onStudentSelect, selectedStudent }) => {
+const StudentList = ({ onStudentSelect, selectedStudent, overdueStudents = [], pendingFeedback = [] }) => {
   const [activeTab, setActiveTab] = useState('all');
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const students = [
-    {
-      id: 1,
-      name: 'Purity Sang',
-      sub: 'HDB212-0324/2022 · Safaricom PLC',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'missing' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '3 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Needs feedback',
-      flagged: false
-    },
-    {
-      id: 2,
-      name: 'Grace Wanjiru',
-      sub: 'HDB212-0204/2022 · KCB Group',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'missing' },
-        { day: 'Wed', status: 'missing' },
-        { day: 'Thu', status: 'missing' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '1 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'pending' },
-        { status: 'pending' }
-      ],
-      weeks1to5Summary: '3 complete, 2 pending',
-      status: 'Flagged',
-      flagged: true
-    },
-    {
-      id: 3,
-      name: 'Kevin Ochieng',
-      sub: 'HDB212-0156/2022 · Equity Bank',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'submitted' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '4 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Needs feedback',
-      flagged: false
-    },
-    {
-      id: 4,
-      name: 'Amina Hassan',
-      sub: 'HDB212-0317/2022 · Nation Media',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'submitted' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '4 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Reviewed',
-      flagged: false
-    },
-    {
-      id: 5,
-      name: 'Brian Otieno',
-      sub: 'HDB212-0112/2022 · KPLC',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'submitted' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '4 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Reviewed',
-      flagged: false
-    },
-    {
-      id: 6,
-      name: 'Diana Muthoni',
-      sub: 'HDB212-0278/2022 · Airtel Kenya',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'draft' },
-        { day: 'Thu', status: 'upcoming' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '2 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'pending' }
-      ],
-      weeks1to5Summary: '4 complete, 1 pending',
-      status: 'Industry pending',
-      flagged: false
-    },
-    {
-      id: 7,
-      name: 'James Kariuki',
-      sub: 'HDB212-0091/2022 · NCBA Bank',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'submitted' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '4 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Reviewed',
-      flagged: false
-    },
-    {
-      id: 8,
-      name: 'Lydia Chebet',
-      sub: 'HDB212-0340/2022 · Safaricom PLC',
-      week6Data: [
-        { day: 'Mon', status: 'submitted' },
-        { day: 'Tue', status: 'submitted' },
-        { day: 'Wed', status: 'submitted' },
-        { day: 'Thu', status: 'submitted' },
-        { day: 'Fri', status: 'upcoming' }
-      ],
-      week6Summary: '4 of 4 days',
-      weeks1to5Data: [
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' },
-        { status: 'complete' }
-      ],
-      weeks1to5Summary: 'All complete',
-      status: 'Reviewed',
-      flagged: false
+  useEffect(() => {
+    loadStudents();
+  }, []);
+
+  const loadStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await supervisorStudentsService.getMyStudents();
+      if (response.success) {
+        // Format each student for the list
+        const formatted = response.students.map(s => {
+          const isOverdue = overdueStudents.some(os => os.regNumber === s.reg_number);
+          const hasPendingFeedback = pendingFeedback.some(pf => pf.regNumber === s.reg_number);
+          
+          let status = 'Reviewed';
+          if (isOverdue) status = 'Overdue logs';
+          else if (hasPendingFeedback) status = 'Needs feedback';
+
+          return {
+            id: s.id,
+            name: s.student_name,
+            sub: `${s.reg_number} · ${s.organization_name || 'Not assigned'}`,
+            regNumber: s.reg_number,
+            organization: s.organization_name,
+            status: status,
+            flagged: s.flagged || false,
+            // These would normally come from specific week data in the response
+            // For now using fallback logic similar to the service
+            week6Summary: isOverdue ? 'Logs missing' : 'On track',
+            weeks1to5Summary: 'Previous weeks ok'
+          };
+        });
+        setStudents(formatted);
+        
+        // Auto-select first student if none selected
+        if (formatted.length > 0 && !selectedStudent) {
+          onStudentSelect(formatted[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading students for list:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const filteredStudents = students.filter(student => {
     switch (activeTab) {
       case 'all': return true;
-      case 'needs': return student.status === 'Needs feedback';
+      case 'needs': return student.status === 'Needs feedback' || student.status === 'Overdue logs';
       case 'flagged': return student.flagged;
       default: return true;
     }
   });
 
-  const getStatusPill = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
       case 'Needs feedback': return styles.pillNeeds;
-      case 'Flagged': return styles.pillFlagged;
+      case 'Overdue logs': return styles.pillFlagged;
       case 'Reviewed': return styles.pillComplete;
       case 'Industry pending': return styles.pillPending;
-      default: return '';
+      default: return styles.pillGray;
     }
-  };
-
-  const getWeeks1to5Dots = (data) => {
-    return data.map((week, index) => {
-      let color = styles.dotUpcoming;
-      switch (week.status) {
-        case 'complete': color = styles.dotComplete; break;
-        case 'pending': color = styles.dotPending; break;
-        default: color = styles.dotUpcoming;
-      }
-      return <div key={index} className={`${styles.wd} ${color}`} />;
-    });
   };
 
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <span className={styles.cardTitle}>All students</span>
+        <span className={styles.cardTitle}>Assigned students ({students.length})</span>
         <div className={styles.filterTabs}>
           <button 
             className={`${styles.ftab} ${activeTab === 'all' ? styles.active : ''}`}
             onClick={() => setActiveTab('all')}
           >
-            All ({students.length})
+            All
           </button>
           <button 
             className={`${styles.ftab} ${activeTab === 'needs' ? styles.active : ''}`}
             onClick={() => setActiveTab('needs')}
           >
-            Needs feedback ({students.filter(s => s.status === 'Needs feedback').length})
+            Action needed
           </button>
           <button 
             className={`${styles.ftab} ${activeTab === 'flagged' ? styles.active : ''}`}
             onClick={() => setActiveTab('flagged')}
           >
-            Flagged ({students.filter(s => s.flagged).length})
+            Flagged
           </button>
         </div>
       </div>
 
-      {/* Header row */}
       <div className={styles.headerRow}>
-        <div>Student</div>
-        <div>This week</div>
-        <div>Weeks 1–5</div>
-        <div>Status</div>
-        <div>Flag</div>
+        <div>STUDENT</div>
+        <div>CURRENT WEEK</div>
+        <div>PREVIOUS WEEKS</div>
+        <div>STATUS</div>
+        <div style={{textAlign: 'center'}}>FLAG</div>
       </div>
 
-      {/* Student rows */}
-      {filteredStudents.map(student => (
-        <div 
-          key={student.id}
-          className={`${styles.studentRow} ${selectedStudent?.id === student.id ? styles.selected : ''}`}
-          onClick={() => onStudentSelect(student)}
-        >
-          <div>
-            <div className={styles.sName}>{student.name}</div>
-            <div className={styles.sSub}>{student.sub}</div>
-          </div>
-          <div>
-            <WeekDots data={student.week6Data} summary={student.week6Summary} />
-          </div>
-          <div>
-            <WeekDots data={student.weeks1to5Data} summary={student.weeks1to5Summary} />
-          </div>
-          <span className={`${styles.statusPill} ${getStatusPill(student.status)}`}>
-            {student.status}
-          </span>
-          <button 
-            className={`${styles.flagBtn} ${student.flagged ? styles.flagged : ''}`}
-            title={student.flagged ? 'Remove flag' : 'Flag student'}
-          >
-            ⚑
-          </button>
-        </div>
-      ))}
+      <div className={styles.cardBody}>
+        {loading ? (
+          <div className={styles.loadingState}>Loading students...</div>
+        ) : filteredStudents.length === 0 ? (
+          <div className={styles.emptyState}>No students found in this category.</div>
+        ) : (
+          filteredStudents.map((student) => (
+            <div 
+              key={student.id} 
+              className={`${styles.studentRow} ${selectedStudent?.id === student.id ? styles.selected : ''}`}
+              onClick={() => onStudentSelect(student)}
+            >
+              <div>
+                <div className={styles.sName}>{student.name}</div>
+                <div className={styles.sSub}>{student.sub}</div>
+              </div>
+              
+              <div className={styles.sProg}>
+                <div className={styles.sProgText}>{student.week6Summary}</div>
+              </div>
+
+              <div className={styles.sProg}>
+                <div className={styles.sProgText}>{student.weeks1to5Summary}</div>
+              </div>
+
+              <div>
+                <span className={`${styles.statusPill} ${getStatusStyle(student.status)}`}>
+                  {student.status}
+                </span>
+              </div>
+
+              <div style={{display: 'flex', justifyContent: 'center'}}>
+                <button 
+                  className={`${styles.flagBtn} ${student.flagged ? styles.flagged : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Toggle flag logic would go here
+                  }}
+                >
+                  ⚑
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

@@ -1,25 +1,31 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './QuickActions.module.css';
 
 const QuickActions = () => {
+  const navigate = useNavigate();
+  
   const actions = [
     {
       icon: '⊞',
       color: 'var(--blue-light)',
       label: 'Assign supervisors',
-      sub: '13 students unassigned'
+      sub: 'Manage student assignments',
+      path: '/admin/students'
     },
     {
       icon: '◎',
       color: 'var(--amber-bg)',
       label: 'Activate attachments',
-      sub: '13 pending activation'
+      sub: 'Review pending registrations',
+      path: '/admin/attachments'
     },
     {
       icon: '↓',
       color: 'var(--green-bg)',
       label: 'Generate cohort report',
-      sub: 'PDF or CSV export'
+      sub: 'PDF or CSV export',
+      path: '/admin/reports'
     }
   ];
 
@@ -30,7 +36,12 @@ const QuickActions = () => {
       </div>
       <div className={styles.cardBody} style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
         {actions.map((action, index) => (
-          <div key={index} className={styles.quickAction}>
+          <div 
+            key={index} 
+            className={styles.quickAction}
+            onClick={() => navigate(action.path)}
+            style={{cursor: 'pointer'}}
+          >
             <div className={styles.qaIcon} style={{background: action.color}}>
               {action.icon}
             </div>

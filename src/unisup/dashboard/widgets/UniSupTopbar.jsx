@@ -1,15 +1,26 @@
 import React from 'react';
 import styles from './UniSupTopbar.module.css';
 
-const UniSupTopbar = () => {
+const UniSupTopbar = ({ user }) => {
+  const getFormattedDate = () => {
+    return new Date().toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  const name = user?.name || user?.userName || 'Supervisor';
+
   return (
     <div className={styles.topbar}>
       <div className={styles.topbarLeft}>
-        <h1>My students</h1>
-        <p>Thursday, 3 April 2025 · Week 6 · 8 students assigned</p>
+        <h1>Welcome back, {name}</h1>
+        <p>{getFormattedDate()} · University Supervisor</p>
       </div>
       <div className={styles.topbarRight}>
-        <button className={`${styles.btnSm} ${styles.btnGhost}`}>↓ Export progress</button>
+        <button className={`${styles.btnSm} ${styles.btnGhost}`}>↓ Export student data</button>
       </div>
     </div>
   );
