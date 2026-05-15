@@ -113,8 +113,8 @@ const AttachmentOversight = () => {
 
   const handleConfirmActivate = async () => {
     if (!selectedAttachment) return;
-    seActivating(tue);
-    tr
+    setActivating(true);
+
     try {
       console.log('Activating attachment:', selectedAttachment.id);
       const response = await attachmentApi.activateAttachment(selectedAttachment.id);
@@ -122,13 +122,12 @@ const AttachmentOversight = () => {
       showToast('Attachment activated successfully');
       setIsActivateModalOpen(false);
       setSelectedAttachment(null);
-      await // Refresh the data
-      fetchAttachments();
+      await fetchAttachments();
     } catch (error) {
-      console.error('Activation error:', error););
-    } finally {
-      setActivating(false
+      console.error('Activation error:', error);
       showToast(error.message || 'Failed to activate attachment', 'error');
+    } finally {
+      setActivating(false);
     }
   };
 

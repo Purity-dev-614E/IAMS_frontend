@@ -85,7 +85,7 @@ export const useFileUpload = () => {
 
         // Set up request
         const token = localStorage.getItem('iams_token');
-        xhr.open('POST', `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/upload/reports`);
+        xhr.open('POST', `${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}/upload/reports`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.timeout = 60000; // 60 seconds timeout
 

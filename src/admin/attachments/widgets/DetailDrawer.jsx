@@ -157,7 +157,7 @@ const DetailDrawer = ({
             fontSize: '12px',
             fontWeight: '500',
             fontFamily: "'DM Sans', sans-serif",
-            cursor: pointer
+            cursor: 'pointer'
           }}
           onClick={() => {
             onResendEmail(attachment);

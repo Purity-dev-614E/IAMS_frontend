@@ -136,9 +136,7 @@ export const getApiUrl = (route, params = {}) => {
 };
 
 // Base URL configuration
-export const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? import.meta.env.VITE_API_URL || 'https://your-api-domain.com'
-  : import.meta.env.VITE_API_URL || 'http://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iams-backend.onrender.com';
 
 // Full API URL builder
 export const buildApiUrl = (route, params = {}) => {

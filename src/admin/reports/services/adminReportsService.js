@@ -145,7 +145,7 @@ class AdminReportsService {
   async downloadEndOfAttachmentReport(id) {
     try {
       const token = sessionStorage.getItem('iams_token') || localStorage.getItem('iams_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
