@@ -195,7 +195,7 @@ class StudentDataService {
       // For file uploads, we need to use fetch directly instead of apiClient
       const token = sessionStorage.getItem('iams_token') || localStorage.getItem('iams_token');
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.submitPdf}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${API_ROUTES.endOfAttachmentReports.submitPdf}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

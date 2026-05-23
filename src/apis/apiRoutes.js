@@ -141,8 +141,13 @@ export const getApiUrl = (route, params = {}) => {
 // VITE_API_URL is used by apiClient as the full API root, so local .env files may
 // include /api. Public URL builders append /api themselves, so keep this value as
 // the backend origin/base without a trailing API segment.
-const RAW_API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iams-backend.onrender.com/api';
-export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '').replace(/\/api$/, '');
+// Local backend:
+// const RAW_API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const RAW_API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iamsbackend-production.up.railway.app/api';
+const NORMALIZED_API_BASE_URL = /^https?:\/\//i.test(RAW_API_BASE_URL)
+  ? RAW_API_BASE_URL
+  : `https://${RAW_API_BASE_URL}`;
+export const API_BASE_URL = NORMALIZED_API_BASE_URL.replace(/\/+$/, '').replace(/\/api$/, '');
 
 // Full API URL builder
 export const buildApiUrl = (route, params = {}) => {

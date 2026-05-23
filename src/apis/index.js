@@ -1,4 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api";
+// Local backend:
+// const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const RAW_API_BASE_URL = import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api";
+const API_BASE_URL = /^https?:\/\//i.test(RAW_API_BASE_URL)
+  ? RAW_API_BASE_URL
+  : `https://${RAW_API_BASE_URL}`;
 
 // Token storage management
 export const tokenStorage = {

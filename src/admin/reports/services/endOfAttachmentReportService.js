@@ -75,7 +75,7 @@ class AdminEndOfAttachmentReportService {
   async downloadReport(id) {
     try {
       const token = localStorage.getItem('iams_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -174,7 +174,7 @@ class AdminEndOfAttachmentReportService {
         : '/end-of-attachment-reports/export';
 
       const token = localStorage.getItem('iams_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${endpoint}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${endpoint}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

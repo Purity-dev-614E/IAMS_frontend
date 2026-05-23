@@ -48,7 +48,7 @@ class EndOfAttachmentReportService {
       }
       
       // Create multipart form data request
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.submitPdf}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${API_ROUTES.endOfAttachmentReports.submitPdf}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('iams_token')}`,
@@ -98,7 +98,7 @@ class EndOfAttachmentReportService {
   async downloadReport(id) {
     try {
       const token = localStorage.getItem('iams_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.download(id)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${API_ROUTES.endOfAttachmentReports.download(id)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -181,7 +181,7 @@ class EndOfAttachmentReportService {
   async staffDownloadReport(id) {
     try {
       const token = localStorage.getItem('iams_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iams-backend.onrender.com/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://iamsbackend-production.up.railway.app/api"}${API_ROUTES.endOfAttachmentReports.staffDownload(id)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
