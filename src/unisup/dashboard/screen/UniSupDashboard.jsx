@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AlertCircle, ClipboardCheck, LoaderCircle, RefreshCw } from 'lucide-react';
 import styles from './UniSupDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import UniSupTopbar from '../widgets/UniSupTopbar';
@@ -70,7 +71,11 @@ const UniSupDashboard = () => {
   if (loading && !dashboardData.supervisor) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.loader}>Loading dashboard...</div>
+        <div className={styles.loader}>
+          <LoaderCircle size={22} className={styles.spin} />
+          <strong>Loading supervisor dashboard</strong>
+          <span>Pulling assigned students, weekly reviews, and feedback status.</span>
+        </div>
       </div>
     );
   }
@@ -92,10 +97,34 @@ const UniSupDashboard = () => {
         <div className={styles.content}>
           {error && (
             <div className={styles.errorBanner}>
-              {error}
-              <button onClick={loadDashboardData} className={styles.retryBtn}>Retry</button>
+              <span className={styles.errorText}>
+                <AlertCircle size={16} />
+                {error}
+              </span>
+              <button onClick={loadDashboardData} className={styles.retryBtn}>
+                <RefreshCw size={13} />
+                Retry
+              </button>
             </div>
           )}
+
+          <div className={styles.focusBand}>
+            <div className={styles.focusIcon}>
+              <ClipboardCheck size={22} />
+            </div>
+            <div>
+              <div className={styles.focusTitle}>Supervisor focus</div>
+              <p>
+                {dashboardData.statistics?.pending > 0
+                  ? `${dashboardData.statistics.pending} weekly reviews need your feedback.`
+                  : 'No pending university feedback right now.'}
+                {' '}
+                {dashboardData.studentsWithOverdueLogs.length > 0
+                  ? `${dashboardData.studentsWithOverdueLogs.length} students have overdue logs.`
+                  : 'Student log activity is currently on track.'}
+              </p>
+            </div>
+          </div>
 
           {/* STATS */}
           <UniSupStatsGrid 

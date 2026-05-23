@@ -36,6 +36,7 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--red);
+  text-decoration: none;
   background: rgba(159,18,57,0.08);
   padding: 0.35rem 0.75rem;
   border-radius: 6px;

@@ -55,7 +55,7 @@ const WeeklyReviews = ({ reviews = [] }) => {
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <span className={styles.cardTitle}>Weekly reviews</span>
-        <a href="/student/reviews" className={styles.cardAction}>View all</a>
+        <a href="/reviews" className={styles.cardAction}>View all</a>
       </div>
       <div className={styles.cardBody} style={{padding: '0.25rem 1.25rem'}}>
         {displayReviews.length === 0 ? (

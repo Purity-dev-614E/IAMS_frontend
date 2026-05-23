@@ -12,12 +12,21 @@
   text-align: center;
   padding: 3rem 2rem;
   color: var(--muted);
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
 }
 
 .emptyIcon {
-  font-size: 3rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-light);
+  color: var(--blue);
   margin-bottom: 1rem;
-  opacity: 0.3;
 }
 
 .emptyState h3 {
@@ -34,8 +43,9 @@
 .studentHeader {
   background: var(--white);
   border: 0.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 1.25rem;
+  box-shadow: 0 14px 36px rgba(15, 34, 68, 0.05);
 }
 
 .shTop {
@@ -126,8 +136,9 @@
 .reviewPanel {
   background: var(--white);
   border: 0.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 14px 36px rgba(15, 34, 68, 0.05);
 }
 
 .rpHeader {
@@ -183,7 +194,6 @@
 }
 
 .wtChevron {
-  font-size: 12px;
   color: var(--subtle);
   transition: transform 0.2s;
 }
@@ -336,9 +346,18 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 4rem 2rem;
   color: var(--muted);
   font-size: 14px;
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+}
+
+.spin {
+  color: var(--blue);
+  animation: spin 0.8s linear infinite;
 }
 
 .statusPill {
@@ -378,4 +397,10 @@ textarea:focus {
 .pillPending {
   background: var(--purple-bg);
   color: var(--purple);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

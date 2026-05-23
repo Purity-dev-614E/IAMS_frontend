@@ -1,29 +1,62 @@
 import React from 'react';
 import styles from './AttachmentCard.module.css';
 
-const AttachmentCard = ({ 
-  organization, 
-  department, 
-  status, 
-  industrySupervisor, 
-  industrySupervisorEmail, 
-  universitySupervisor, 
-  startDate, 
-  endDate, 
-  duration, 
-  currentWeek, 
-  progress, 
-  activationDate, 
-  lastLogDate, 
+const AttachmentCard = ({
+  organization,
+  department,
+  status,
+  industrySupervisor,
+  industrySupervisorEmail,
+  universitySupervisor,
+  startDate,
+  endDate,
+  duration,
+  currentWeek,
+  progress,
+  activationDate,
+  lastLogDate,
   submissionDate,
-  onViewLogs 
+  onViewLogs
 }) => {
+  const normalizedStatus = String(status || 'pending').trim().toLowerCase();
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      active: 'Active',
+      pending: 'Pending',
+      complete: 'Complete',
+      completed: 'Complete',
+      inactive: 'Inactive'
+    };
+
+    return labels[status] || status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
   const getStatusPillClass = (status) => {
     switch (status) {
       case 'active': return styles.pillActive;
       case 'pending': return styles.pillPending;
-      case 'complete': return styles.pillComplete;
+      case 'complete':
+      case 'completed':
+        return styles.pillComplete;
+      case 'inactive': return styles.pillInactive;
       default: return '';
+    }
+  };
+
+  const getFooterText = () => {
+    switch (normalizedStatus) {
+      case 'active':
+        return `${activationDate} - ${lastLogDate}`;
+      case 'pending':
+        return `${submissionDate} - Awaiting admin activation`;
+      case 'complete':
+      case 'completed':
+        return 'Attachment complete';
+      case 'inactive':
+        return 'Attachment inactive';
+      default:
+        return '';
     }
   };
 
@@ -34,8 +67,8 @@ const AttachmentCard = ({
           <div className={styles.acOrg}>{organization}</div>
           <div className={styles.acSub}>{department}</div>
         </div>
-        <span className={`${styles.statusPill} ${getStatusPillClass(status)}`}>
-          {status}
+        <span className={`${styles.statusPill} ${getStatusPillClass(normalizedStatus)}`}>
+          {getStatusLabel(normalizedStatus)}
         </span>
       </div>
       <div className={styles.acBody}>
@@ -44,7 +77,7 @@ const AttachmentCard = ({
             <div className={styles.infoKey}>Industry supervisor</div>
             <div className={styles.infoVal}>{industrySupervisor}</div>
             {industrySupervisorEmail && (
-              <div className={styles.infoValLight} style={{fontSize: '12px', marginTop: '2px'}}>
+              <div className={styles.infoValLight} style={{ fontSize: '12px', marginTop: '2px' }}>
                 {industrySupervisorEmail}
               </div>
             )}
@@ -53,7 +86,7 @@ const AttachmentCard = ({
             <div className={styles.infoKey}>University supervisor</div>
             <div className={styles.infoVal}>{universitySupervisor || 'Not yet assigned'}</div>
             {universitySupervisor && (
-              <div className={styles.infoValLight} style={{fontSize: '12px', marginTop: '2px'}}>
+              <div className={styles.infoValLight} style={{ fontSize: '12px', marginTop: '2px' }}>
                 Assigned by admin
               </div>
             )}
@@ -79,7 +112,7 @@ const AttachmentCard = ({
             </div>
           )}
         </div>
-        
+
         {progress && (
           <div className={styles.progressSection}>
             <div className={styles.progHeader}>
@@ -87,7 +120,7 @@ const AttachmentCard = ({
               <strong>{progress.percentage}% complete</strong>
             </div>
             <div className={styles.progTrack}>
-              <div className={styles.progFill} style={{width: `${progress.percentage}%`}}></div>
+              <div className={styles.progFill} style={{ width: `${progress.percentage}%` }}></div>
             </div>
             <div className={styles.progMarkers}>
               <span>Start</span>
@@ -98,13 +131,10 @@ const AttachmentCard = ({
         )}
       </div>
       <div className={styles.acFooter}>
-        <p>
-          {status === 'active' && `${activationDate} · ${lastLogDate}`}
-          {status === 'pending' && `${submissionDate} · Awaiting admin activation`}
-        </p>
-        {status === 'active' && onViewLogs && (
+        <p>{getFooterText()}</p>
+        {normalizedStatus === 'active' && onViewLogs && (
           <button className={styles.btnSmOutline} onClick={onViewLogs}>
-            View all logs →
+            View all logs
           </button>
         )}
       </div>

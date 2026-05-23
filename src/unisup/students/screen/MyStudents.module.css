@@ -27,6 +27,9 @@
   display: grid;
   grid-template-columns: 220px 1fr;
   min-height: 100vh;
+  background:
+    linear-gradient(180deg, #f8fbff 0%, #fff 220px),
+    var(--w);
 }
 
 /* Sidebar */
@@ -224,7 +227,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 /* Toolbar */
@@ -243,8 +246,9 @@
 }
 
 .searchWrap input {
+  box-sizing: border-box;
   width: 100%;
-  padding: 8px 12px 8px 32px;
+  padding: 8px 12px 8px 40px;
   border: 0.5px solid var(--border);
   border-radius: 8px;
   font-size: 13px;
@@ -261,16 +265,17 @@
 
 .searchIcon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
   color: var(--subtle);
+  pointer-events: none;
 }
 
 .searchInput {
+  box-sizing: border-box;
   width: 100%;
-  padding: 8px 12px 8px 32px;
+  padding: 8px 12px 8px 40px;
   border: 0.5px solid var(--border);
   border-radius: 8px;
   font-size: 13px;
@@ -296,6 +301,12 @@
   justify-content: space-between;
   color: #DC2626;
   font-size: 13px;
+}
+
+.errorText {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .retryButton {

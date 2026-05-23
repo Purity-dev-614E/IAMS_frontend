@@ -1,26 +1,32 @@
 import React from 'react';
+import { CircleCheckBig } from 'lucide-react';
 import styles from './UsedState.module.css';
 
-const UsedState = () => {
+const UsedState = ({ review }) => {
+  const studentName = review?.student?.name || 'this student';
+  const decision = review?.decision === 'rejected' ? 'Rejected' : review?.decision ? 'Approved' : 'Submitted';
+
   return (
     <div className={styles.endPage}>
-      <div className={styles.endIcon} style={{background: 'var(--bl)', border: '.5px solid rgba(27,79,216,.2)'}}>â</div>
-      <h1>Already submitted</h1>
-      <p>You have already submitted your review for Purity Sang's Week 6. No further action needed.</p>
-      <div className={styles.endCard} style={{background: 'var(--bl)', border: '.5px solid rgba(27,79,216,.2)'}}>
-        <div style={{fontSize: '10px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--blue)', marginBottom: '8px'}}>
-          Your submission
-        </div>
-        <div className={styles.endRow} style={{color: 'var(--blue)'}}>
-          <span>Decision</span>
-          <span style={{fontWeight: '500'}}>Approved</span>
-        </div>
-        <div className={styles.endRow} style={{color: 'var(--blue)'}}>
-          <span>Submitted</span>
-          <span style={{fontWeight: '500'}}>Tuesday 1 Apr 2025</span>
-        </div>
+      <div className={`${styles.endIcon} ${styles.usedIcon}`}>
+        <CircleCheckBig size={28} />
       </div>
-      <p style={{fontSize: '12px', color: 'var(--subtle)'}}>Questions? iams@jkuat.ac.ke</p>
+      <h1>Already submitted</h1>
+      <p>You have already submitted your review for {studentName}{review?.week ? `, Week ${review.week}` : ''}. No further action is needed.</p>
+      <div className={`${styles.endCard} ${styles.usedCard}`}>
+        <div className={styles.endCardTitle}>Your submission</div>
+        <div className={styles.endRow}>
+          <span>Decision</span>
+          <span>{decision}</span>
+        </div>
+        {review?.submittedAt && (
+          <div className={styles.endRow}>
+            <span>Submitted</span>
+            <span>{review.submittedAt}</span>
+          </div>
+        )}
+      </div>
+      <p className={styles.note}>Questions? iams@jkuat.ac.ke</p>
     </div>
   );
 };

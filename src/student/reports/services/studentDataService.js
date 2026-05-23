@@ -1,6 +1,26 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
 
+const getFirst = (source, keys, fallback = '') => {
+  for (const key of keys) {
+    const value = source?.[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return fallback;
+};
+
+const extractNestedFeedback = (review, type) => {
+  if (type === 'industry') {
+    return review.industry_feedback || review.industryFeedback || {};
+  }
+
+  return review.uni_feedback ||
+    review.uniFeedback ||
+    review.university_feedback ||
+    review.universityFeedback ||
+    {};
+};
+
 class StudentDataService {
   // Get student by ID
   async getStudentById(id) {
@@ -133,6 +153,24 @@ class StudentDataService {
       }
 
       const data = await apiClient.get(endpoint);
+      if (Array.isArray(data?.reviews)) {
+        return {
+          ...data,
+          reviews: data.reviews.map(review => this.normalizeWeeklyReview(review))
+        };
+      }
+
+      if (Array.isArray(data?.data?.reviews)) {
+        return {
+          ...data,
+          data: {
+            ...data.data,
+            reviews: data.data.reviews.map(review => this.normalizeWeeklyReview(review))
+          },
+          reviews: data.data.reviews.map(review => this.normalizeWeeklyReview(review))
+        };
+      }
+
       return data;
     } catch (error) {
       console.error('Error fetching weekly reviews:', error);
@@ -255,29 +293,89 @@ class StudentDataService {
 
   // Format weekly review data for display
   formatWeeklyReviewForDisplay(review) {
+    const normalized = this.normalizeWeeklyReview(review);
+
     return {
-      id: review.id,
-      attachmentId: review.attachment_id,
-      weekNumber: review.week_number,
-      weekStartDate: review.week_start_date,
-      weekEndDate: review.week_end_date,
-      status: review.status,
-      createdAt: review.created_at,
-      updatedAt: review.updated_at,
-      organizationName: review.organization_name,
-      studentName: review.student_name,
-      studentEmail: review.student_email,
-      regNumber: review.reg_number,
-      program: review.program,
-      industryApproval: review.industry_approval,
-      industryComments: review.industry_comments,
-      industryImprovements: review.industry_improvements,
-      industryFeedbackDate: review.industry_feedback_date,
-      uniRating: review.uni_rating,
-      uniComments: review.uni_comments,
-      uniImprovements: review.uni_improvements,
-      uniFeedbackDate: review.uni_feedback_date,
-      uniSupervisorName: review.uni_supervisor_name
+      id: normalized.id,
+      attachmentId: normalized.attachment_id,
+      weekNumber: normalized.week_number,
+      weekStartDate: normalized.week_start_date,
+      weekEndDate: normalized.week_end_date,
+      status: normalized.status,
+      createdAt: normalized.created_at,
+      updatedAt: normalized.updated_at,
+      organizationName: normalized.organization_name,
+      studentName: normalized.student_name,
+      studentEmail: normalized.student_email,
+      regNumber: normalized.reg_number,
+      program: normalized.program,
+      industryApproval: normalized.industry_approval,
+      industryComments: normalized.industry_comments,
+      industryImprovements: normalized.industry_improvements,
+      industryFeedbackDate: normalized.industry_feedback_date,
+      uniRating: normalized.uni_rating,
+      uniComments: normalized.uni_comments,
+      uniImprovements: normalized.uni_improvements,
+      uniFeedbackDate: normalized.uni_feedback_date,
+      uniSupervisorName: normalized.uni_supervisor_name
+    };
+  }
+
+  normalizeWeeklyReview(review = {}) {
+    const industryFeedback = extractNestedFeedback(review, 'industry');
+    const uniFeedback = extractNestedFeedback(review, 'uni');
+
+    const industryApproval = getFirst(review, ['industry_approval', 'industryApproval', 'approval', 'decision'], getFirst(industryFeedback, ['approval', 'decision'], ''));
+    const industryComments = getFirst(review, ['industry_comments', 'industryComments', 'comments', 'feedback'], getFirst(industryFeedback, ['comments', 'comment', 'feedback'], ''));
+    const industryImprovements = getFirst(
+      review,
+      ['industry_improvements', 'industryImprovements', 'industry_recommendations', 'improvement_suggestions', 'improvements'],
+      getFirst(industryFeedback, ['improvements', 'recommendations', 'suggestions', 'improvement_suggestions'], '')
+    );
+    const industryFeedbackDate = getFirst(
+      review,
+      ['industry_feedback_date', 'industryFeedbackDate', 'feedback_submitted_at', 'submitted_at'],
+      getFirst(industryFeedback, ['submitted_at', 'submittedAt', 'feedback_date', 'feedbackDate'], '')
+    );
+
+    const uniComments = getFirst(review, ['uni_comments', 'uniComments', 'university_comments'], getFirst(uniFeedback, ['comments', 'comment', 'feedback'], ''));
+    const uniImprovements = getFirst(
+      review,
+      ['uni_improvements', 'uniImprovements', 'uni_recommendations', 'university_improvements'],
+      getFirst(uniFeedback, ['improvements', 'recommendations', 'suggestions'], '')
+    );
+    const uniRating = getFirst(review, ['uni_rating', 'uniRating', 'university_rating'], getFirst(uniFeedback, ['rating'], ''));
+    const uniFeedbackDate = getFirst(
+      review,
+      ['uni_feedback_date', 'uniFeedbackDate', 'university_feedback_date'],
+      getFirst(uniFeedback, ['submitted_at', 'submittedAt', 'feedback_date', 'feedbackDate'], '')
+    );
+
+    const hasIndustryFeedback = Boolean(industryFeedbackDate || industryComments || industryImprovements || industryApproval);
+    const hasUniFeedback = Boolean(uniFeedbackDate || uniComments || uniImprovements || uniRating);
+    const rawStatus = getFirst(review, ['status', 'review_status', 'reviewStatus'], '');
+    const status = hasUniFeedback
+      ? 'complete'
+      : hasIndustryFeedback && (!rawStatus || rawStatus === 'pending')
+        ? 'industry_reviewed'
+        : rawStatus;
+
+    return {
+      ...review,
+      id: getFirst(review, ['id', 'reviewId', 'review_id', 'weekly_review_id'], ''),
+      attachment_id: getFirst(review, ['attachment_id', 'attachmentId'], ''),
+      week_number: getFirst(review, ['week_number', 'weekNumber', 'week'], ''),
+      week_start_date: getFirst(review, ['week_start_date', 'weekStartDate', 'start_date'], ''),
+      week_end_date: getFirst(review, ['week_end_date', 'weekEndDate', 'end_date'], ''),
+      status,
+      industry_approval: industryApproval,
+      industry_comments: industryComments,
+      industry_improvements: industryImprovements,
+      industry_feedback_date: industryFeedbackDate,
+      uni_comments: uniComments,
+      uni_improvements: uniImprovements,
+      uni_rating: uniRating,
+      uni_feedback_date: uniFeedbackDate
     };
   }
 

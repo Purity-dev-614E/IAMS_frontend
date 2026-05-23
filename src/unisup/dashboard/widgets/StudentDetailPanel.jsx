@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Check, ChevronRight, FileText, LoaderCircle } from 'lucide-react';
 import styles from './StudentDetailPanel.module.css';
 import { studentDataService } from '../../../student/reports/services/studentDataService';
+import { supervisorReviewService } from '../../student/review/services/supervisorReviewService';
 
 const StudentDetailPanel = ({ student }) => {
   const [expandedWeeks, setExpandedWeeks] = useState(new Set());
@@ -9,6 +11,8 @@ const StudentDetailPanel = ({ student }) => {
   const [dailyLogs, setDailyLogs] = useState([]);
   const [weeklyReviews, setWeeklyReviews] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [feedbackDrafts, setFeedbackDrafts] = useState({});
+  const [submittingReviewId, setSubmittingReviewId] = useState(null);
 
   useEffect(() => {
     if (student?.id) {
@@ -70,7 +74,7 @@ const StudentDetailPanel = ({ student }) => {
     return (
       <div className={styles.detailPanel}>
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>⊞</div>
+          <div className={styles.emptyIcon}><FileText size={28} /></div>
           <h3>Select a student</h3>
           <p>Click on a student from the list to view their detailed information and weekly reviews.</p>
         </div>
@@ -81,7 +85,10 @@ const StudentDetailPanel = ({ student }) => {
   if (loading) {
     return (
       <div className={styles.detailPanel}>
-        <div className={styles.loadingState}>Loading student details...</div>
+        <div className={styles.loadingState}>
+          <LoaderCircle size={18} className={styles.spin} />
+          Loading student details
+        </div>
       </div>
     );
   }
@@ -110,7 +117,65 @@ const StudentDetailPanel = ({ student }) => {
     if (!start || !end) return '';
     const s = new Date(start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     const e = new Date(end).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    return `${s} – ${e}`;
+    return `${s} - ${e}`;
+  };
+
+  const hasIndustryFeedback = (week) => supervisorReviewService.hasIndustryFeedback(week);
+  const hasUniversityFeedback = (week) => supervisorReviewService.hasUniversityFeedback(week);
+  const getIndustryFeedback = (week) => supervisorReviewService.normalizeIndustryFeedback(week, activeAttachment);
+  const getUniversityFeedback = (week) => supervisorReviewService.normalizeUniversityFeedback(week);
+
+  const getReviewStatusLabel = (week) => {
+    if (hasUniversityFeedback(week)) return 'Complete';
+    if (hasIndustryFeedback(week)) return 'Needs feedback';
+    return 'Industry pending';
+  };
+
+  const updateFeedbackDraft = (reviewId, field, value) => {
+    setFeedbackDrafts(prev => ({
+      ...prev,
+      [reviewId]: {
+        ...(prev[reviewId] || {}),
+        [field]: value
+      }
+    }));
+  };
+
+  const submitFeedback = async (week) => {
+    const draft = feedbackDrafts[week.id] || {};
+    const comments = (draft.comments || '').trim();
+    const improvements = (draft.improvements || '').trim();
+
+    if (!comments) return;
+
+    try {
+      setSubmittingReviewId(week.id);
+      await supervisorReviewService.submitUniversityFeedback(week.id, {
+        comments,
+        improvements
+      });
+
+      setWeeklyReviews(prev => prev.map(review => (
+        review.id === week.id
+          ? {
+              ...review,
+              status: 'complete',
+              uni_comments: comments,
+              uni_improvements: improvements,
+              uni_feedback_date: new Date().toISOString()
+            }
+          : review
+      )));
+      setFeedbackDrafts(prev => {
+        const next = { ...prev };
+        delete next[week.id];
+        return next;
+      });
+    } catch (error) {
+      console.error('Error submitting supervisor feedback:', error);
+    } finally {
+      setSubmittingReviewId(null);
+    }
   };
 
   const initials = student.name ? student.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??';
@@ -124,7 +189,7 @@ const StudentDetailPanel = ({ student }) => {
             <div className={styles.shAvatar}>{initials}</div>
             <div>
               <div className={styles.shName}>{student.name}</div>
-              <div className={styles.shSub}>{student.regNumber || student.registration} · {student.program}</div>
+              <div className={styles.shSub}>{student.regNumber || student.registration} - {student.program}</div>
             </div>
           </div>
         </div>
@@ -162,9 +227,9 @@ const StudentDetailPanel = ({ student }) => {
       <div className={styles.reviewPanel}>
         <div className={styles.rpHeader}>
           <span className={styles.rpTitle}>Weekly reviews</span>
-          {weeklyReviews.some(r => r.status === 'pending') && (
+          {weeklyReviews.some(r => hasIndustryFeedback(r) && !hasUniversityFeedback(r)) && (
             <span className={`${styles.statusPill} ${styles.pillNeeds}`}>
-              {weeklyReviews.filter(r => r.status === 'pending').length} need feedback
+              {weeklyReviews.filter(r => hasIndustryFeedback(r) && !hasUniversityFeedback(r)).length} need feedback
             </span>
           )}
         </div>
@@ -177,6 +242,12 @@ const StudentDetailPanel = ({ student }) => {
           weeklyReviews.map(week => {
             const weekLogs = getLogsForWeek(week);
             const isExpanded = expandedWeeks.has(week.week_number.toString());
+            const statusLabel = getReviewStatusLabel(week);
+            const needsFeedback = hasIndustryFeedback(week) && !hasUniversityFeedback(week);
+            const industryFeedback = getIndustryFeedback(week);
+            const universityFeedback = getUniversityFeedback(week);
+            const draft = feedbackDrafts[week.id] || {};
+            const isSubmitting = submittingReviewId === week.id;
             
             return (
               <div key={week.id} className={styles.weekItem}>
@@ -191,10 +262,10 @@ const StudentDetailPanel = ({ student }) => {
                     </div>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    <span className={`${styles.statusPill} ${week.status === 'pending' ? styles.pillNeeds : week.status === 'complete' ? styles.pillComplete : ''}`}>
-                      {week.status === 'pending' ? 'Needs feedback' : 'Complete'}
+                    <span className={`${styles.statusPill} ${needsFeedback ? styles.pillNeeds : hasUniversityFeedback(week) ? styles.pillComplete : styles.pillGray}`}>
+                      {statusLabel}
                     </span>
-                    <span className={`${styles.wtChevron} ${isExpanded ? styles.open : ''}`}>›</span>
+                    <ChevronRight size={14} className={`${styles.wtChevron} ${isExpanded ? styles.open : ''}`} />
                   </div>
                 </div>
                 
@@ -225,37 +296,52 @@ const StudentDetailPanel = ({ student }) => {
                   )}
 
                   {/* Industry feedback block */}
-                  {week.industry_comments && (
+                  {!industryFeedback.waiting && (
                     <div className={styles.industryBlock}>
-                      <div className={styles.ibLabel}>Industry supervisor · {activeAttachment?.industry_supervisor_name}</div>
-                      <div className={styles.ibText}>{week.industry_comments}</div>
-                      {week.industry_improvements && (
+                      <div className={styles.ibLabel}>Industry supervisor - {industryFeedback.supervisorName}</div>
+                      <div className={styles.ibText}>{industryFeedback.comments}</div>
+                      {industryFeedback.improvements && (
                         <div className={styles.ibText} style={{marginTop: '4px', borderTop: '0.5px dashed var(--border)', paddingTop: '4px'}}>
-                          <strong>Recommendations:</strong> {week.industry_improvements}
+                          <strong>Recommendations:</strong> {industryFeedback.improvements}
                         </div>
                       )}
                     </div>
                   )}
 
                   {/* Feedback form (Supervisor view) */}
-                  {week.status === 'pending' && (
+                  {needsFeedback && (
                     <div className={styles.feedbackForm}>
-                      <div className={styles.ffLabel}>Your feedback — Week {week.week_number}</div>
-                      <textarea placeholder="Academic comments for this week…"></textarea>
+                      <div className={styles.ffLabel}>Your feedback - Week {week.week_number}</div>
+                      <textarea
+                        placeholder="Academic comments for this week..."
+                        value={draft.comments || ''}
+                        onChange={(event) => updateFeedbackDraft(week.id, 'comments', event.target.value)}
+                      />
                       <div className={styles.ffRow}>
-                        <textarea placeholder="Improvements / recommendations…" style={{minHeight: '55px'}}></textarea>
+                        <textarea
+                          placeholder="Improvements / recommendations..."
+                          style={{minHeight: '55px'}}
+                          value={draft.improvements || ''}
+                          onChange={(event) => updateFeedbackDraft(week.id, 'improvements', event.target.value)}
+                        />
                       </div>
-                      <button className={styles.submitBtn}>Submit feedback for Week {week.week_number}</button>
+                      <button
+                        className={styles.submitBtn}
+                        onClick={() => submitFeedback(week)}
+                        disabled={isSubmitting || !(draft.comments || '').trim()}
+                      >
+                        {isSubmitting ? 'Submitting...' : `Submit feedback for Week ${week.week_number}`}
+                      </button>
                     </div>
                   )}
 
                   {/* Submitted Feedback display */}
-                  {week.status === 'complete' && week.uni_comments && (
+                  {universityFeedback?.comments && (
                     <div className={styles.awaitingBlock}>
-                      <span>✓</span>
+                      <Check size={14} />
                       <span>
-                        Feedback submitted on {new Date(week.uni_feedback_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}: 
-                        "{week.uni_comments}"
+                        Feedback submitted on {universityFeedback.submittedDate ? new Date(universityFeedback.submittedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'today'}:
+                        "{universityFeedback.comments}"
                       </span>
                     </div>
                   )}

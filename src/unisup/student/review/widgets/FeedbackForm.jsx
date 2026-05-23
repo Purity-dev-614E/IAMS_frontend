@@ -2,16 +2,22 @@ import React, { useState } from 'react';
 import styles from './FeedbackForm.module.css';
 
 const FeedbackForm = ({ week, onSubmit, onEdit, submittedFeedback, isEditing }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({
     comments: submittedFeedback?.comments || '',
     improvements: submittedFeedback?.improvements || ''
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!feedback.comments.trim()) {
       return;
     }
-    onSubmit(week, feedback);
+    try {
+      setIsSubmitting(true);
+      await onSubmit(week, feedback);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEdit = () => {
@@ -61,8 +67,8 @@ const FeedbackForm = ({ week, onSubmit, onEdit, submittedFeedback, isEditing }) 
             onChange={(e) => setFeedback({ ...feedback, improvements: e.target.value })}
           />
         </div>
-        <button className={styles.submitFbBtn} onClick={handleSubmit}>
-          {submittedFeedback ? 'Save changes' : `Submit feedback for ${week}`}
+        <button className={styles.submitFbBtn} onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : submittedFeedback ? 'Save changes' : `Submit feedback for ${week}`}
         </button>
       </div>
     </div>

@@ -2,6 +2,49 @@ import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
 
 class AdminReportsService {
+  async getAdminReportsSummary() {
+    try {
+      const data = await apiClient.get(API_ROUTES.admin.reportsSummary);
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to fetch reports summary');
+      }
+
+      return data.summary;
+    } catch (error) {
+      console.error('Error fetching admin reports summary:', error);
+      throw this.transformError(error);
+    }
+  }
+
+  async generateAdminReport(type) {
+    try {
+      const data = await apiClient.post(API_ROUTES.admin.reportsGenerate, { type });
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to generate report');
+      }
+
+      return data.report;
+    } catch (error) {
+      console.error('Error generating admin report:', error);
+      throw this.transformError(error);
+    }
+  }
+
+  downloadTableReport(report) {
+    const columns = report?.columns || [];
+    const rows = report?.rows || [];
+    const headers = columns.map(column => column.label || column.key);
+    const body = rows.map(row => columns.map(column => row[column.key] ?? ''));
+    const csv = [headers, ...body].map(items =>
+      items.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    const filename = `${report?.type || 'admin-report'}_${new Date().toISOString().split('T')[0]}.csv`;
+
+    return this.downloadReport(csv, filename);
+  }
+
   // Generate Student Report
   async generateStudentReport(studentId, format = 'json') {
     try {

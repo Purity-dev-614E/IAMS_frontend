@@ -1,5 +1,6 @@
-import React from 'react';
-import styles from './UserTable.module.css';
+  import React from 'react';
+  import styles from './UserTable.module.css';
+  import Button from '../../../shared/components/Button';
 
 const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onApprove, onReject }) => {
   const getRoleBadge = (role) => {
@@ -44,34 +45,34 @@ const UserTable = ({ users, onEdit, onDeactivate, onReactivate, onDelete, onAppr
     if (user.status === 'active') {
       return (
         <div className={styles.actions}>
-          <button className={`${styles.abtn} ${styles.abtnEdit}`} onClick={() => onEdit(user)}>
+          <Button variant="secondary" size="small" onClick={() => onEdit(user)}>
             Edit
-          </button>
-          <button className={`${styles.abtn} ${styles.abtnDeact}`} onClick={() => onDeactivate(user)}>
+          </Button>
+          <Button variant="warning" size="small" onClick={() => onDeactivate(user)}>
             Deactivate
-          </button>
+          </Button>
         </div>
       );
     } else if (user.status === 'inactive') {
       return (
         <div className={styles.actions}>
-          <button className={`${styles.abtn} ${styles.abtnAct}`} onClick={() => onReactivate(user)}>
+          <Button variant="success" size="small" onClick={() => onReactivate(user)}>
             Reactivate
-          </button>
-          <button className={`${styles.abtn} ${styles.abtnDel}`} onClick={() => onDelete(user)}>
+          </Button>
+          <Button variant="danger" size="small" onClick={() => onDelete(user)}>
             Delete
-          </button>
+          </Button>
         </div>
       );
     } else if (user.status === 'pending' && user.role === 'uni_supervisor') {
       return (
         <div className={styles.actions}>
-          <button className={`${styles.abtn} ${styles.abtnAct}`} onClick={() => onApprove(user)}>
+          <Button variant="success" size="small" onClick={() => onApprove(user)}>
             Approve
-          </button>
-          <button className={`${styles.abtn} ${styles.abtnDel}`} onClick={() => onReject(user)}>
+          </Button>
+          <Button variant="danger" size="small" onClick={() => onReject(user)}>
             Reject
-          </button>
+          </Button>
         </div>
       );
     }

@@ -12,8 +12,8 @@ const ReviewCard = ({ week, data, onFeedbackSubmit, onFeedbackEdit }) => {
     setIsOpen(!isOpen);
   };
 
-  const handleFeedbackSubmit = (weekId, feedback) => {
-    onFeedbackSubmit(weekId, feedback);
+  const handleFeedbackSubmit = async (_weekLabel, feedback) => {
+    await onFeedbackSubmit(data.id, feedback);
     setIsEditingFeedback(false);
   };
 
@@ -89,6 +89,7 @@ const ReviewCard = ({ week, data, onFeedbackSubmit, onFeedbackEdit }) => {
             {data.industryFeedback && <IndustryFeedback feedback={data.industryFeedback} />}
             <FeedbackForm
               week={`Week ${week}`}
+              reviewId={data.id}
               onSubmit={handleFeedbackSubmit}
               onEdit={handleFeedbackEdit}
               submittedFeedback={data.myFeedback}

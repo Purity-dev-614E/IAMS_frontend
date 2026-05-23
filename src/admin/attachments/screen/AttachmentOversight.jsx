@@ -75,7 +75,8 @@ const AttachmentOversight = () => {
 
   const pendingCount = attachments.filter(a => a.status === 'pending').length;
   const activeCount = attachments.filter(a => a.status === 'active').length;
-  const completedCount = attachments.filter(a => a.status === 'completed').length;
+  const completedCount = attachments.filter(a => ['complete', 'completed'].includes(a.status)).length;
+  const inactiveCount = attachments.filter(a => a.status === 'inactive').length;
 
   const showToast = (message, type = 'success') => {
     setToast({
@@ -133,25 +134,11 @@ const AttachmentOversight = () => {
 
   const handleStatusChange = async (attachment, action) => {
     try {
-      let response;
-      switch (action) {
-        case 'activate':
-          response = await attachmentApi.activateAttachment(attachment.id);
-          showToast('Attachment activated successfully');
-          break;
-        case 'complete':
-          response = await attachmentApi.completeAttachment(attachment.id);
-          showToast('Attachment marked as complete');
-          break;
-        case 'deact':
-          response = await attachmentApi.deactivateAttachment(attachment.id);
-          showToast('Attachment deactivated');
-          break;
-        default:
-          showToast('Status changed');
+      if (action === 'activate') {
+        await attachmentApi.activateAttachment(attachment.id);
+        showToast('Attachment activated successfully');
       }
-      // Refresh the data
-      fetchAttachments();
+      await fetchAttachments();
     } catch (error) {
       showToast('Failed to update attachment status', 'error');
     }
@@ -195,6 +182,7 @@ const AttachmentOversight = () => {
             pending={pendingCount}
             active={activeCount}
             completed={completedCount}
+            inactive={inactiveCount}
             total={attachments.length}
           />
 
@@ -204,6 +192,7 @@ const AttachmentOversight = () => {
             pendingCount={pendingCount}
             activeCount={activeCount}
             completedCount={completedCount}
+            inactiveCount={inactiveCount}
           />
 
           <AttachmentTable 

@@ -125,22 +125,37 @@
   color: var(--green);
 }
 
-.sbtnComplete {
-  background: var(--bl);
-  border-color: rgba(27, 79, 216, 0.3);
-  color: var(--blue);
-}
-
-.sbtnDeact {
-  background: var(--rbg);
-  border-color: rgba(159, 18, 57, 0.3);
-  color: var(--red);
-}
-
 .df {
   padding: 16px 20px;
   border-top: 0.5px solid var(--border);
   flex-shrink: 0;
+}
+
+.progressTrack {
+  height: 5px;
+  background: var(--surface);
+  border-radius: 100px;
+  border: 0.5px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 100px;
+}
+
+.resendBtn {
+  width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  background: var(--abg);
+  border: 0.5px solid rgba(146, 64, 14, 0.2);
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
 }
 
 .sp {
@@ -164,4 +179,10 @@
 .spBlue {
   background: var(--bl);
   color: var(--blue);
+}
+
+.spGray {
+  background: var(--surface);
+  color: var(--muted);
+  border: 0.5px solid var(--border);
 }

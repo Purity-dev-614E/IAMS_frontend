@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import styles from './UserManagement.module.css';
-import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
-import UserTable from '../widgets/UserTable';
-import UserModal from '../widgets/UserModal';
-import ConfirmModal from '../widgets/ConfirmModal';
-import Toast from '../../../shared/widgets/Toast';
-import { useAuth } from '../../../contexts/AuthContext';
-import { userApi } from '../services/userApi';
-import { FiDownload, FiSearch } from 'react-icons/fi';
+/* eslint-disable no-unused-vars */
+  import React, { useState, useEffect } from 'react';
+  import styles from './UserManagement.module.css';
+  import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
+  import UserTable from '../widgets/UserTable';
+  import UserModal from '../widgets/UserModal';
+  import ConfirmModal from '../widgets/ConfirmModal';
+  import Toast from '../../../shared/widgets/Toast';
+  import { useAuth } from '../../../contexts/AuthContext';
+  import { userApi } from '../services/userApi';
+  import { FiDownload, FiSearch } from 'react-icons/fi';
+  import Button from '../../../shared/components/Button';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -133,6 +135,7 @@ const UserManagement = () => {
       await userApi.deleteUser(selectedUser.id);
       showToast('Account deleted');
       fetchUsers(); // Refresh user list
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       showToast('Failed to delete user', 'error');
     } finally {
@@ -199,13 +202,12 @@ const UserManagement = () => {
             <div className={styles.topbarSubtitle}>84 users across all roles</div>
           </div>
           <div className={styles.topbarRight}>
-            <button className={styles.btnGhost}>
-              <FiDownload style={{marginRight: '6px'}} />
+            <Button variant="ghost" icon={FiDownload} iconPosition="left">
               Export
-            </button>
-            <button className={styles.btnPrimary} onClick={handleCreate}>
+            </Button>
+            <Button variant="primary" onClick={handleCreate}>
               + Create user
-            </button>
+            </Button>
           </div>
         </div>
 

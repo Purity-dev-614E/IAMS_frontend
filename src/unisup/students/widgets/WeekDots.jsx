@@ -36,11 +36,11 @@ const WeekDots = ({ weekData, showLabels = true, currentWeek = false }) => {
   };
 
   const getCompletedCount = () => {
-    return weekData.filter(day => day === 'submitted' || day === 'complete').length;
+    return (weekData || []).filter(day => day === 'submitted' || day === 'complete').length;
   };
 
   const getTotalCount = () => {
-    return weekData.filter(day => day !== 'upcoming').length;
+    return (weekData || []).filter(day => day !== 'upcoming').length;
   };
 
   const getStatusText = () => {
@@ -72,12 +72,12 @@ const WeekDots = ({ weekData, showLabels = true, currentWeek = false }) => {
   return (
     <div>
       <div className={styles.weekDots}>
-        {weekData.map((status, index) => (
+        {(weekData || []).map((status, index) => (
           <div
             key={index}
             className={styles.weekDot}
             style={getDotStyle(status)}
-            title={`${getDayLabel(index)} — ${status}`}
+            title={`${getDayLabel(index)} - ${status}`}
           />
         ))}
       </div>

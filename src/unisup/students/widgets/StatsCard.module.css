@@ -3,6 +3,18 @@
   border: 0.5px solid var(--border);
   border-radius: 12px;
   padding: 14px 18px;
+  box-shadow: 0 12px 30px rgba(15, 34, 68, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.statsCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), rgba(22, 101, 52, 0.75), rgba(146, 64, 14, 0.7));
+  opacity: 0.75;
 }
 
 .label {
@@ -10,6 +22,7 @@
   color: var(--subtle);
   letter-spacing: 0.03em;
   margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 .value {
@@ -28,7 +41,7 @@
 .pill {
   display: inline-block;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 2px 7px;
   border-radius: 100px;
   margin-top: 5px;

@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './AttachmentTable.module.css';
 
-// Helper function to format date to local readable format
 const formatLocalDate = (dateString) => {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
@@ -15,7 +14,6 @@ const formatLocalDate = (dateString) => {
   });
 };
 
-// Helper function to calculate duration in weeks
 const calculateWeeks = (startDate, endDate) => {
   if (!startDate || !endDate) return 'N/A';
   const start = new Date(startDate);
@@ -25,29 +23,48 @@ const calculateWeeks = (startDate, endDate) => {
   return `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`;
 };
 
-const AttachmentTable = ({ 
-  attachments, 
-  onActivate, 
-  onView, 
+const formatStatus = (status) => {
+  const normalizedStatus = String(status || 'pending').trim().toLowerCase();
+  const labels = {
+    pending: 'Pending',
+    active: 'Active',
+    inactive: 'Inactive',
+    complete: 'Complete',
+    completed: 'Complete'
+  };
+
+  return labels[normalizedStatus] || normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+};
+
+const AttachmentTable = ({
+  attachments,
+  onActivate,
+  onView,
   onResend,
   loading = false
 }) => {
   const getStatusBadge = (status) => {
+    const normalizedStatus = String(status || 'pending').trim().toLowerCase();
     const statusClasses = {
       pending: styles.spAmber,
       active: styles.spGreen,
-      completed: styles.spBlue
+      inactive: styles.spGray,
+      complete: styles.spBlue,
+      completed: styles.spBlue,
     };
+
     return (
-      <span className={`${styles.sp} ${statusClasses[status] || styles.spGray}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className={`${styles.sp} ${statusClasses[normalizedStatus] || styles.spGray}`}>
+        {formatStatus(normalizedStatus)}
       </span>
     );
   };
 
   const getLogsBadge = (logs, status) => {
-    if (status === 'pending') {
-      return <span style={{color: 'var(--subtle)'}}>â</span>;
+    const normalizedStatus = String(status || '').trim().toLowerCase();
+
+    if (normalizedStatus === 'pending') {
+      return <span style={{ color: 'var(--subtle)' }}>N/A</span>;
     }
     if (logs === 0) {
       return <span className={`${styles.sp} ${styles.spGray}`}>0 logs</span>;
@@ -62,13 +79,13 @@ const AttachmentTable = ({
     if (attachment.status === 'pending') {
       return (
         <div className={styles.acts}>
-          <button 
+          <button
             className={`${styles.abtn} ${styles.abtnActivate}`}
             onClick={() => onActivate(attachment)}
           >
             Activate
           </button>
-          <button 
+          <button
             className={`${styles.abtn} ${styles.abtnView}`}
             onClick={() => onView(attachment)}
           >
@@ -77,17 +94,17 @@ const AttachmentTable = ({
         </div>
       );
     }
-    
+
     if (attachment.status === 'active') {
       return (
         <div className={styles.acts}>
-          <button 
+          <button
             className={`${styles.abtn} ${styles.abtnResend}`}
             onClick={() => onResend(attachment)}
           >
             Resend email
           </button>
-          <button 
+          <button
             className={`${styles.abtn} ${styles.abtnView}`}
             onClick={() => onView(attachment)}
           >
@@ -96,11 +113,10 @@ const AttachmentTable = ({
         </div>
       );
     }
-    
-    // completed
+
     return (
       <div className={styles.acts}>
-        <button 
+        <button
           className={`${styles.abtn} ${styles.abtnView}`}
           onClick={() => onView(attachment)}
         >
@@ -140,12 +156,14 @@ const AttachmentTable = ({
                 </td>
                 <td>
                   <div className={styles.org}>{attachment.organization_name}</div>
-                  <div className={styles.orgSup}>{formatLocalDate(attachment.start_date)} · {formatLocalDate(attachment.end_date)}</div>
+                  <div className={styles.orgSup}>
+                    {formatLocalDate(attachment.start_date)} - {formatLocalDate(attachment.end_date)}
+                  </div>
                 </td>
-                <td style={{fontSize: '12px', color: 'var(--muted)'}}>
+                <td style={{ fontSize: '12px', color: 'var(--muted)' }}>
                   {attachment.industry_supervisor_name}
                 </td>
-                <td style={{fontSize: '12px', color: 'var(--muted)', whiteSpace: 'nowrap'}}>
+                <td style={{ fontSize: '12px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>
                   {calculateWeeks(attachment.start_date, attachment.end_date)}
                 </td>
                 <td>{getStatusBadge(attachment.status)}</td>

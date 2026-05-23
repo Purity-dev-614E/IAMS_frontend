@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import styles from './StudentTable.module.css';
 
@@ -37,13 +38,28 @@ const StudentTable = ({
   };
 
   const getAttachmentBadge = (status) => {
+    const normalizedStatus = String(status || 'pending').trim().toLowerCase();
     const statusClasses = {
       active: styles.spGreen,
-      pending: styles.spAmber
+      pending: styles.spAmber,
+      completed: styles.spBlue,
+      complete: styles.spBlue,
+      inactive: styles.spGray,
+      rejected: styles.spRed,
+      none: styles.spGray
+    };
+    const statusLabels = {
+      active: 'Active',
+      pending: 'Pending',
+      completed: 'Complete',
+      complete: 'Complete',
+      inactive: 'Inactive',
+      rejected: 'Rejected',
+      none: 'No attachment'
     };
     return (
-      <span className={`${styles.sp} ${statusClasses[status] || styles.spGray}`}>
-        {status === 'active' ? 'Active' : 'Pending'}
+      <span className={`${styles.sp} ${statusClasses[normalizedStatus] || styles.spGray}`}>
+        {statusLabels[normalizedStatus] || normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1)}
       </span>
     );
   };

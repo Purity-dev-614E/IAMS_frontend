@@ -12,7 +12,6 @@ const WeeklyReviews = () => {
   const [profileData, setProfileData] = useState(null);
   const [weeklyReviews, setWeeklyReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState(null);
   const { user } = useAuth();
 
   // Fetch profile data and weekly reviews on component mount
@@ -40,13 +39,24 @@ const WeeklyReviews = () => {
       console.log('📝 Reviews Data:', reviewsData);
       console.log('📄 Pagination:', reviewsResponse.pagination);
       
-      // Set pagination info
-      setPagination(reviewsResponse.pagination);
-      
-      // Transform API data to match component format
-      const transformedReviews = reviewsData.map(review => 
-        weeklyReviewService.transformReviewData(review)
-      );
+      // Transform API data to match component format and fetch logs if the review
+      // payload does not already include them.
+      const transformedReviews = await Promise.all(reviewsData.map(async (review) => {
+        const transformedReview = weeklyReviewService.transformReviewData(review);
+
+        if (transformedReview.dailyLogs.length === 0) {
+          const logs = await weeklyReviewService.getReviewLogs(review);
+          const dailyLogs = weeklyReviewService.normalizeDailyLogs(logs);
+          return {
+            ...transformedReview,
+            dailyLogs,
+            logsSubmitted: transformedReview.logsSubmitted || dailyLogs.filter(log => !log.missing).length,
+            totalLogs: transformedReview.totalLogs || dailyLogs.length || 5
+          };
+        }
+
+        return transformedReview;
+      }));
       console.log('🔄 Transformed Reviews:', transformedReviews);
       
       setWeeklyReviews(transformedReviews);

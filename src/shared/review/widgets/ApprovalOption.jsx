@@ -9,13 +9,15 @@ const ApprovalOption = ({
   sublabel 
 }) => {
   return (
-    <div 
+    <button
+      type="button"
       className={`${styles.approvalOption} ${
         isSelected && type === 'approve' ? styles.selectedApprove : ''
       } ${
         isSelected && type === 'reject' ? styles.selectedReject : ''
       }`}
       onClick={onClick}
+      aria-pressed={isSelected}
     >
       <div className={styles.approvalRadio}>
         <div className={styles.approvalDot}></div>
@@ -24,7 +26,7 @@ const ApprovalOption = ({
         <div className={styles.approvalLabel}>{label}</div>
         <div className={styles.approvalSublabel}>{sublabel}</div>
       </div>
-    </div>
+    </button>
   );
 };
 

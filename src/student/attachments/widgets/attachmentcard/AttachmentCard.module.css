@@ -54,6 +54,12 @@
   border: 0.5px solid rgba(147,197,253,0.3);
 }
 
+.pillInactive {
+  background: rgba(100,116,139,0.3);
+  color: #CBD5E1;
+  border: 0.5px solid rgba(203,213,225,0.25);
+}
+
 .acBody {
   padding: 1.5rem;
 }

@@ -1,7 +1,108 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
+import { studentDataService } from '../../../student/reports/services/studentDataService';
 
 class SupervisorStudentsService {
+  getField(student, keys, fallback = '') {
+    const keyList = Array.isArray(keys) ? keys : [keys];
+    for (const key of keyList) {
+      if (student?.[key] !== undefined && student?.[key] !== null && student?.[key] !== '') {
+        return student[key];
+      }
+    }
+    return fallback;
+  }
+
+  normalizeStatus(status) {
+    const normalized = String(status || '').toLowerCase().replace(/[_-]/g, ' ');
+
+    if (normalized.includes('flag')) return 'Flagged';
+    if (normalized.includes('need') || normalized.includes('pending uni') || normalized.includes('awaiting supervisor')) {
+      return 'Needs my feedback';
+    }
+    if (normalized.includes('industry')) return 'Industry pending';
+    if (normalized.includes('complete') || normalized.includes('reviewed') || normalized.includes('done')) return 'Reviewed';
+
+    return '';
+  }
+
+  buildWeekStatuses(student, mode) {
+    const raw =
+      mode === 'current'
+        ? this.getField(student, ['currentWeek', 'current_week', 'current_week_statuses', 'week_statuses'], null)
+        : this.getField(student, ['previousWeeks', 'previous_weeks', 'previous_week_statuses'], null);
+
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw;
+    }
+
+    const submitted = Number(this.getField(student, ['submitted_logs_count', 'submittedLogsCount', 'logs_submitted'], 0));
+    const missing = Number(this.getField(student, ['missing_logs_count', 'missingLogsCount', 'logs_missing'], 0));
+    const total = mode === 'current' ? 5 : 5;
+
+    if (submitted || missing) {
+      return Array.from({ length: total }, (_, index) => {
+        if (index < submitted) return mode === 'current' ? 'submitted' : 'complete';
+        if (index < submitted + missing) return 'missing';
+        return mode === 'current' ? 'upcoming' : 'pending';
+      });
+    }
+
+    return Array.from({ length: total }, () => (mode === 'current' ? 'upcoming' : 'pending'));
+  }
+
+  async enrichStudentWithAttachment(student) {
+    const studentId = this.getField(student, ['id', 'student_id', 'studentId'], null);
+    if (!studentId) {
+      return student;
+    }
+
+    try {
+      const attachmentsResponse = await studentDataService.getStudentAttachments(studentId, { limit: 20 });
+      const attachments = attachmentsResponse.attachments || [];
+      const activeAttachment = attachments.find(attachment => attachment.status === 'active') || attachments[0];
+
+      if (!activeAttachment) {
+        return student;
+      }
+
+      let weeklyReviews = [];
+      try {
+        const reviewsResponse = await studentDataService.getWeeklyReviews({
+          attachmentId: activeAttachment.id,
+          limit: 100
+        });
+        weeklyReviews = reviewsResponse.reviews || [];
+      } catch (reviewError) {
+        console.error(`Error fetching reviews for student ${studentId}:`, reviewError);
+      }
+
+      const latestWeeklyReview = [...weeklyReviews].sort((a, b) => {
+        const weekA = Number(a.week_number) || 0;
+        const weekB = Number(b.week_number) || 0;
+        return weekB - weekA;
+      })[0] || null;
+
+      return {
+        ...student,
+        organization_name: activeAttachment.organization_name,
+        industry_supervisor_name: activeAttachment.industry_supervisor_name,
+        industry_supervisor_email: activeAttachment.industry_supervisor_email,
+        active_attachment: activeAttachment,
+        attachment_status: activeAttachment.status,
+        weekly_reviews: weeklyReviews,
+        latest_weekly_review: latestWeeklyReview
+      };
+    } catch (error) {
+      console.error(`Error enriching student ${studentId} with attachment:`, error);
+      return student;
+    }
+  }
+
+  async enrichStudentsWithAttachments(students = []) {
+    return Promise.all(students.map(student => this.enrichStudentWithAttachment(student)));
+  }
+
   // Get students assigned to current supervisor
   async getMyStudents() {
     try {
@@ -35,9 +136,11 @@ class SupervisorStudentsService {
               return acc;
             }, []);
             
+            const enrichedStudents = await this.enrichStudentsWithAttachments(uniqueStudents);
+
             return {
               success: true,
-              students: uniqueStudents
+              students: enrichedStudents
             };
           }
         } catch (secondError) {
@@ -51,6 +154,13 @@ class SupervisorStudentsService {
         }
       }
       
+      if (data?.students && Array.isArray(data.students)) {
+        return {
+          ...data,
+          students: await this.enrichStudentsWithAttachments(data.students)
+        };
+      }
+
       return data;
     } catch (error) {
       console.error('Error fetching my students:', error);
@@ -107,72 +217,141 @@ class SupervisorStudentsService {
 
   // Format student data for display
   formatStudentForDisplay(student) {
+    const reviewStatus = this.getReviewStatus(student);
+    const flagged = Boolean(this.getField(student, ['flagged', 'is_flagged'], false)) || reviewStatus === 'Flagged';
+    const name = this.getField(student, ['name', 'student_name', 'studentName'], 'Unknown student');
+    const registration = this.getField(student, ['registration', 'reg_number', 'regNumber'], 'No registration');
+
     return {
-      id: student.id,
-      name: student.student_name,
-      registration: student.reg_number,
-      program: student.program,
-      yearOfStudy: student.year_of_study,
-      email: student.student_email,
-      organization: student.organization_name || 'Not assigned',
-      attachmentCount: student.attachment_count || 0,
-      // These would come from additional API calls or be calculated
+      id: this.getField(student, ['id', 'student_id', 'studentId']),
+      name,
+      registration,
+      regNumber: registration,
+      program: this.getField(student, ['program'], 'Not provided'),
+      yearOfStudy: this.getField(student, ['yearOfStudy', 'year_of_study'], ''),
+      email: this.getField(student, ['email', 'student_email', 'studentEmail'], ''),
+      organization: this.getField(student, ['organization', 'organization_name', 'organizationName'], 'Not assigned'),
+      attachmentCount: Number(this.getField(student, ['attachmentCount', 'attachment_count'], 0)),
+      activeAttachment: student.active_attachment || null,
+      latestWeeklyReview: student.latest_weekly_review || null,
+      weeklyReviews: student.weekly_reviews || [],
+      attachmentStatus: this.getField(student, ['attachmentStatus', 'attachment_status'], ''),
       currentWeek: this.getCurrentWeekStatus(student),
       previousWeeks: this.getPreviousWeeksStatus(student),
-      reviewStatus: this.getReviewStatus(student),
-      flagged: student.flagged || false,
-      filters: this.getStudentFilters(student)
+      reviewStatus,
+      flagged,
+      filters: this.getStudentFilters({ ...student, reviewStatus, flagged })
     };
   }
 
-  // Calculate current week status (mock implementation)
+  // Calculate current week status from API fields, falling back to neutral values
   getCurrentWeekStatus(student) {
-    // This would typically come from weekly reviews API
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    return days.map(() => {
-      const statuses = ['submitted', 'missing', 'upcoming'];
-      return statuses[Math.floor(Math.random() * statuses.length)];
-    });
+    return this.buildWeekStatuses(student, 'current');
   }
 
-  // Calculate previous weeks status (mock implementation)
+  // Calculate previous weeks status from API fields, falling back to neutral values
   getPreviousWeeksStatus(student) {
-    // This would typically come from weekly reviews API
-    const weeks = 5;
-    return Array(weeks).fill(null).map(() => {
-      const statuses = ['complete', 'pending', 'missing'];
-      return statuses[Math.floor(Math.random() * statuses.length)];
-    });
+    return this.buildWeekStatuses(student, 'previous');
   }
 
   // Determine review status based on student data
   getReviewStatus(student) {
-    // This would be calculated based on weekly reviews and feedback
-    const statuses = ['Needs my feedback', 'Reviewed', 'Industry pending', 'Flagged'];
-    
-    if (student.flagged) return 'Flagged';
-    
-    // Random logic for demo - in real implementation this would be based on actual review data
-    const randomStatus = statuses[Math.floor(Math.random() * (statuses.length - 1))];
-    return randomStatus;
+    if (student.flagged || student.is_flagged) return 'Flagged';
+
+    const latestReview = student.latest_weekly_review || student.latestWeeklyReview;
+    if (latestReview) {
+      const industryFeedback = latestReview.industry_feedback || latestReview.industryFeedback || {};
+      const universityFeedback = latestReview.uni_feedback || latestReview.uniFeedback || latestReview.university_feedback || latestReview.universityFeedback || {};
+      const hasUniFeedback = Boolean(
+        latestReview.uni_feedback_date ||
+        latestReview.uniFeedbackDate ||
+        latestReview.uni_comments ||
+        latestReview.uniComments ||
+        latestReview.uni_improvements ||
+        latestReview.uniImprovements ||
+        latestReview.uni_rating ||
+        latestReview.uniRating ||
+        universityFeedback.submitted_at ||
+        universityFeedback.submittedAt ||
+        universityFeedback.comments ||
+        universityFeedback.feedback ||
+        universityFeedback.rating ||
+        latestReview.status === 'complete'
+      );
+
+      if (hasUniFeedback) return 'Reviewed';
+
+      const hasIndustryFeedback = Boolean(
+        latestReview.industry_feedback_date ||
+        latestReview.industryFeedbackDate ||
+        latestReview.feedback_submitted_at ||
+        latestReview.submitted_at ||
+        latestReview.industry_comments ||
+        latestReview.industryComments ||
+        latestReview.comments ||
+        latestReview.feedback ||
+        latestReview.industry_improvements ||
+        latestReview.industryImprovements ||
+        latestReview.industry_recommendations ||
+        latestReview.improvement_suggestions ||
+        latestReview.industry_approval ||
+        latestReview.industryApproval ||
+        latestReview.approval ||
+        latestReview.decision ||
+        industryFeedback.submitted_at ||
+        industryFeedback.submittedAt ||
+        industryFeedback.comments ||
+        industryFeedback.feedback ||
+        industryFeedback.improvements ||
+        industryFeedback.approval ||
+        industryFeedback.decision
+      );
+
+      if (hasIndustryFeedback) return 'Needs my feedback';
+
+      return 'Industry pending';
+    }
+
+    const status = this.normalizeStatus(this.getField(student, [
+      'reviewStatus',
+      'review_status',
+      'status',
+      'weekly_review_status',
+      'latest_review_status'
+    ]));
+
+    if (status) return status;
+
+    const pendingFeedback = Number(this.getField(student, ['pending_feedback_count', 'pendingReviews', 'pending_reviews'], 0));
+    const missingLogs = Number(this.getField(student, ['missing_logs_count', 'missingLogsCount', 'logs_missing'], 0));
+    const completedReviews = Number(this.getField(student, ['complete_reviews', 'completedReviews', 'reviewed_count'], 0));
+
+    if (pendingFeedback > 0) return 'Needs my feedback';
+    if (missingLogs > 0) return 'Industry pending';
+    if (completedReviews > 0) return 'Reviewed';
+
+    if (student.active_attachment || student.activeAttachment) return 'Industry pending';
+
+    return 'No active attachment';
   }
 
   // Get filter categories for student
   getStudentFilters(student) {
     const filters = [];
+    const reviewStatus = this.getReviewStatus(student);
     
     if (student.flagged) {
       filters.push('flagged');
     }
     
-    // Add other filter logic based on review status, submission status, etc.
-    const reviewStatus = this.getReviewStatus(student);
     if (reviewStatus === 'Needs my feedback') {
       filters.push('needs');
     }
     
-    // Check if student is behind (mock implementation)
-    if (Math.random() > 0.7) {
+    if (
+      Number(this.getField(student, ['missing_logs_count', 'missingLogsCount', 'logs_missing'], 0)) > 0 ||
+      this.getCurrentWeekStatus(student).includes('missing')
+    ) {
       filters.push('behind');
     }
     
@@ -190,8 +369,8 @@ class SupervisorStudentsService {
     };
 
     students.forEach(student => {
-      const filters = this.getStudentFilters(student);
-      const reviewStatus = this.getReviewStatus(student);
+      const filters = student.filters || this.getStudentFilters(student);
+      const reviewStatus = student.reviewStatus || this.getReviewStatus(student);
 
       if (reviewStatus === 'Needs my feedback') {
         stats.needs++;
@@ -220,7 +399,7 @@ class SupervisorStudentsService {
     }
     
     return students.filter(student => {
-      const filters = this.getStudentFilters(student);
+      const filters = student.filters || this.getStudentFilters(student);
       return filters.includes(activeFilter);
     });
   }
@@ -233,9 +412,13 @@ class SupervisorStudentsService {
     
     const term = searchTerm.toLowerCase();
     return students.filter(student => 
+      student.name?.toLowerCase().includes(term) ||
       student.student_name?.toLowerCase().includes(term) ||
+      student.registration?.toLowerCase().includes(term) ||
       student.reg_number?.toLowerCase().includes(term) ||
-      student.program?.toLowerCase().includes(term)
+      student.program?.toLowerCase().includes(term) ||
+      student.organization?.toLowerCase().includes(term) ||
+      student.organization_name?.toLowerCase().includes(term)
     );
   }
 
@@ -254,14 +437,14 @@ class SupervisorStudentsService {
     ];
     
     const rows = students.map(student => [
-      student.student_name || '',
-      student.reg_number || '',
+      student.name || student.student_name || '',
+      student.registration || student.reg_number || '',
       student.program || '',
-      student.year_of_study || '',
-      student.student_email || '',
-      student.organization_name || 'Not assigned',
-      student.attachment_count || 0,
-      this.getReviewStatus(student),
+      student.yearOfStudy || student.year_of_study || '',
+      student.email || student.student_email || '',
+      student.organization || student.organization_name || 'Not assigned',
+      student.attachmentCount || student.attachment_count || 0,
+      student.reviewStatus || this.getReviewStatus(student),
       student.flagged ? 'Yes' : 'No'
     ]);
     

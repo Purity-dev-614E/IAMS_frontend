@@ -25,6 +25,21 @@ const AttachmentInfo = ({ student, attachment }) => {
   };
 
   const progress = calculateProgress();
+  const status = String(attachment?.status || '').trim().toLowerCase();
+  const statusLabels = {
+    active: 'Active',
+    pending: 'Pending',
+    complete: 'Complete',
+    completed: 'Complete',
+    inactive: 'Inactive'
+  };
+  const statusClasses = {
+    active: styles.pillVerified,
+    pending: styles.pillPending,
+    complete: styles.pillComplete,
+    completed: styles.pillComplete,
+    inactive: styles.pillInactive
+  };
 
   return (
     <div className={styles.card}>
@@ -52,8 +67,8 @@ const AttachmentInfo = ({ student, attachment }) => {
           </div>
           <div className={styles.infoRow}>
             <span className={styles.infoKey}>Status</span>
-            <span className={`${styles.statusPill} ${attachment?.status === 'active' ? styles.pillVerified : styles.pillPending}`} style={{fontSize: '11px'}}>
-              {attachment?.status ? (attachment.status.charAt(0).toUpperCase() + attachment.status.slice(1)) : 'N/A'}
+            <span className={`${styles.statusPill} ${statusClasses[status] || styles.pillPending}`} style={{fontSize: '11px'}}>
+              {status ? (statusLabels[status] || status.charAt(0).toUpperCase() + status.slice(1)) : 'N/A'}
             </span>
           </div>
         </div>

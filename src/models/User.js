@@ -7,6 +7,9 @@ export class User extends BaseModel {
     this.userName = data.userName || data.name;
     this.userEmail = data.userEmail || data.email;
     this.userRole = data.userRole || data.role;
+    this.userStatus = data.userStatus || data.status;
+    this.department = data.department;
+    this.staffId = data.staffId || data.staff_id;
   }
 
   getFieldMapping() {
@@ -15,7 +18,10 @@ export class User extends BaseModel {
       userId: 'id',
       userName: 'name',
       userEmail: 'email',
-      userRole: 'role'
+      userRole: 'role',
+      userStatus: 'status',
+      department: 'department',
+      staffId: 'staff_id'
     };
   }
 
@@ -40,7 +46,7 @@ export class User extends BaseModel {
   }
 
   isUniSupervisor() {
-    return this.userRole === 'uni_supervisor';
+    return ['uni_supervisor', 'uni_sup'].includes(this.userRole);
   }
 
   getDisplayName() {
@@ -50,5 +56,17 @@ export class User extends BaseModel {
   // Add role getter for backward compatibility
   get role() {
     return this.userRole;
+  }
+
+  get name() {
+    return this.userName;
+  }
+
+  get email() {
+    return this.userEmail;
+  }
+
+  get status() {
+    return this.userStatus;
   }
 }

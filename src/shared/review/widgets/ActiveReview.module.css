@@ -1,13 +1,13 @@
 .pageContent {
   max-width: 540px;
   margin: 0 auto;
-  padding: 28px 20px;
+  padding: 28px 20px 32px;
 }
 
 .card {
   background: var(--w);
   border: 0.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   margin-bottom: 12px;
   overflow: hidden;
 }
@@ -87,6 +87,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .logsTitle {
@@ -113,6 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   margin-bottom: 8px;
 }
 
@@ -199,7 +201,7 @@
   margin-bottom: 20px;
 }
 
-label {
+.reviewForm label {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -219,7 +221,7 @@ label {
   color: var(--red);
 }
 
-textarea {
+.reviewForm textarea {
   width: 100%;
   border: 0.5px solid var(--border);
   border-radius: 8px;
@@ -234,18 +236,20 @@ textarea {
   line-height: 1.6;
   display: block;
   margin-bottom: 14px;
+  min-height: 112px;
 }
 
-textarea:last-of-type {
+.reviewForm textarea:last-of-type {
   margin-bottom: 0;
+  min-height: 92px;
 }
 
-textarea:focus {
+.reviewForm textarea:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.07);
 }
 
-textarea::placeholder {
+.reviewForm textarea::placeholder {
   color: var(--subtle);
 }
 
@@ -262,6 +266,7 @@ textarea::placeholder {
   cursor: pointer;
   margin-top: 16px;
   transition: background 0.15s;
+  min-height: 48px;
 }
 
 .submitButton:hover {
@@ -279,4 +284,91 @@ textarea::placeholder {
   color: var(--subtle);
   padding: 10px 0 4px;
   line-height: 1.6;
+}
+
+.emptyLogs {
+  padding: 24px 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.formError {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 0.5px solid var(--rb);
+  border-radius: 8px;
+  background: var(--rbg);
+  color: var(--red);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 560px) {
+  .pageContent {
+    width: 100%;
+    padding: 14px 12px 24px;
+  }
+
+  .card {
+    margin-bottom: 10px;
+  }
+
+  .cardHeader,
+  .reviewForm {
+    padding: 16px;
+  }
+
+  .cardRow {
+    align-items: stretch;
+  }
+
+  .cardName {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .cardSub {
+    line-height: 1.45;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .logsHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px 16px;
+  }
+
+  .logEntry {
+    padding: 14px 16px;
+  }
+
+  .logEntryHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .logDate {
+    line-height: 1.4;
+  }
+
+  .approvalOptions {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .reviewHeader {
+    padding: 14px 16px;
+  }
+
+  .submitButton {
+    font-size: 13px;
+  }
 }

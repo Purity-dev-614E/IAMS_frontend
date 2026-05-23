@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './StudentDashboard.module.css';
 import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import { profileService } from '../../../shared/profile/profileService';
 import { useAuth } from '../../../contexts/AuthContext';
 import { studentDashboardService } from '../services/studentDashboardService';
+import { isActiveAttachment } from '../../attachments/services/studentAttachmentAccess';
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
 import { 
@@ -19,6 +21,7 @@ import {
 
 const StudentDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -31,19 +34,17 @@ const StudentDashboard = () => {
     thisWeekLogs: []
   });
 
-  // Fetch dashboard data on component mount
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
       const rawData = await studentDashboardService.fetchDashboardData();
+
+      if (!isActiveAttachment(rawData.activeAttachment)) {
+        navigate('/attachments', { replace: true });
+        return;
+      }
       
       // Also fetch logs for the current week
       let weekLogs = [];
@@ -70,7 +71,14 @@ const StudentDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user, loadDashboardData]);
 
   if (loading && !dashboardData.student) {
     return (

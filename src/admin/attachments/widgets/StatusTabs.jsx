@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './StatusTabs.module.css';
 
-const StatusTabs = ({ activeTab, onTabChange, pendingCount, activeCount, completedCount }) => {
+const StatusTabs = ({ activeTab, onTabChange, pendingCount, activeCount, completedCount, inactiveCount }) => {
   const tabs = [
     { id: 'pending', label: 'Pending', badge: pendingCount, badgeClass: styles.tbAmber },
     { id: 'active', label: 'Active', badge: activeCount, badgeClass: styles.tbBlue },
-    { id: 'completed', label: 'Completed', badge: completedCount, badgeClass: styles.tbGreen },
+    { id: 'complete', label: 'Complete', badge: completedCount, badgeClass: styles.tbGreen },
+    { id: 'inactive', label: 'Inactive', badge: inactiveCount, badgeClass: styles.tbGray },
     { id: 'all', label: 'All', badge: null }
   ];
 

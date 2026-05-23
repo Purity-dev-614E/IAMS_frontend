@@ -1,11 +1,17 @@
 import React from 'react';
 import styles from './StudentsNeedingAttention.module.css';
 
-const NewStudents = ({ students = [] }) => {
+const NewStudents = ({ students = [], onViewStudent }) => {
+  const normalizeStatus = (status, fallback = 'pending') => (
+    String(status || fallback).trim().toLowerCase()
+  );
+
   const getStatusPill = (status) => {
-    switch (status?.toLowerCase()) {
+    switch (normalizeStatus(status)) {
       case 'active': return styles.pillActive;
       case 'pending': return styles.pillPending;
+      case 'inactive': return styles.pillGray;
+      case 'completed': return styles.pillActive;
       default: return styles.pillGray;
     }
   };
@@ -33,7 +39,7 @@ const NewStudents = ({ students = [] }) => {
           </thead>
           <tbody>
             {students.map((student, index) => (
-              <tr key={student.id || index}>
+              <tr key={student.student_id || student.id || index}>
                 <td>
                   <div className={styles.studentName}>{student.student_name || 'Unknown'}</div>
                   <div className={styles.studentSub}>{student.student_email}</div>
@@ -42,12 +48,12 @@ const NewStudents = ({ students = [] }) => {
                 <td style={{fontSize: '12px', color: 'var(--muted)'}}>{student.reg_number || 'N/A'}</td>
                 <td>
                   <span className={`${styles.statusPill} ${getStatusPill(student.status || 'pending')}`}>
-                    {student.status || 'Pending'}
+                    {normalizeStatus(student.status || 'pending').replace(/\b\w/g, char => char.toUpperCase())}
                   </span>
                 </td>
                 <td>
                   <div className={styles.actionBtns}>
-                    <button className={`${styles.tblBtn}`}>
+                    <button className={`${styles.tblBtn}`} onClick={() => onViewStudent?.(student)}>
                       View profile
                     </button>
                   </div>

@@ -2,6 +2,20 @@ import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
 import { Student, Attachment, WeeklyReview, transformToModel } from '../../../models';
 
+const getFirst = (source, keys, fallback = '') => {
+  for (const key of keys) {
+    const value = source?.[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return fallback;
+};
+
+const toDate = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 // API integration service for student dashboard
 export const studentDashboardService = {
   // Fetch student dashboard data
@@ -90,18 +104,34 @@ export const studentDashboardService = {
     
     return reviews.map(review => {
       const reviewModel = transformToModel(review, WeeklyReview);
+      const industryFeedback = review.industry_feedback || review.industryFeedback || {};
+      const uniFeedback = review.uni_feedback || review.uniFeedback || review.university_feedback || review.universityFeedback || {};
+      const industryApproval = getFirst(review, ['industry_approval', 'industryApproval', 'approval', 'decision'], getFirst(industryFeedback, ['approval', 'decision'], ''));
+      const industryComments = getFirst(review, ['industry_comments', 'industryComments', 'comments', 'feedback'], getFirst(industryFeedback, ['comments', 'comment', 'feedback'], ''));
+      const industryFeedbackDate = getFirst(
+        review,
+        ['industry_feedback_date', 'industryFeedbackDate', 'feedback_submitted_at', 'submitted_at'],
+        getFirst(industryFeedback, ['submitted_at', 'submittedAt', 'feedback_date', 'feedbackDate'], '')
+      );
+      const uniComments = getFirst(review, ['uni_comments', 'uniComments', 'university_comments'], getFirst(uniFeedback, ['comments', 'comment', 'feedback'], ''));
+      const uniRating = getFirst(review, ['uni_rating', 'uniRating', 'university_rating'], getFirst(uniFeedback, ['rating'], ''));
+      const uniFeedbackDate = getFirst(review, ['uni_feedback_date', 'uniFeedbackDate', 'university_feedback_date'], getFirst(uniFeedback, ['submitted_at', 'submittedAt'], ''));
+      const hasUniFeedback = Boolean(uniFeedbackDate || uniComments || uniRating);
+      const status = hasUniFeedback ? 'complete' : (reviewModel.status || review.status || 'pending');
+
       return {
         id: reviewModel.reviewId,
         weekNumber: reviewModel.weekNumber,
-        weekStartDate: reviewModel.weekStartDate ? new Date(reviewModel.weekStartDate) : null,
-        weekEndDate: reviewModel.weekEndDate ? new Date(reviewModel.weekEndDate) : null,
-        status: reviewModel.status,
-        industryApproval: reviewModel.industryApproval,
-        industryComments: reviewModel.industryComments,
-        industryFeedbackDate: reviewModel.industryFeedbackDate ? new Date(reviewModel.industryFeedbackDate) : null,
-        uniRating: reviewModel.uniRating,
-        uniComments: reviewModel.uniComments,
-        uniSupervisorName: reviewModel.uniSupervisorName
+        weekStartDate: toDate(reviewModel.weekStartDate),
+        weekEndDate: toDate(reviewModel.weekEndDate),
+        status,
+        industryApproval,
+        industryComments,
+        industryFeedbackDate: toDate(industryFeedbackDate),
+        uniRating,
+        uniComments,
+        uniFeedbackDate: toDate(uniFeedbackDate),
+        uniSupervisorName: getFirst(review, ['uni_supervisor_name', 'uniSupervisorName', 'supervisor_name'], '')
       };
     });
   },

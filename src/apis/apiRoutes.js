@@ -115,6 +115,8 @@ export const API_ROUTES = {
   admin: {
     dashboard: "/admin/dashboard",
     sendWeeklyReviews: "/admin/send-weekly-reviews",
+    reportsSummary: "/admin/reports/summary",
+    reportsGenerate: "/admin/reports/generate",
   },
 
   // General Routes
@@ -135,12 +137,16 @@ export const getApiUrl = (route, params = {}) => {
   return url;
 };
 
-// Base URL configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iams-backend.onrender.com';
+// Base URL configuration.
+// VITE_API_URL is used by apiClient as the full API root, so local .env files may
+// include /api. Public URL builders append /api themselves, so keep this value as
+// the backend origin/base without a trailing API segment.
+const RAW_API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iams-backend.onrender.com/api';
+export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '').replace(/\/api$/, '');
 
 // Full API URL builder
 export const buildApiUrl = (route, params = {}) => {
-  const routePath = typeof route === 'function' ? route(params) : route;
+  const routePath = typeof route === 'function' ? route(params.id || params.token || params) : route;
   return `${API_BASE_URL}/api${routePath}`;
 };
 

@@ -10,15 +10,21 @@ import WeeklyReviewTrigger from '../widgets/WeeklyReviewTrigger';
 import SubmissionDonut from '../widgets/SubmissionDonut';
 import QuickActions from '../widgets/QuickActions';
 import RecentActivity from '../widgets/RecentActivity';
+import DetailDrawer from '../../attachments/widgets/DetailDrawer';
 import { useAuth } from '../../../contexts/AuthContext';
 import { profileService } from '../../../shared/profile/profileService';
 import { adminDashboardService } from '../services/adminDashboardService';
+import { studentApi } from '../../students/services/studentServices';
+import attachmentApi from '../../attachments/services/attachmentServices';
+import supervisorApprovalService from '../../supervisor-approval/services/supervisorApprovalService';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedAttachment, setSelectedAttachment] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   // Dashboard data state
   const [dashboardData, setDashboardData] = useState({
@@ -75,9 +81,8 @@ const AdminDashboard = () => {
 
   const handleApproveSupervisor = async (id) => {
     try {
-      // Assuming there's a method in userApi or similar
-      // await userApi.approve(id);
-      loadDashboardData(); // Refresh
+      await supervisorApprovalService.approveSupervisor(id);
+      await loadDashboardData();
     } catch (err) {
       console.error('Approval failed:', err);
     }
@@ -85,17 +90,86 @@ const AdminDashboard = () => {
 
   const handleRejectSupervisor = async (id) => {
     try {
-      // await userApi.reject(id);
-      loadDashboardData(); // Refresh
+      await supervisorApprovalService.rejectSupervisor(id);
+      await loadDashboardData();
     } catch (err) {
       console.error('Rejection failed:', err);
+    }
+  };
+
+  const handleViewStudent = async (student) => {
+    try {
+      const attachment = await studentApi.getPrimaryAttachmentForStudent(student);
+      if (!attachment) return;
+
+      setSelectedAttachment({
+        ...attachment,
+        student_name: attachment.student_name || student.student_name || student.name,
+        student_email: attachment.student_email || student.student_email || student.email,
+        reg_number: attachment.reg_number || student.reg_number || student.regNumber,
+        supervisor_name: attachment.supervisor_name || student.supervisor_name || student.supervisor
+      });
+      setIsDrawerOpen(true);
+    } catch (err) {
+      console.error('Failed to load attachment details:', err);
+    }
+  };
+
+  const handleStatusChange = async (attachment, action) => {
+    try {
+      if (action === 'activate') {
+        await attachmentApi.activateAttachment(attachment.id);
+      }
+      await loadDashboardData();
+    } catch (err) {
+      console.error('Failed to update attachment status:', err);
+    }
+  };
+
+  const handleResendEmail = async (attachment) => {
+    try {
+      await attachmentApi.resendReviewEmail(attachment.id);
+    } catch (err) {
+      console.error('Failed to resend review email:', err);
     }
   };
 
   if (loading && !dashboardData.systemStats) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.loader}>Loading admin dashboard...</div>
+        <aside className={styles.loadingSidebar}>
+          <div className={styles.loadingLogo}></div>
+          <div className={styles.loadingNav}>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </aside>
+        <main className={styles.loadingMain}>
+          <div className={styles.loadingTopbar}>
+            <div>
+              <div className={styles.loadingTitle}></div>
+              <div className={styles.loadingSubtitle}></div>
+            </div>
+            <div className={styles.loadingPulse}>
+              <span className={styles.loadingSpinner}></span>
+              Loading dashboard
+            </div>
+          </div>
+          <div className={styles.loadingContent}>
+            <div className={styles.loadingStats}>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div className={styles.loadingGrid}>
+              <div className={styles.loadingPanel}></div>
+              <div className={styles.loadingPanelSmall}></div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -123,7 +197,7 @@ const AdminDashboard = () => {
           )}
 
           {/* Pending approval banner */}
-          <PendingBanner pendingCount={dashboardData.systemStats?.pending_attachments} />
+          <PendingBanner pendingCount={dashboardData.pendingSupervisors.length} />
           
           {/* STATS */}
           <AdminStatsGrid stats={adminDashboardService.transformSystemStats(dashboardData.systemStats)} />
@@ -133,7 +207,7 @@ const AdminDashboard = () => {
             {/* LEFT */}
             <div style={{display: 'flex', flexDirection: 'column', gap: '1.25rem'}}>
               {/* New students list */}
-              <NewStudents students={dashboardData.newStudents} />
+              <NewStudents students={dashboardData.newStudents} onViewStudent={handleViewStudent} />
               
               {/* Pending supervisor approvals */}
               <PendingSupervisorApprovals 
@@ -146,7 +220,7 @@ const AdminDashboard = () => {
             {/* RIGHT */}
             <div style={{display: 'flex', flexDirection: 'column', gap: '1.25rem'}}>
               {/* Weekly review trigger */}
-              <WeeklyReviewTrigger metrics={dashboardData.metrics} />
+              <WeeklyReviewTrigger metrics={dashboardData.metrics} onTriggered={loadDashboardData} />
               
               {/* Submission breakdown donut */}
               <SubmissionDonut systemStats={dashboardData.systemStats} />
@@ -162,6 +236,14 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      <DetailDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        attachment={selectedAttachment}
+        onStatusChange={handleStatusChange}
+        onResendEmail={handleResendEmail}
+      />
     </div>
   );
 };

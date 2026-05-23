@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AlertCircle, Download, Search } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import supervisorStudentsService from '../services/supervisorStudentsService';
 import styles from './MyStudents.module.css';
@@ -101,12 +102,6 @@ const MyStudents = () => {
     }
   };
 
-  const handleViewReviews = (student) => {
-    console.log(`Opening ${student.name}'s reviews`);
-    // Navigate to student reviews page or open modal
-    // This would typically use React Router navigation
-  };
-
   const handleExportProgress = async () => {
     try {
       const csvContent = supervisorStudentsService.exportToCSV(students);
@@ -144,7 +139,7 @@ const MyStudents = () => {
           <div>
             <div className={styles.topbarTitle}>My Students</div>
             <div className={styles.topbarSubtitle}>
-              {loading ? 'Loading...' : `${students.length} students assigned · Week 6`}
+              {loading ? 'Loading assigned students...' : `${students.length} students assigned - Week 6`}
             </div>
           </div>
           <button 
@@ -152,14 +147,18 @@ const MyStudents = () => {
             onClick={handleExportProgress}
             disabled={loading || students.length === 0}
           >
-            ↓ Export progress
+            <Download size={14} />
+            Export progress
           </button>
         </div>
 
         <div className={styles.content}>
           {error && (
             <div className={styles.errorMessage}>
-              Error: {error}
+              <span className={styles.errorText}>
+                <AlertCircle size={16} />
+                {error}
+              </span>
               <button 
                 onClick={loadStudents}
                 className={styles.retryButton}
@@ -207,7 +206,7 @@ const MyStudents = () => {
               counts={counts}
             />
             <div className={styles.searchWrap}>
-              <span className={styles.searchIcon}>⌕</span>
+              <Search size={15} className={styles.searchIcon} />
               <input
                 type="text"
                 placeholder="Search student..."
@@ -221,8 +220,9 @@ const MyStudents = () => {
           <StudentsTable
             students={getFilteredStudents()}
             loading={loading}
+            activeFilter={activeFilter}
+            searchTerm={searchTerm}
             onFlagToggle={handleFlagToggle}
-            onViewReviews={handleViewReviews}
           />
         </div>
       </div>

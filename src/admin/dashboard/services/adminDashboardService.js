@@ -1,5 +1,6 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
+import supervisorApprovalService from '../../supervisor-approval/services/supervisorApprovalService';
 
 export const adminDashboardService = {
   // Fetch admin dashboard data
@@ -14,6 +15,22 @@ export const adminDashboardService = {
       return data.dashboard;
     } catch (error) {
       console.error('Error fetching admin dashboard data:', error);
+      throw error;
+    }
+  },
+
+  // Trigger weekly review emails for the current work week
+  async sendWeeklyReviews() {
+    try {
+      const data = await apiClient.post(API_ROUTES.admin.sendWeeklyReviews, {});
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to send weekly reviews');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error sending weekly reviews:', error);
       throw error;
     }
   },
@@ -57,8 +74,10 @@ export const adminDashboardService = {
   // Fetch pending supervisors
   async fetchPendingSupervisors() {
     try {
-      const data = await apiClient.get(API_ROUTES.users.pendingSupervisors);
-      return data.users || [];
+      const response = await supervisorApprovalService.getPendingSupervisors();
+      return response.supervisors.map(supervisor =>
+        supervisorApprovalService.formatSupervisorForDisplay(supervisor)
+      );
     } catch (error) {
       console.error('Error fetching pending supervisors:', error);
       return [];

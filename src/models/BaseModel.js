@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /**
  * Base Model Class
  * Provides common functionality for all data models

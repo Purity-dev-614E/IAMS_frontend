@@ -4,6 +4,7 @@ import styles from './LoginScreen.module.css';
 import IAMSlogo from '../../../assets/IAMSlogo.png';
 import LoginForm from '../widgets/LoginForm';
 import { useAuth } from '../../../contexts/AuthContext';
+import { getStudentLandingPath } from '../../../student/attachments/services/studentAttachmentAccess';
 
 const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +14,9 @@ const LoginScreen = () => {
 
   // Redirect if already authenticated
   React.useEffect(() => {
-    if (isAuthenticated() && user) {
+    const redirectAuthenticatedUser = async () => {
+      if (!isAuthenticated() || !user) return;
+
       switch (user.role) {
         case 'admin':
           navigate('/admin');
@@ -22,12 +25,14 @@ const LoginScreen = () => {
           navigate('/supervisor');
           break;
         case 'student':
-          navigate('/dashboard');
+          navigate(await getStudentLandingPath());
           break;
         default:
           navigate('/dashboard');
       }
-    }
+    };
+
+    redirectAuthenticatedUser();
   }, [user, isAuthenticated, navigate]);
 
   return (

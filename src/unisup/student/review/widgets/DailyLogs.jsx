@@ -16,7 +16,10 @@ const DailyLogs = ({ logs }) => {
   return (
     <div className={styles.logsSection}>
       <div className={styles.secTitle}>Daily logs this week</div>
-      {logs.map((log, index) => (
+      {(!logs || logs.length === 0) && (
+        <div className={styles.leMissing}>No daily logs were found for this review.</div>
+      )}
+      {(logs || []).map((log, index) => (
         <div key={index} className={styles.logEntry}>
           <div className={styles.leDate}>
             <div className={styles.leDay}>{log.day}</div>

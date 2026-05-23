@@ -6,6 +6,9 @@ const DailyLogsSection = ({ logs }) => {
   return (
     <div className={styles.logsSection}>
       <div className={styles.sectionTitle}>Daily logs this week</div>
+      {logs.length === 0 && (
+        <div className={styles.emptyLogs}>No daily logs are attached to this review yet.</div>
+      )}
       {logs.map((log, index) => (
         <div key={index} className={styles.logDay}>
           <div className={styles.ldDate}>

@@ -38,6 +38,11 @@
   background: rgba(255,255,255,0.15);
 }
 
+.triggerBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .triggerMeta {
   font-size: 11px;
   color: rgba(255,255,255,0.3);

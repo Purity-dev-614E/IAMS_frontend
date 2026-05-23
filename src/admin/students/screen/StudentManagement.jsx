@@ -4,11 +4,17 @@ import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import StudentTable from '../widgets/StudentTable';
 import BulkActionBar from '../widgets/BulkActionBar';
 import AssignSupervisorModal from '../widgets/AssignSupervisorModal';
+import DetailDrawer from '../../attachments/widgets/DetailDrawer';
 import Toast from '../../../shared/widgets/Toast';
 import { useAuth } from '../../../contexts/AuthContext';
 import { FiDownload, FiSearch, FiAlertTriangle, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { studentApi } from '../services/studentServices';
+import attachmentApi from '../../attachments/services/attachmentServices';
 import Button from '../../../shared/components/Button/Button';
+
+const normalizeStatus = (status, fallback = 'pending') => (
+  String(status || fallback).trim().toLowerCase()
+);
 
 const StudentManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +25,8 @@ const StudentManagement = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('single');
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedAttachment, setSelectedAttachment] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showUnassignedOnly, setShowUnassignedOnly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -61,7 +69,7 @@ const StudentManagement = () => {
       };
       const response = await studentApi.getStudents(filters);
       // Map backend response to frontend format
-      const mappedStudents = response.students.map(student => {
+      const baseStudents = response.students.map(student => {
         return {
           ...student,
           name: student.student_name,
@@ -70,11 +78,11 @@ const StudentManagement = () => {
           year: student.year_of_study,
           supervisor: student.supervisor_name,
           program: student.program,
-          attachmentStatus: student.attachmentStatus || 'pending',
-          logsThisWeek: student.logsThisWeek || 0,
-          totalLogs: student.totalLogs || 0
+          accountStatus: normalizeStatus(student.status, 'active'),
+          attachmentStatus: normalizeStatus(student.attachment_status || student.attachmentStatus, 'none')
         };
       });
+      const mappedStudents = await studentApi.enrichStudentTableRows(baseStudents);
       setStudents(mappedStudents || []);
     } catch (err) {
       if (err.message.includes('401') || err.message.includes('Unauthorized')) {
@@ -149,7 +157,7 @@ const StudentManagement = () => {
     setIsAssignModalOpen(true);
   };
 
-  const handleAssign = async (supervisorId) => {
+  const handleAssign = async () => {
     try {
       // Close the modal
       setIsAssignModalOpen(false);
@@ -164,13 +172,53 @@ const StudentManagement = () => {
         showToast('Supervisors assigned successfully');
         setSelectedStudents([]);
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to assign supervisor', 'error');
     }
   };
 
-  const handleViewStudent = (student) => {
-    showToast(`Viewing ${student.name}`);
+  const handleViewStudent = async (student) => {
+    try {
+      const attachment = student.currentAttachment || await studentApi.getPrimaryAttachmentForStudent(student);
+
+      if (!attachment) {
+        showToast('No attachment found for this student', 'error');
+        return;
+      }
+
+      setSelectedAttachment({
+        ...attachment,
+        student_name: attachment.student_name || student.name,
+        student_email: attachment.student_email || student.email,
+        reg_number: attachment.reg_number || student.regNumber,
+        supervisor_name: attachment.supervisor_name || student.supervisor,
+        logs: attachment.logs ?? student.logsThisWeek ?? 0
+      });
+      setIsDrawerOpen(true);
+    } catch {
+      showToast('Failed to load attachment details', 'error');
+    }
+  };
+
+  const handleStatusChange = async (attachment, action) => {
+    try {
+      if (action === 'activate') {
+        await attachmentApi.activateAttachment(attachment.id);
+        showToast('Attachment activated successfully');
+      }
+      await fetchStudents();
+    } catch {
+      showToast('Failed to update attachment status', 'error');
+    }
+  };
+
+  const handleResendEmail = async (attachment) => {
+    try {
+      await attachmentApi.resendReviewEmail(attachment.id);
+      showToast('Review email resent to industry supervisor');
+    } catch {
+      showToast('Failed to resend review email', 'error');
+    }
   };
 
   const handleFilterUnassigned = () => {
@@ -228,6 +276,13 @@ const StudentManagement = () => {
             </div>
           )}
 
+          {error && (
+            <div className={styles.alert}>
+              <FiAlertTriangle style={{fontSize: '14px', marginRight: '8px'}} />
+              <p>{error}</p>
+            </div>
+          )}
+
           {/* TOOLBAR */}
           <div className={styles.toolbar}>
             <div style={{display: 'flex', gap: '8px', flex: 1, flexWrap: 'wrap'}}>
@@ -263,7 +318,7 @@ const StudentManagement = () => {
               </select>
             </div>
             <div style={{fontSize: '12px', color: 'var(--muted)'}}>
-              Showing {filteredStudents.length} of {students.length}
+              {loading ? 'Loading students...' : `Showing ${filteredStudents.length} of ${students.length}`}
             </div>
           </div>
 
@@ -302,6 +357,14 @@ const StudentManagement = () => {
         mode={modalMode}
         selectedStudents={modalMode === 'single' ? (selectedStudent ? [selectedStudent] : []) : selectedStudents.map(id => students.find(s => s.id === id)).filter(Boolean)}
         onAssign={handleAssign}
+      />
+
+      <DetailDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        attachment={selectedAttachment}
+        onStatusChange={handleStatusChange}
+        onResendEmail={handleResendEmail}
       />
 
       <Toast 

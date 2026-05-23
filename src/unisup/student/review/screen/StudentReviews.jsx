@@ -8,6 +8,7 @@ import ReviewCard from '../widgets/ReviewCard';
 import Toast from '../widgets/Toast';
 import { profileService } from '../../../../shared/profile/profileService';
 import { studentDataService } from '../../../../student/reports/services/studentDataService';
+import { supervisorReviewService } from '../services/supervisorReviewService';
 
 const StudentReviews = () => {
   const { id } = useParams();
@@ -27,22 +28,22 @@ const StudentReviews = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Loading student data for ID:', id);
       
       // Get student data
       const studentResponse = await studentDataService.getStudentById(id);
-      const rawStudent = studentResponse.student;
+      const rawStudent = studentResponse.student || studentResponse.data || studentResponse;
       
       // Get student's attachments to find active attachment
       const attachmentsResponse = await studentDataService.getStudentAttachments(id);
-      const activeAttachment = attachmentsResponse.attachments?.find(att => att.status === 'active') || attachmentsResponse.attachments?.[0];
+      const attachments = supervisorReviewService.extractAttachments(attachmentsResponse);
+      const activeAttachment = attachments.find(att => att.status === 'active') || attachments[0];
       
       // Get daily logs count for the active attachment
       let logsCount = 0;
       if (activeAttachment) {
         try {
-          const logsResponse = await studentDataService.getDailyLogs({ attachmentId: activeAttachment.id });
-          logsCount = logsResponse.logs?.length || 0;
+          const logsResponse = await studentDataService.getDailyLogs({ attachmentId: activeAttachment.id, limit: 100 });
+          logsCount = (logsResponse.logs || logsResponse.data || []).length || 0;
         } catch (logErr) {
           console.error('Error fetching logs for count:', logErr);
         }
@@ -51,9 +52,9 @@ const StudentReviews = () => {
       // Format student for the StudentCard widget
       const formattedStudent = {
         ...studentDataService.formatStudentForDisplay(rawStudent),
-        name: rawStudent.student_name,
-        registration: rawStudent.reg_number,
-        initials: rawStudent.student_name ? rawStudent.student_name.split(' ').map(n => n[0]).join('').toUpperCase() : '??',
+        name: rawStudent.student_name || rawStudent.name,
+        registration: rawStudent.reg_number || rawStudent.registration,
+        initials: (rawStudent.student_name || rawStudent.name) ? (rawStudent.student_name || rawStudent.name).split(' ').map(n => n[0]).join('').toUpperCase() : '??',
         organization: activeAttachment ? activeAttachment.organization_name : 'Not assigned',
         industrySupervisor: activeAttachment ? activeAttachment.industry_supervisor_name : 'Not assigned',
         period: activeAttachment ? `${new Date(activeAttachment.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} - ${new Date(activeAttachment.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}` : 'N/A',
@@ -80,18 +81,14 @@ const StudentReviews = () => {
         reviewsResponse = { reviews: [], pagination: null, success: false };
       }
       
-      console.log('📊 Reviews response:', reviewsResponse);
-      
       // Transform reviews data
-      const transformedReviews = reviewsResponse.reviews ? reviewsResponse.reviews.map(review => 
-        studentDataService.formatWeeklyReviewForDisplay(review)
-      ) : [];
+      const rawReviews = supervisorReviewService.extractReviews(reviewsResponse);
+      const transformedReviews = await supervisorReviewService.normalizeReviews(rawReviews, activeAttachment);
       
       setWeeklyReviews(transformedReviews);
-      console.log('✅ Loaded reviews:', transformedReviews.length);
       
     } catch (error) {
-      console.error('❌ Error loading student data:', error);
+      console.error('Error loading student data:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -131,13 +128,16 @@ const StudentReviews = () => {
     showNotification('Student flagged for admin attention');
   };
 
-  const handleFeedbackSubmit = (weekId, feedback) => {
-    setWeeklyReviews(prev => prev.map(review => 
-      review.weekId === weekId ? {
+  const handleFeedbackSubmit = async (reviewId, feedback) => {
+    try {
+      await supervisorReviewService.submitUniversityFeedback(reviewId, feedback);
+
+      setWeeklyReviews(prev => prev.map(review => 
+      review.id === reviewId ? {
         ...review,
         myFeedback: {
           ...feedback,
-          submittedDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          submittedDate: new Date().toISOString()
         },
         status: 'Complete',
         needsFeedback: false,
@@ -146,12 +146,17 @@ const StudentReviews = () => {
           feedback: 'done'
         }
       } : review
-    ));
-    showNotification(`Feedback submitted for ${weekId === '6' ? 'Week 6' : weekId} — student notified`);
+      ));
+      showNotification('Feedback submitted - student notified');
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      showNotification(error.message || 'Failed to submit feedback. Please try again.');
+      throw error;
+    }
   };
 
-  const handleFeedbackEdit = (weekId) => {
-    showNotification(`Editing feedback for ${weekId === '6' ? 'Week 6' : weekId}`);
+  const handleFeedbackEdit = () => {
+    showNotification('Editing feedback');
   };
 
   return (
@@ -221,7 +226,7 @@ const StudentReviews = () => {
                   ) : (
                     weeklyReviews.map(review => (
                       <ReviewCard
-                        key={review.id || review.weekId || `review-${Math.random()}`}
+                        key={review.id || review.weekId}
                         week={review.weekId}
                         data={review}
                         onFeedbackSubmit={handleFeedbackSubmit}

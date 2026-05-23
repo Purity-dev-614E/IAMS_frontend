@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './DetailDrawer.module.css';
 
-// Helper function to format date to local readable format
 const formatLocalDate = (dateString) => {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
@@ -15,45 +14,57 @@ const formatLocalDate = (dateString) => {
   });
 };
 
-const DetailDrawer = ({ 
-  isOpen, 
-  onClose, 
+const normalizeStatus = (status) => String(status || 'pending').trim().toLowerCase();
+
+const getStatusLabel = (status) => {
+  const normalizedStatus = normalizeStatus(status);
+  const labels = {
+    pending: 'Pending',
+    active: 'Active',
+    inactive: 'Inactive',
+    complete: 'Complete',
+    completed: 'Complete'
+  };
+
+  return labels[normalizedStatus] || normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+};
+
+const getStatusClass = (status) => {
+  switch (normalizeStatus(status)) {
+    case 'pending':
+      return styles.spAmber;
+    case 'active':
+      return styles.spGreen;
+    case 'complete':
+    case 'completed':
+      return styles.spBlue;
+    case 'inactive':
+      return styles.spGray;
+    default:
+      return styles.spGray;
+  }
+};
+
+const DetailDrawer = ({
+  isOpen,
+  onClose,
   attachment,
   onStatusChange,
-  onResendEmail 
+  onResendEmail
 }) => {
   if (!attachment) return null;
 
-  const getAvailableActions = (status) => {
-    switch (status) {
-      case 'pending':
-        return [
-          { type: 'activate', label: 'Activate', class: styles.sbtnActivate },
-          { type: 'deact', label: 'Deactivate', class: styles.sbtnDeact }
-        ];
-      case 'active':
-        return [
-          { type: 'complete', label: 'Complete', class: styles.sbtnComplete },
-          { type: 'deact', label: 'Deactivate', class: styles.sbtnDeact }
-        ];
-      case 'completed':
-        return [
-          { type: 'activate', label: 'Reactivate', class: styles.sbtnActivate }
-        ];
-      default:
-        return [];
-    }
-  };
-
-  const availableActions = getAvailableActions(attachment.status);
-  const progressPercentage = Math.min(100, Math.round((attachment.logs / 40) * 100));
+  const status = normalizeStatus(attachment.status);
+  const canActivate = status === 'pending';
+  const canResendEmail = status === 'active';
+  const progressPercentage = Math.min(100, Math.round(((attachment.logs || 0) / 40) * 100));
 
   return (
     <div className={`${styles.drawer} ${isOpen ? styles.open : ''}`}>
       <div className={styles.dh}>
         <span className={styles.dht}>Attachment details</span>
         <button className={styles.dclose} onClick={onClose}>
-          ×
+          x
         </button>
       </div>
       <div className={styles.db}>
@@ -66,9 +77,8 @@ const DetailDrawer = ({
           <div className={styles.di}>
             <div className={styles.dil}>Status</div>
             <div>
-              <span className={`${styles.sp} ${attachment.status === 'pending' ? styles.spAmber : 
-                            attachment.status === 'active' ? styles.spGreen : styles.spBlue}`}>
-                {attachment.status.charAt(0).toUpperCase() + attachment.status.slice(1)}
+              <span className={`${styles.sp} ${getStatusClass(status)}`}>
+                {getStatusLabel(status)}
               </span>
             </div>
           </div>
@@ -76,7 +86,7 @@ const DetailDrawer = ({
         <div className={styles.di}>
           <div className={styles.dil}>Organization</div>
           <div className={styles.div2}>{attachment.organization_name}</div>
-          <div className={styles.divs}>{attachment.start_date} · {attachment.end_date}</div>
+          <div className={styles.divs}>{attachment.start_date} - {attachment.end_date}</div>
         </div>
         <div className={styles.drow}>
           <div className={styles.di}>
@@ -108,65 +118,47 @@ const DetailDrawer = ({
             <div className={styles.div2}>{progressPercentage}%</div>
           </div>
         </div>
-        <div style={{
-          height: '5px',
-          background: 'var(--surface)',
-          borderRadius: '100px',
-          border: '0.5px solid var(--border)',
-          marginBottom: '16px'
-        }}>
-          <div style={{
-            height: '100%',
-            width: `${progressPercentage}%`,
-            background: 'var(--blue)',
-            borderRadius: '100px'
-          }}></div>
+        <div className={styles.progressTrack}>
+          <div className={styles.progressFill} style={{ width: `${progressPercentage}%` }}></div>
         </div>
         <div className={styles.di}>
           <div className={styles.dil}>Last log submitted</div>
           <div className={styles.div2}>{formatLocalDate(attachment.created_at)}</div>
         </div>
-        <div className={styles.dsep}></div>
-        <div className={styles.statusChange}>
-          <div className={styles.scl2}>Change attachment status</div>
-          <div className={styles.statusBtns}>
-            {availableActions.map((action) => (
-              <button
-                key={action.type}
-                className={`${styles.sbtn} ${action.class}`}
-                onClick={() => {
-                  onStatusChange(attachment, action.type);
-                  onClose();
-                }}
-              >
-                {action.label}
-              </button>
-            ))}
-          </div>
+
+        {canActivate && (
+          <>
+            <div className={styles.dsep}></div>
+            <div className={styles.statusChange}>
+              <div className={styles.scl2}>Attachment activation</div>
+              <div className={styles.statusBtns}>
+                <button
+                  className={`${styles.sbtn} ${styles.sbtnActivate}`}
+                  onClick={() => {
+                    onStatusChange(attachment, 'activate');
+                    onClose();
+                  }}
+                >
+                  Activate
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      {canResendEmail && (
+        <div className={styles.df}>
+          <button
+            className={styles.resendBtn}
+            onClick={() => {
+              onResendEmail(attachment);
+              onClose();
+            }}
+          >
+            Resend weekly review email to industry supervisor
+          </button>
         </div>
-      </div>
-      <div className={styles.df}>
-        <button
-          style={{
-            width: '100%',
-            padding: '9px',
-            borderRadius: '8px',
-            background: 'var(--abg)',
-            border: '0.5px solid rgba(146, 64, 14, 0.2)',
-            color: 'var(--amber)',
-            fontSize: '12px',
-            fontWeight: '500',
-            fontFamily: "'DM Sans', sans-serif",
-            cursor: 'pointer'
-          }}
-          onClick={() => {
-            onResendEmail(attachment);
-            onClose();
-          }}
-        >
-          Resend weekly review email to industry supervisor
-        </button>
-      </div>
+      )}
     </div>
   );
 };

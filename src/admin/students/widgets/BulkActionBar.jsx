@@ -11,7 +11,7 @@ const BulkActionBar = ({ selectedCount, onAssign, onClear }) => {
       </span>
       <div className={styles.bulkActions}>
         <button className={`${styles.bbtn} ${styles.bbtnAssign}`} onClick={onAssign}>
-          Assign supervisor â
+          Assign supervisor 
         </button>
         <button className={`${styles.bbtn} ${styles.bbtnClear}`} onClick={onClear}>
           Clear selection

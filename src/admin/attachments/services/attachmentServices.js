@@ -57,30 +57,6 @@ const attachmentApi = {
     }
   },
 
-  // Deactivate attachment (sets status to pending)
-  deactivateAttachment: async (id) => {
-    try {
-      const response = await apiClient.put(API_ROUTES.attachments.updateStatus(id), {
-        status: 'pending'
-      });
-      return response;
-    } catch (error) {
-      handleApiError(error, 'Failed to deactivate attachment');
-    }
-  },
-
-  // Complete attachment
-  completeAttachment: async (id) => {
-    try {
-      const response = await apiClient.put(API_ROUTES.attachments.updateStatus(id), {
-        status: 'completed'
-      });
-      return response;
-    } catch (error) {
-      handleApiError(error, 'Failed to complete attachment');
-    }
-  },
-
   // Resend review email to industry supervisor
   resendReviewEmail: async (id) => {
     try {

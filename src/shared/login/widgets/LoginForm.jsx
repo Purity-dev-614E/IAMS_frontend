@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import { useAuth } from '../../../contexts/AuthContext';
+import { getStudentLandingPath } from '../../../student/attachments/services/studentAttachmentAccess';
 
 const LoginForm = ({ showPassword, setShowPassword, rememberMe, setRememberMe }) => {
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ const LoginForm = ({ showPassword, setShowPassword, rememberMe, setRememberMe })
             navigate('/supervisor');
             break;
           case 'student':
-            navigate('/dashboard');
+            navigate(await getStudentLandingPath());
             break;
           default:
             navigate('/dashboard');
