@@ -31,3 +31,9 @@
   color: var(--muted);
   margin-top: 3px;
 }
+
+@media (max-width: 520px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

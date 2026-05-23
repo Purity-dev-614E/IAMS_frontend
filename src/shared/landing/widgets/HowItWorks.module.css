@@ -92,3 +92,23 @@
 .serif {
   font-family: 'DM Serif Display', serif;
 }
+
+@media (max-width: 720px) {
+  .howSection {
+    padding: 3rem 1rem;
+  }
+
+  .howSteps {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .howSteps::before {
+    display: none;
+  }
+
+  .step {
+    padding: 0;
+  }
+}

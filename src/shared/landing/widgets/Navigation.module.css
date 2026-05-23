@@ -80,3 +80,43 @@
 .btnPrimary:hover {
   background: #1740B0;
 }
+
+@media (max-width: 720px) {
+  .nav {
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .navLogo {
+    min-width: 0;
+  }
+
+  .navBrand {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .navLinks {
+    width: 100%;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .navLinks::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navLinks a {
+    flex: 0 0 auto;
+    font-size: 13px;
+  }
+
+  .btnPrimary {
+    margin-left: auto;
+    padding: 0.45rem 0.85rem;
+  }
+}

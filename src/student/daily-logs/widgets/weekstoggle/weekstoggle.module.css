@@ -23,3 +23,17 @@
   font-size: 13px;
   color: var(--muted);
 }
+
+@media (max-width: 640px) {
+  .shell {
+    margin: 1rem;
+  }
+
+  .pageHeader {
+    margin-bottom: 1rem;
+  }
+
+  .pageHeader h1 {
+    font-size: 1.3rem;
+  }
+}

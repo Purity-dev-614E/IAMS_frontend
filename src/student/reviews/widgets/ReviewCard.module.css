@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
 }
 
 .weekBadge {
@@ -68,6 +69,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--navy);
+  overflow-wrap: anywhere;
 }
 
 .rhDates {
@@ -101,4 +103,21 @@
 
 .chevron.open {
   transform: rotate(90deg);
+}
+
+@media (max-width: 560px) {
+  .reviewHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rhLeft {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .rhRight {
+    justify-content: space-between;
+    width: 100%;
+  }
 }

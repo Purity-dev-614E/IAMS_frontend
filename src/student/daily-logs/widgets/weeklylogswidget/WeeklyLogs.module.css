@@ -136,3 +136,27 @@
   color: var(--subtle);
   border: 0.5px solid var(--border);
 }
+
+@media (max-width: 560px) {
+  .cardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cardBody {
+    padding: 1rem;
+  }
+
+  .logRow {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .logTasks {
+    flex-basis: 100%;
+    order: 3;
+    white-space: normal;
+  }
+}

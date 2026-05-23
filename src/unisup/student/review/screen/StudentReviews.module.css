@@ -259,6 +259,7 @@
 .content {
   padding: 24px 28px;
   flex: 1;
+  min-width: 0;
 }
 
 .layout {
@@ -355,5 +356,38 @@
   .studentCardColumn,
   .reviewsColumn {
     gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    height: auto;
+    padding: 12px 16px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .topbarLeft,
+  .topbarRight {
+    width: 100%;
+  }
+
+  .btn {
+    justify-content: center;
+    flex: 1;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .errorMessage {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .retryButton {
+    width: 100%;
   }
 }

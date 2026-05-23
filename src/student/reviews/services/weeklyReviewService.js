@@ -5,7 +5,7 @@ class WeeklyReviewService {
   async getMyReviews(page = 1, limit = 20) {
     try {
       const response = await apiClient.get(`${API_ROUTES.weeklyReviews.myReviews}?page=${page}&limit=${limit}`);
-      const reviews = this.extractReviews(response);
+      const reviews = await this.hydrateReviews(this.extractReviews(response));
       const pagination = response?.pagination || response?.data?.pagination || {
         page,
         limit,
@@ -41,6 +41,57 @@ class WeeklyReviewService {
     return [];
   }
 
+  extractReview(response) {
+    if (response?.review && typeof response.review === 'object') return response.review;
+    if (response?.weeklyReview && typeof response.weeklyReview === 'object') return response.weeklyReview;
+    if (response?.weekly_review && typeof response.weekly_review === 'object') return response.weekly_review;
+    if (response?.data?.review && typeof response.data.review === 'object') return response.data.review;
+    if (response?.data?.weeklyReview && typeof response.data.weeklyReview === 'object') return response.data.weeklyReview;
+    if (response?.data?.weekly_review && typeof response.data.weekly_review === 'object') return response.data.weekly_review;
+    if (response && typeof response === 'object' && !Array.isArray(response)) return response;
+    return {};
+  }
+
+  getReviewId(review) {
+    return review.id || review.reviewId || review.review_id || review.weekly_review_id || review.weeklyReviewId;
+  }
+
+  hasFetchedIndustryFields(review) {
+    return Boolean(
+      review.industry_approval ||
+      review.industryApproval ||
+      review.industry_comments ||
+      review.industryComments ||
+      review.industry_improvements ||
+      review.industryImprovements ||
+      review.industry_feedback_date ||
+      review.industryFeedbackDate ||
+      review.industry_feedback ||
+      review.industryFeedback
+    );
+  }
+
+  async hydrateReview(review) {
+    const reviewId = this.getReviewId(review);
+    if (!reviewId || this.hasFetchedIndustryFields(review)) return review;
+
+    try {
+      const response = await apiClient.get(API_ROUTES.weeklyReviews.byId(reviewId));
+      const detailedReview = this.extractReview(response);
+      return {
+        ...review,
+        ...detailedReview
+      };
+    } catch (error) {
+      console.error(`Error fetching weekly review details for ${reviewId}:`, error);
+      return review;
+    }
+  }
+
+  async hydrateReviews(reviews = []) {
+    return Promise.all(reviews.map(review => this.hydrateReview(review)));
+  }
+
   async getReviewById(reviewId) {
     try {
       return await apiClient.get(API_ROUTES.weeklyReviews.byId(reviewId));
@@ -52,7 +103,13 @@ class WeeklyReviewService {
 
   async getReviewsByAttachment(attachmentId, page = 1, limit = 20) {
     try {
-      return await apiClient.get(`${API_ROUTES.weeklyReviews.byAttachment(attachmentId)}?page=${page}&limit=${limit}`);
+      const response = await apiClient.get(`${API_ROUTES.weeklyReviews.byAttachment(attachmentId)}?page=${page}&limit=${limit}`);
+      const reviews = await this.hydrateReviews(this.extractReviews(response));
+
+      return {
+        ...response,
+        reviews
+      };
     } catch (error) {
       console.error('Error fetching reviews by attachment:', error);
       throw error;

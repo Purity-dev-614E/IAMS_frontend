@@ -125,3 +125,13 @@
 .supNotice strong {
   font-weight: 500;
 }
+
+@media (max-width: 560px) {
+  .roleOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .roleOpt {
+    min-height: 58px;
+  }
+}

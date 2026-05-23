@@ -273,3 +273,55 @@ body {
   color: var(--red);
   line-height: 1.4;
 }
+
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    min-height: 100svh;
+  }
+
+  .left {
+    min-height: auto;
+    padding: 28px 24px;
+    gap: 24px;
+  }
+
+  .leftContent h2 {
+    font-size: 1.7rem;
+  }
+
+  .leftSteps,
+  .leftFooter {
+    display: none;
+  }
+
+  .right {
+    align-items: flex-start;
+    padding: 28px 24px 36px;
+  }
+
+  .formWrap {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .left,
+  .right {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .fieldRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .formHeader {
+    margin-bottom: 20px;
+  }
+
+  .formHeader h1 {
+    font-size: 1.45rem;
+  }
+}

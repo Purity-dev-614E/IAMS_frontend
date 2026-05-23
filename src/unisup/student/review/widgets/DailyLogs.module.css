@@ -42,6 +42,7 @@
 
 .leContent {
   flex: 1;
+  min-width: 0;
 }
 
 .leField {
@@ -96,4 +97,19 @@
   background: var(--surface);
   color: var(--muted);
   border: 0.5px solid var(--border);
+}
+
+@media (max-width: 560px) {
+  .logsSection {
+    padding: 1rem;
+  }
+
+  .logEntry {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .leDate {
+    width: auto;
+  }
 }

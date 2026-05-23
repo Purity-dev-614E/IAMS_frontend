@@ -63,6 +63,7 @@
 .content {
   padding: 24px 28px;
   flex: 1;
+  min-width: 0;
 }
 
 .errorMessage {
@@ -391,7 +392,7 @@
   }
 
   .content {
-    padding: 20px;
+    padding: 1rem;
   }
 
   .overview {
@@ -405,5 +406,34 @@
 
   .reportButton {
     width: 100%;
+  }
+
+  .topbarButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .errorMessage {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .panelHeader,
+  .checkRow {
+    align-items: flex-start;
+    grid-template-columns: 10px 1fr;
+  }
+
+  .dataBadge {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .summaryCard,
+  .panel,
+  .sidePanel,
+  .previewPanel {
+    padding: 1rem;
   }
 }

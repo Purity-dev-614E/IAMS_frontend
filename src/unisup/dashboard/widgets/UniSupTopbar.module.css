@@ -61,3 +61,22 @@
 .btnGhost:hover {
   background: var(--surface);
 }
+
+@media (max-width: 720px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .topbarRight {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .btnSm {
+    justify-content: center;
+    flex: 1;
+  }
+}

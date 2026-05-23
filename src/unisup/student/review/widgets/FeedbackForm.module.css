@@ -108,3 +108,21 @@ textarea::placeholder {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+@media (max-width: 560px) {
+  .mySection {
+    padding: 1rem;
+  }
+
+  .ffRow {
+    grid-template-columns: 1fr;
+  }
+
+  .submittedFeedback {
+    flex-direction: column;
+  }
+
+  .editBtn {
+    width: 100%;
+  }
+}

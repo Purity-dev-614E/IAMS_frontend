@@ -20,3 +20,10 @@
   color: var(--muted);
   margin-top: 1px;
 }
+
+@media (max-width: 640px) {
+  .topbar {
+    height: auto;
+    padding: 12px 16px;
+  }
+}

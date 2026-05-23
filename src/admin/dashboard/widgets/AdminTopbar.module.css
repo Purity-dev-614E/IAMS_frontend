@@ -60,3 +60,30 @@
 .btnGhost:hover {
   background: var(--surface);
 }
+
+@media (max-width: 720px) {
+  .topbar {
+    height: auto;
+    margin-top: 0.75rem;
+    padding: 0 1rem 0.75rem;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .topbarLeft h1 {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .topbarRight {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .btnSm {
+    justify-content: center;
+    flex: 1;
+  }
+}

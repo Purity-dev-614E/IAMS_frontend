@@ -193,6 +193,7 @@
 .content {
   padding: 24px 28px;
   flex: 1;
+  min-width: 0;
 }
 
 /* PAGINATION */
@@ -243,6 +244,35 @@
   
   .main {
     min-height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    height: auto;
+    padding: 12px 16px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .topbarRight {
+    width: 100%;
+  }
+
+  .btnGhost {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .pagination {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 }
 

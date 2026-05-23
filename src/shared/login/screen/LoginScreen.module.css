@@ -1,7 +1,7 @@
 .loginContainer {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   font-family: 'DM Sans', sans-serif;
   overflow: hidden;
 }
@@ -171,16 +171,39 @@
 @media (max-width: 768px) {
   .loginContainer {
     flex-direction: column;
+    min-height: 100svh;
+    overflow: visible;
   }
   
   .leftColumn,
   .rightColumn {
     padding: 2rem 1.5rem;
-    min-height: 50vh;
+    min-height: auto;
+  }
+
+  .leftColumn {
+    justify-content: flex-start;
+  }
+
+  .rightColumn {
+    align-items: flex-start;
+  }
+
+  .logoSection {
+    margin-bottom: 2rem;
   }
   
   .title {
     font-size: 2rem;
+  }
+
+  .description {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+  }
+
+  .loginFormContainer {
+    max-width: none;
   }
   
   .topCircle {
@@ -195,5 +218,24 @@
     height: 250px;
     bottom: -75px;
     right: -75px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leftColumn,
+  .rightColumn {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .signInTitle {
+    font-size: 1.7rem;
+  }
+
+  .noAccount {
+    text-align: center;
   }
 }

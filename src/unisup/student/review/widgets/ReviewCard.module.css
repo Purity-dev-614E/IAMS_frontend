@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .weekBadge {
@@ -59,6 +60,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--navy);
+  overflow-wrap: anywhere;
 }
 
 .rhDates {
@@ -170,4 +172,23 @@
 .spPurple {
   background: var(--pbg);
   color: var(--purple);
+}
+
+@media (max-width: 560px) {
+  .rh {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rhLeft {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .rhRight,
+  .stages {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+  }
 }

@@ -23,6 +23,8 @@
   color: var(--text);
   text-align: right;
   font-weight: 400;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .attachmentProgress {
@@ -83,6 +85,31 @@
 
 .cardBody {
   padding: 1.25rem;
+}
+
+@media (max-width: 560px) {
+  .cardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cardBody {
+    padding: 1rem;
+  }
+
+  .infoRow {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .infoKey {
+    width: auto;
+  }
+
+  .infoVal {
+    text-align: left;
+  }
 }
 
 .statusPill {

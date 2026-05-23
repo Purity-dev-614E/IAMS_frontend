@@ -16,6 +16,7 @@
   padding: 1.75rem 2rem;
   flex: 1;
   overflow-y: auto;
+  min-width: 0;
 }
 
 .pagination {
@@ -34,4 +35,17 @@
   }
 }
 
+@media (max-width: 640px) {
+  .content {
+    padding: 1rem;
+  }
 
+  .pagination {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .pagination button {
+    flex: 1;
+  }
+}

@@ -281,3 +281,35 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 980px) {
+  .card {
+    overflow-x: auto;
+  }
+
+  .cardHeader,
+  .listTools {
+    min-width: 760px;
+  }
+
+  .headerRow,
+  .studentRow {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 560px) {
+  .cardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filterTabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .searchWrap {
+    max-width: none;
+  }
+}

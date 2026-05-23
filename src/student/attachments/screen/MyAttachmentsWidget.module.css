@@ -84,6 +84,18 @@
 }
 
 @media (max-width: 768px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    min-height: auto;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
   .pageInner {
     max-width: 100%;
   }

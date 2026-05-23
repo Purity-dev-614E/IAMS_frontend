@@ -12,6 +12,27 @@ const getFirst = (source, keys, fallback = '') => {
   return fallback;
 };
 
+const getNestedFeedback = (review, keys) => {
+  for (const key of keys) {
+    const value = review?.[key];
+    if (value !== undefined && value !== null && value !== '') {
+      return value;
+    }
+  }
+  return {};
+};
+
+const getFeedbackText = (review, reviewKeys, nested, nestedKeys, fallback = '') => {
+  const direct = getFirst(review, reviewKeys, null);
+  if (direct && typeof direct !== 'object') return direct;
+  if (typeof nested === 'string') return nested;
+  if (nested && typeof nested === 'object') {
+    const nestedValue = getFirst(nested, nestedKeys, null);
+    if (nestedValue && typeof nestedValue !== 'object') return nestedValue;
+  }
+  return fallback;
+};
+
 const extractArray = (response, keys) => {
   if (Array.isArray(response)) return response;
   for (const key of keys) {
@@ -21,6 +42,15 @@ const extractArray = (response, keys) => {
   if (Array.isArray(response?.data)) return response.data;
   if (Array.isArray(response?.data?.data)) return response.data.data;
   return [];
+};
+
+const extractObject = (response, keys) => {
+  for (const key of keys) {
+    const value = response?.[key] || response?.data?.[key];
+    if (value && typeof value === 'object' && !Array.isArray(value)) return value;
+  }
+  if (response && typeof response === 'object' && !Array.isArray(response)) return response;
+  return {};
 };
 
 class SupervisorReviewService {
@@ -40,21 +70,47 @@ class SupervisorReviewService {
     return getFirst(review, ['week_number', 'weekNumber', 'week'], null);
   }
 
+  hasFetchedIndustryFields(review) {
+    return Boolean(
+      getFirst(review, ['industry_approval', 'industryApproval'], null) ||
+      getFirst(review, ['industry_comments', 'industryComments'], null) ||
+      getFirst(review, ['industry_improvements', 'industryImprovements'], null) ||
+      getFirst(review, ['industry_feedback_date', 'industryFeedbackDate'], null)
+    );
+  }
+
+  async getReviewDetails(review) {
+    const reviewId = this.getReviewId(review);
+    if (!reviewId || this.hasFetchedIndustryFields(review)) return review;
+
+    try {
+      const response = await apiClient.get(API_ROUTES.weeklyReviews.byId(reviewId));
+      const detailedReview = extractObject(response, ['review', 'weeklyReview', 'weekly_review']);
+      return {
+        ...review,
+        ...detailedReview
+      };
+    } catch (error) {
+      console.error(`Error fetching weekly review details for ${reviewId}:`, error);
+      return review;
+    }
+  }
+
   hasIndustryFeedback(review) {
-    const nested = review.industry_feedback || review.industryFeedback || {};
+    const nested = getNestedFeedback(review, ['industry_feedback', 'industryFeedback']);
 
     return Boolean(
       getFirst(review, ['industry_feedback_date', 'industryFeedbackDate'], null) ||
       getFirst(review, ['feedback_submitted_at', 'submitted_at'], null) ||
-      getFirst(review, ['industry_comments', 'industryComments', 'comments', 'feedback'], null) ||
-      getFirst(review, ['industry_improvements', 'industryImprovements', 'industry_recommendations', 'improvement_suggestions', 'improvements'], null) ||
+      getFeedbackText(review, ['industry_comments', 'industryComments', 'industry_feedback_comments', 'industryFeedbackComments', 'industry_supervisor_comments', 'supervisor_comments', 'comments', 'feedback_comments', 'feedback'], nested, ['comments', 'comment', 'feedback', 'feedback_comments'], null) ||
+      getFeedbackText(review, ['industry_improvements', 'industryImprovements', 'industry_recommendations', 'industryRecommendations', 'improvement_suggestions', 'improvementSuggestions', 'recommendations', 'suggestions', 'improvements'], nested, ['improvements', 'recommendations', 'suggestions', 'improvement_suggestions'], null) ||
       getFirst(review, ['industry_approval', 'industryApproval', 'approval', 'decision'], null) ||
-      getFirst(nested, ['submitted_at', 'submittedAt', 'feedback_date', 'comments', 'comment', 'feedback', 'improvements', 'recommendations', 'approval', 'decision'], null)
+      (typeof nested === 'string' ? nested : getFirst(nested, ['submitted_at', 'submittedAt', 'feedback_date', 'comments', 'comment', 'feedback', 'improvements', 'recommendations', 'approval', 'decision'], null))
     );
   }
 
   hasUniversityFeedback(review) {
-    const nested = review.uni_feedback || review.uniFeedback || review.university_feedback || review.universityFeedback || {};
+    const nested = getNestedFeedback(review, ['uni_feedback', 'uniFeedback', 'university_feedback', 'universityFeedback']);
 
     return Boolean(
       getFirst(review, ['uni_feedback_date', 'uniFeedbackDate'], null) ||
@@ -100,8 +156,8 @@ class SupervisorReviewService {
       return { waiting: true };
     }
 
-    const nested = review.industry_feedback || review.industryFeedback || {};
-    const approval = String(getFirst(review, ['industry_approval', 'industryApproval', 'approval', 'decision'], getFirst(nested, ['approval', 'decision'], 'approved'))).toLowerCase();
+    const nested = getNestedFeedback(review, ['industry_feedback', 'industryFeedback']);
+    const approval = String(getFirst(review, ['industry_approval', 'industryApproval', 'approval', 'decision'], typeof nested === 'object' ? getFirst(nested, ['approval', 'decision'], 'approved') : 'approved')).toLowerCase();
     const supervisorName = getFirst(
       review,
       ['industry_supervisor_name', 'industrySupervisorName'],
@@ -115,18 +171,26 @@ class SupervisorReviewService {
       supervisorName,
       supervisorRole: 'Industry Supervisor',
       status: approval === 'rejected' ? 'Rejected' : 'Approved',
-      comments: getFirst(review, ['industry_comments', 'industryComments', 'comments', 'feedback'], getFirst(nested, ['comments', 'comment', 'feedback'], 'No comments provided.')),
-      improvements: getFirst(
+      comments: getFeedbackText(
         review,
-        ['industry_improvements', 'industryImprovements', 'industry_recommendations', 'improvement_suggestions', 'improvements'],
-        getFirst(nested, ['improvements', 'recommendations', 'suggestions', 'improvement_suggestions'], '')
+        ['industry_comments', 'industryComments', 'industry_feedback_comments', 'industryFeedbackComments', 'industry_supervisor_comments', 'supervisor_comments', 'comments', 'feedback_comments', 'feedback'],
+        nested,
+        ['comments', 'comment', 'feedback', 'feedback_comments'],
+        'No comments provided.'
+      ),
+      improvements: getFeedbackText(
+        review,
+        ['industry_improvements', 'industryImprovements', 'industry_recommendations', 'industryRecommendations', 'improvement_suggestions', 'improvementSuggestions', 'recommendations', 'suggestions', 'improvements'],
+        nested,
+        ['improvements', 'recommendations', 'suggestions', 'improvement_suggestions'],
+        ''
       )
     };
   }
 
   normalizeUniversityFeedback(review) {
     if (!this.hasUniversityFeedback(review)) return null;
-    const nested = review.uni_feedback || review.uniFeedback || review.university_feedback || review.universityFeedback || {};
+    const nested = getNestedFeedback(review, ['uni_feedback', 'uniFeedback', 'university_feedback', 'universityFeedback']);
 
     return {
       comments: getFirst(review, ['uni_comments', 'uniComments', 'university_comments'], getFirst(nested, ['comments', 'comment', 'feedback'], '')),
@@ -137,17 +201,18 @@ class SupervisorReviewService {
   }
 
   async normalizeReview(review, activeAttachment) {
-    const reviewId = this.getReviewId(review);
-    const weekNumber = this.getWeekNumber(review);
-    const startDate = getFirst(review, ['week_start_date', 'weekStartDate'], null);
-    const endDate = getFirst(review, ['week_end_date', 'weekEndDate'], null);
-    const nestedLogs = extractArray(review, ['logs', 'dailyLogs', 'daily_logs']);
-    const fetchedLogs = nestedLogs.length > 0 ? nestedLogs : await weeklyReviewService.getReviewLogs(review);
-    const hasIndustry = this.hasIndustryFeedback(review);
-    const hasUni = this.hasUniversityFeedback(review);
+    const detailedReview = await this.getReviewDetails(review);
+    const reviewId = this.getReviewId(detailedReview);
+    const weekNumber = this.getWeekNumber(detailedReview);
+    const startDate = getFirst(detailedReview, ['week_start_date', 'weekStartDate'], null);
+    const endDate = getFirst(detailedReview, ['week_end_date', 'weekEndDate'], null);
+    const nestedLogs = extractArray(detailedReview, ['logs', 'dailyLogs', 'daily_logs']);
+    const fetchedLogs = nestedLogs.length > 0 ? nestedLogs : await weeklyReviewService.getReviewLogs(detailedReview);
+    const hasIndustry = this.hasIndustryFeedback(detailedReview);
+    const hasUni = this.hasUniversityFeedback(detailedReview);
 
     return {
-      ...review,
+      ...detailedReview,
       id: reviewId,
       weekId: weekNumber,
       weekNumber,
@@ -161,8 +226,8 @@ class SupervisorReviewService {
         feedback: hasUni ? 'done' : 'wait'
       },
       dailyLogs: this.normalizeDailyLogs(fetchedLogs),
-      industryFeedback: this.normalizeIndustryFeedback(review, activeAttachment),
-      myFeedback: this.normalizeUniversityFeedback(review)
+      industryFeedback: this.normalizeIndustryFeedback(detailedReview, activeAttachment),
+      myFeedback: this.normalizeUniversityFeedback(detailedReview)
     };
   }
 

@@ -72,3 +72,18 @@
 .serif {
   font-family: 'DM Serif Display', serif;
 }
+
+@media (max-width: 720px) {
+  .featuresSection {
+    padding: 3rem 1rem;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    margin-top: 2rem;
+  }
+
+  .featureCard {
+    padding: 1.15rem;
+  }
+}

@@ -85,3 +85,18 @@
 .serif {
   font-family: 'DM Serif Display', serif;
 }
+
+@media (max-width: 720px) {
+  .rolesSection {
+    padding: 3rem 1rem;
+  }
+
+  .rolesGrid {
+    grid-template-columns: 1fr;
+    margin-top: 2rem;
+  }
+
+  .roleCard {
+    padding: 1.15rem;
+  }
+}

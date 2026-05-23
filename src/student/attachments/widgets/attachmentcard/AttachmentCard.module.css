@@ -82,6 +82,7 @@
   font-size: 13px;
   color: var(--text);
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .infoValLight {
@@ -169,7 +170,24 @@
 }
 
 @media (max-width: 768px) {
+  .acHeader,
+  .acFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .acHeader,
+  .acBody,
+  .acFooter {
+    padding: 1rem;
+  }
+
   .infoGrid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .btnSmOutline {
+    width: 100%;
   }
 }

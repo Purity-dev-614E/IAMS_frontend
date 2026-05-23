@@ -116,3 +116,16 @@
   background: var(--amber-bg);
   color: var(--amber);
 }
+
+@media (max-width: 560px) {
+  .cardHeader,
+  .reviewTop {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cardBody {
+    padding: 1rem;
+  }
+}

@@ -53,3 +53,18 @@
 .serif {
   font-family: 'DM Serif Display', serif;
 }
+
+@media (max-width: 720px) {
+  .ctaSection {
+    padding: 3rem 1rem;
+  }
+
+  .ctaSection p {
+    font-size: 14px;
+  }
+
+  .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}

@@ -33,3 +33,17 @@
   font-size: 13px;
   color: #94A3B8;
 }
+
+@media (max-width: 720px) {
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+  }
+
+  .footerRight {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

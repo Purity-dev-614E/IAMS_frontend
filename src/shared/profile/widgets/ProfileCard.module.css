@@ -55,6 +55,7 @@
 .profileInfo {
   flex: 1;
   color: white;
+  min-width: 0;
 }
 
 .profileName {
@@ -63,6 +64,7 @@
   font-weight: 500;
   margin: 0 0 0.25rem 0;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .profileRole {
@@ -125,6 +127,7 @@
   font-weight: 400;
   text-align: right;
   max-width: 60%;
+  overflow-wrap: anywhere;
 }
 
 .roleBadge {

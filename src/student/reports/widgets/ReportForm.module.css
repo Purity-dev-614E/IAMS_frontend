@@ -242,3 +242,26 @@ textarea::placeholder {
 .btnSubmit:hover {
   background: #1740B0;
 }
+
+@media (max-width: 560px) {
+  .sectionHeader,
+  .sectionBody,
+  .submitSection {
+    padding: 1rem;
+  }
+
+  .uploadZone {
+    padding: 22px 14px;
+  }
+
+  .uzFile,
+  .ssTop,
+  .ssBtns {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .uzFname {
+    overflow-wrap: anywhere;
+  }
+}

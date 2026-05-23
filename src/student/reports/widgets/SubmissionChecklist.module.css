@@ -83,3 +83,20 @@
   font-size: 11px;
   color: var(--subtle);
 }
+
+@media (max-width: 560px) {
+  .clHeader {
+    padding: 1rem;
+  }
+
+  .clItem {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  .clMeta {
+    flex-basis: 100%;
+    padding-left: 32px;
+  }
+}

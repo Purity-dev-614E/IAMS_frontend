@@ -16,6 +16,7 @@
 .content {
   padding: 1.75rem 2rem;
   flex: 1;
+  min-width: 0;
 }
 
 .mainGrid {
@@ -198,5 +199,17 @@
   .loadingStats,
   .loadingGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content,
+  .loadingContent {
+    padding: 1rem;
+  }
+
+  .loadingTopbar {
+    height: auto;
+    padding: 1rem;
   }
 }
