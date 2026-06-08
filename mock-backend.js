@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 // Simple mock backend server for testing user management
 // Run with: node mock-backend.js
 
