@@ -24,6 +24,7 @@ import StudentManagement from './admin/students/screen/StudentManagement';
 import AttachmentOversight from './admin/attachments/screen/AttachmentOversight';
 import SupervisorApproval from './admin/supervisor-approval/screen/SupervisorApproval';
 import Reports from './admin/reports/screen/Reports';
+import EligibilityReviews from './admin/eligibility-reviews/screen/EligibilityReviews';
 
 // University Supervisor Screens
 import UniSupDashboard from './unisup/dashboard/screen/UniSupDashboard';
@@ -60,6 +61,7 @@ function App() {
               <Route path="/admin/users" element={<UserManagement />} />
               <Route path="/admin/students" element={<StudentManagement />} />
               <Route path="/admin/attachments" element={<AttachmentOversight />} />
+              <Route path="/admin/eligibility-reviews" element={<EligibilityReviews />} />
               <Route path="/admin/supervisors/pending" element={<SupervisorApproval />} />
               <Route path="/admin/reports" element={<Reports />} />
               

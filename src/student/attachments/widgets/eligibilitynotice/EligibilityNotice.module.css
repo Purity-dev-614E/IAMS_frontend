@@ -1,0 +1,55 @@
+.notice {
+  display: flex;
+  gap: 1rem;
+  background: #fff7ed;
+  border: 0.5px solid #fed7aa;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #ffedd5;
+  color: #c2410c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.notice h2 {
+  margin: 0 0 0.35rem;
+  color: var(--navy);
+  font-size: 16px;
+}
+
+.notice p {
+  margin: 0 0 0.9rem;
+  color: #9a3412;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.requestBtn {
+  border: none;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  padding: 0.58rem 1rem;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pending {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #ffedd5;
+  color: #9a3412;
+  padding: 0.35rem 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+}

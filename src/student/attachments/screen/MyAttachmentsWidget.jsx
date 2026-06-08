@@ -7,9 +7,12 @@ import {
   EmptyState,
   PendingNotice,
   AttachmentCard,
-  RegisterForm
+  RegisterForm,
+  EligibilityNotice,
+  EligibilityReviewModal
 } from '../widgets';
 import { useAttachments } from '../services/useAttachments';
+import { eligibilityService } from '../services/eligibilityService';
 
 const MyAttachments = () => {
   const navigate = useNavigate();
@@ -21,15 +24,44 @@ const MyAttachments = () => {
     startDate: '',
     endDate: ''
   });
+  const [eligibilityState, setEligibilityState] = useState({
+    loading: true,
+    data: null,
+    error: ''
+  });
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState('');
 
   const { 
     attachments, 
     loading, 
     error, 
     createAttachment, 
-    getAttachmentLogs,
     clearError 
   } = useAttachments();
+
+  const fetchEligibility = async () => {
+    setEligibilityState(prev => ({ ...prev, loading: true, error: '' }));
+    try {
+      const response = await eligibilityService.getMyEligibility();
+      setEligibilityState({
+        loading: false,
+        data: response.eligibility || response,
+        error: ''
+      });
+    } catch (err) {
+      setEligibilityState({
+        loading: false,
+        data: null,
+        error: err.message || 'Failed to check attachment eligibility.'
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchEligibility();
+  }, []);
 
   // Set initial view based on attachments
   useEffect(() => {
@@ -59,10 +91,19 @@ const MyAttachments = () => {
 
   const handleSubmitForm = async () => {
     try {
+      const response = await eligibilityService.getMyEligibility();
+      const eligibility = response.eligibility || response;
+      setEligibilityState({ loading: false, data: eligibility, error: '' });
+
+      if (eligibility?.eligible === false) {
+        setActiveView('empty');
+        return;
+      }
+
       await createAttachment(formData);
       setActiveView('pending');
-    } catch (err) {
-      // Error is handled by the hook
+    } catch {
+      await fetchEligibility();
     }
   };
 
@@ -71,15 +112,35 @@ const MyAttachments = () => {
       try {
         // Navigate to logs page for this attachment
         navigate('/logs');
-      } catch (err) {
+      } catch {
         // Error is handled by the hook
       }
     }
   };
 
   const handleRegister = () => {
+    if (eligibilityState.data?.eligible === false) {
+      return;
+    }
     setActiveView('register');
     clearError();
+  };
+
+  const handleSubmitReview = async (payload) => {
+    setIsReviewSubmitting(true);
+    try {
+      await eligibilityService.requestReview(payload);
+      setReviewSuccess('Your eligibility review request has been submitted and is pending admin review.');
+      setIsReviewModalOpen(false);
+      await fetchEligibility();
+    } catch (err) {
+      setEligibilityState(prev => ({
+        ...prev,
+        error: err.message || 'Failed to submit eligibility review request.'
+      }));
+    } finally {
+      setIsReviewSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -142,8 +203,29 @@ const MyAttachments = () => {
               </div>
             )}
 
+            {eligibilityState.error && (
+              <div className={styles.errorState}>
+                <p>{eligibilityState.error}</p>
+                <button onClick={fetchEligibility} className={styles.btnRetry}>Retry</button>
+              </div>
+            )}
+
+            {reviewSuccess && (
+              <div className={styles.successState}>
+                <p>{reviewSuccess}</p>
+              </div>
+            )}
+
+            {!loading && !eligibilityState.loading && !error && eligibilityState.data?.eligible === false && (
+              <EligibilityNotice
+                message={eligibilityState.data?.message}
+                pendingReview={eligibilityState.data?.pendingReview}
+                onRequestReview={() => setIsReviewModalOpen(true)}
+              />
+            )}
+
             {/* EMPTY STATE */}
-            {!loading && !error && activeView === 'empty' && (
+            {!loading && !eligibilityState.loading && !error && eligibilityState.data?.eligible !== false && activeView === 'empty' && (
               <EmptyState onRegister={handleRegister} />
             )}
 
@@ -192,17 +274,25 @@ const MyAttachments = () => {
             })()}
 
             {/* REGISTER FORM */}
-            {activeView === 'register' && (
+            {activeView === 'register' && eligibilityState.data?.eligible !== false && (
               <RegisterForm
                 formData={formData}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmitForm}
                 onCancel={handleCancel}
+                isSubmitting={loading || eligibilityState.loading}
               />
             )}
           </div>
         </div>
       </div>
+
+      <EligibilityReviewModal
+        isOpen={isReviewModalOpen}
+        isSubmitting={isReviewSubmitting}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleSubmitReview}
+      />
     </div>
   );
 };

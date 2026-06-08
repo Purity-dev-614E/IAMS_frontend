@@ -1,6 +1,6 @@
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
-import { User, Student, transformToModel, transformToAPI, validateModel, transformError } from '../../../models';
+import { User, Student, transformToAPI, validateModel, transformError } from '../../../models';
 
 export const registerService = {
   // User registration - backend handles role-specific logic
@@ -32,7 +32,10 @@ export const registerService = {
         const student = new Student({
           registrationNumber: userData.reg,
           program: userData.program,
-          yearOfStudy: userData.yearOfStudy || 1
+          school: userData.school,
+          yearOfStudy: userData.yearOfStudy || 1,
+          admissionYear: userData.admissionYear,
+          academicStatus: userData.academicStatus || 'active'
         });
         
         // Validate the student model
@@ -45,7 +48,10 @@ export const registerService = {
         const studentApiData = transformToAPI(student);
         payload.reg_number = studentApiData.reg_number;
         payload.program = studentApiData.program;
+        payload.school = studentApiData.school;
         payload.year_of_study = studentApiData.year_of_study;
+        payload.admission_year = studentApiData.admission_year;
+        payload.academic_status = studentApiData.academic_status || 'active';
       }
 
       const response = await apiClient.post(API_ROUTES.auth.register, payload);

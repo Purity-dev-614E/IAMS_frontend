@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { eligibilityService } from '../../../student/attachments/services/eligibilityService';
 import styles from './RegisterPage.module.css';
 import { 
   RoleSelector,
@@ -8,6 +9,14 @@ import {
   PendingState,
   SuccessState
 } from '../widgets';
+
+const FALLBACK_COLLEGES = [
+  { code: 'COETEC', name: 'College of Engineering and Technology' },
+  { code: 'COANR', name: 'College of Agriculture and Natural Resources' },
+  { code: 'COPAS', name: 'College of Pure and Applied Sciences' },
+  { code: 'COHES', name: 'College of Health Sciences' },
+  { code: 'CHRD', name: 'College of Human Resource Development' }
+];
 
 export default function RegisterPage() {
   const { register, isLoading, error: authError } = useAuth();
@@ -18,7 +27,9 @@ export default function RegisterPage() {
     email: '',
     reg: '',
     program: '',
+    school: '',
     yearOfStudy: '',
+    admissionYear: '',
     pw: '',
     cpw: ''
   });
@@ -26,6 +37,40 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState({ pw: false, cpw: false });
   const [currentState, setCurrentState] = useState('register'); // register, pending, success
   const [submitError, setSubmitError] = useState('');
+  const [colleges, setColleges] = useState([]);
+  const [collegesLoading, setCollegesLoading] = useState(false);
+  const [collegesError, setCollegesError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchColleges = async () => {
+      setCollegesLoading(true);
+      setCollegesError('');
+
+      try {
+        const data = await eligibilityService.getColleges();
+        if (isMounted) {
+          setColleges(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setColleges(FALLBACK_COLLEGES);
+          setCollegesError(error.message || 'Unable to load colleges.');
+        }
+      } finally {
+        if (isMounted) {
+          setCollegesLoading(false);
+        }
+      }
+    };
+
+    fetchColleges();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const setRole = (role) => {
     setCurrentRole(role);
@@ -54,6 +99,20 @@ export default function RegisterPage() {
     }
   };
 
+  const handleCollegeChange = (e) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      school: value
+    }));
+    if (errors.school) {
+      setErrors(prev => ({
+        ...prev,
+        school: ''
+      }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
@@ -67,7 +126,9 @@ export default function RegisterPage() {
     if (currentRole === 'student') {
       if (!formData.reg.trim()) newErrors.reg = true;
       if (!formData.program.trim()) newErrors.program = true;
+      if (!formData.school.trim()) newErrors.school = true;
       if (!formData.yearOfStudy.trim()) newErrors.yearOfStudy = true;
+      if (!formData.admissionYear.trim()) newErrors.admissionYear = true;
     }
         
     setErrors(newErrors);
@@ -109,7 +170,9 @@ export default function RegisterPage() {
       email: '',
       reg: '',
       program: '',
+      school: '',
       yearOfStudy: '',
+      admissionYear: '',
       pw: '',
       cpw: ''
     });
@@ -213,13 +276,46 @@ export default function RegisterPage() {
                   error={errors.program}
                 />
               </div>
+              <div className={styles.fieldRow}>
+                <div className={styles.selectField}>
+                  <div className={styles.selectLabel}>
+                    College
+                    <span>{collegesLoading ? 'Loading' : 'Required'}</span>
+                  </div>
+                  <select
+                    id="school"
+                    value={formData.school}
+                    onChange={handleCollegeChange}
+                    className={errors.school ? styles.selectError : ''}
+                    disabled={collegesLoading}
+                  >
+                    <option value="">Select college</option>
+                    {colleges.map((college) => (
+                      <option key={college.code} value={college.code}>
+                        {college.code} - {college.name}
+                      </option>
+                    ))}
+                  </select>
+                  {collegesError && (
+                    <div className={styles.fieldHelp}>{collegesError}</div>
+                  )}
+                </div>
+                <FormField
+                  id="yearOfStudy"
+                  label="Year of study"
+                  placeholder="e.g. 3"
+                  value={formData.yearOfStudy}
+                  onChange={handleInputChange}
+                  error={errors.yearOfStudy}
+                />
+              </div>
               <FormField
-                id="yearOfStudy"
-                label="Year of study"
-                placeholder="e.g. 3"
-                value={formData.yearOfStudy}
+                id="admissionYear"
+                label="Admission year"
+                placeholder="e.g. 2022"
+                value={formData.admissionYear}
                 onChange={handleInputChange}
-                error={errors.yearOfStudy}
+                error={errors.admissionYear}
               />
             </>
           )}

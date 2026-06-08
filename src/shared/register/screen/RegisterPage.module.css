@@ -197,6 +197,61 @@ body {
   gap: 10px;
 }
 
+.selectField {
+  margin-bottom: 14px;
+}
+
+.selectLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.selectLabel span,
+.fieldHelp {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--subtle);
+}
+
+.selectField select {
+  width: 100%;
+  min-height: 36px;
+  padding: 9px 13px;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--w);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.selectField select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27, 79, 216, 0.07);
+}
+
+.selectField select:disabled {
+  color: var(--subtle);
+  background: var(--surface);
+  cursor: not-allowed;
+}
+
+.selectField .selectError {
+  border-color: var(--red);
+}
+
+.fieldHelp {
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
 /* SUBMIT */
 .submitBtn {
   width: 100%;

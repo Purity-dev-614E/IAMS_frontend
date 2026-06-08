@@ -5,3 +5,5 @@ export { default as PendingNotice } from './pendingnotice/PendingNotice';
 export { default as AttachmentTopbar } from './attachmenttopbar/AttachmentTopbar';
 export { default as AttachmentSidebar } from './attachmentsidebar/AttachmentSidebar';
 export { default as LogCard } from './logcard/LogCard';
+export { default as EligibilityNotice } from './eligibilitynotice/EligibilityNotice';
+export { default as EligibilityReviewModal } from './eligibilityreview/EligibilityReviewModal';

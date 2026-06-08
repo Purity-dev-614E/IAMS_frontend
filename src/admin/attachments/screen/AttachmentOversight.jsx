@@ -29,6 +29,7 @@ const AttachmentOversight = () => {
         { to: '/admin/users', label: 'Users', icon: '◉' },
         { to: '/admin/students', label: 'Students', icon: '⊞' },
         { to: '/admin/attachments', label: 'Attachments', icon: '◎' },
+        { to: '/admin/eligibility-reviews', label: 'Eligibility Reviews', icon: 'E' },
       ]
     },
     {

@@ -130,6 +130,11 @@ input:focus {
   background: #1740B0;
 }
 
+.btnSubmitForm:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 @media (max-width: 768px) {
   .fieldRow {
     grid-template-columns: 1fr;

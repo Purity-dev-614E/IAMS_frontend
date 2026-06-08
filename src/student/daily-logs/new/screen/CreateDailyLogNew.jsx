@@ -422,6 +422,8 @@ const CreateDailyLog = () => {
     return new Date(dateStr).toDateString() === new Date().toDateString();
   };
 
+  const isSubmitDisabled = !formData.tasks.trim() || !formData.skills.trim();
+
   return (
     <div className={styles.shell}>
       {/* SIDEBAR */}
@@ -646,6 +648,7 @@ const CreateDailyLog = () => {
                     className={`${styles.btn} ${styles.btnSubmit}`} 
                     id="submit-btn"
                     onClick={openModal}
+                    disabled={isSubmitDisabled}
                   >
                     {mode === 'edit' ? 'Update and submit log' : 'Submit log for today'}
                   </button>

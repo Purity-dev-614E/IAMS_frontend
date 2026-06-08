@@ -49,6 +49,15 @@ export const API_ROUTES = {
     myAttachments: "/attachments/my-attachments",
   },
 
+  // Attachment Eligibility Routes
+  attachmentEligibility: {
+    me: "/attachment-eligibility/me",
+    colleges: "/attachment-eligibility/colleges",
+    reviews: "/attachment-eligibility/reviews",
+    adminReviews: "/attachment-eligibility/admin/reviews",
+    adminReviewById: (id) => `/attachment-eligibility/admin/reviews/${id}`,
+  },
+
   // Daily Log Routes
   dailyLogs: {
     list: "/daily-logs",

@@ -68,6 +68,21 @@
   margin: 0 0 1rem 0;
 }
 
+.successState {
+  text-align: center;
+  padding: 1rem;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.successState p {
+  color: #166534;
+  font-size: 14px;
+  margin: 0;
+}
+
 .btnRetry {
   background: var(--navy);
   color: white;

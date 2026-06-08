@@ -7,7 +7,8 @@ const RegisterForm = ({
   formData, 
   onInputChange, 
   onSubmit, 
-  onCancel 
+  onCancel,
+  isSubmitting = false
 }) => {
   return (
     <div className={styles.registerForm}>
@@ -87,8 +88,8 @@ const RegisterForm = ({
         <button className={styles.btnCancelForm} onClick={onCancel}>
           Cancel
         </button>
-        <button className={styles.btnSubmitForm} onClick={onSubmit}>
-          Submit for activation
+        <button className={styles.btnSubmitForm} onClick={onSubmit} disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit for activation'}
         </button>
       </div>
     </div>

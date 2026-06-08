@@ -1,0 +1,248 @@
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.main {
+  min-width: 0;
+}
+
+.topbar {
+  min-height: 56px;
+  background: var(--w);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0.8rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.topbarTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.topbarSubtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.statusSelect {
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--w);
+  padding: 0.58rem 0.8rem;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.content {
+  padding: 1.5rem 1.75rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1050px;
+}
+
+.table th,
+.table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.table th {
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.primary {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.explanation {
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.approveBtn,
+.rejectBtn,
+.secondaryBtn {
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveBtn {
+  border: none;
+  background: #16a34a;
+  color: #fff;
+}
+
+.rejectBtn {
+  border: none;
+  background: #dc2626;
+  color: #fff;
+}
+
+.secondaryBtn {
+  border: 0.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+
+.emptyCell {
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 23, 42, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal {
+  width: min(500px, 100%);
+  border-radius: 8px;
+  background: var(--w);
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+}
+
+.modalHeader,
+.modalFooter {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modalHeader {
+  border-bottom: 0.5px solid var(--border);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--navy);
+}
+
+.modalHeader button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.modalBody {
+  padding: 1.25rem;
+}
+
+.modalBody label {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.modalBody textarea,
+.modalBody input {
+  width: 100%;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  font-size: 13px;
+}
+
+.modalFooter {
+  justify-content: flex-end;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
