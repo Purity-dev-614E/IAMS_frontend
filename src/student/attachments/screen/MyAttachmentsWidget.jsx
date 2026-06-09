@@ -13,6 +13,7 @@ import {
 } from '../widgets';
 import { useAttachments } from '../services/useAttachments';
 import { eligibilityService } from '../services/eligibilityService';
+import { isActiveAttachment } from '../services/studentAttachmentAccess';
 
 const MyAttachments = () => {
   const navigate = useNavigate();
@@ -65,16 +66,7 @@ const MyAttachments = () => {
 
   // Set initial view based on attachments
   useEffect(() => {
-    if (attachments.length > 0) {
-      const latestAttachment = attachments[0];
-      if (latestAttachment.status === 'active') {
-        setActiveView('active');
-      } else if (latestAttachment.status === 'pending') {
-        setActiveView('pending');
-      } else {
-        setActiveView('empty');
-      }
-    }
+    setActiveView(attachments.some(isActiveAttachment) ? 'active' : 'empty');
   }, [attachments]);
 
   const handleInputChange = (field, value) => {
@@ -168,6 +160,14 @@ const MyAttachments = () => {
 
   // Get current attachment for display
   const getCurrentAttachment = () => {
+    if (activeView === 'active') {
+      return attachments.find(isActiveAttachment) || null;
+    }
+
+    if (activeView === 'pending') {
+      return attachments.find(attachment => String(attachment.status || '').toLowerCase() === 'pending') || null;
+    }
+
     return attachments.length > 0 ? attachments[0] : null;
   };
 

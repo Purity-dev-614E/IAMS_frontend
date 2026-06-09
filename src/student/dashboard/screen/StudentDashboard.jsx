@@ -5,7 +5,7 @@ import AppSidebar from '../../../shared/components/AppSidebar/AppSidebar';
 import { profileService } from '../../../shared/profile/profileService';
 import { useAuth } from '../../../contexts/AuthContext';
 import { studentDashboardService } from '../services/studentDashboardService';
-import { isActiveAttachment } from '../../attachments/services/studentAttachmentAccess';
+import { getActiveAttachment, isActiveAttachment } from '../../attachments/services/studentAttachmentAccess';
 import { apiClient } from '../../../apis';
 import { API_ROUTES } from '../../../apis/apiRoutes';
 import { 
@@ -41,7 +41,11 @@ const StudentDashboard = () => {
       
       const rawData = await studentDashboardService.fetchDashboardData();
 
-      if (!isActiveAttachment(rawData.activeAttachment)) {
+      const activeAttachment = isActiveAttachment(rawData.activeAttachment)
+        ? rawData.activeAttachment
+        : await getActiveAttachment();
+
+      if (!activeAttachment) {
         navigate('/attachments', { replace: true });
         return;
       }
@@ -59,7 +63,7 @@ const StudentDashboard = () => {
       
       setDashboardData({
         student: studentDashboardService.transformStudentData(rawData.student),
-        activeAttachment: studentDashboardService.transformAttachmentData(rawData.activeAttachment),
+        activeAttachment: studentDashboardService.transformAttachmentData(activeAttachment),
         statistics: studentDashboardService.transformStatistics(rawData.statistics),
         weeklyReviews: studentDashboardService.transformWeeklyReviews(rawData.weeklyReviews),
         thisWeekLogs: weekLogs

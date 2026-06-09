@@ -6,7 +6,7 @@ export const isActiveAttachment = (attachment) => {
   return String(attachment?.status || '').toLowerCase() === ACTIVE_STATUS;
 };
 
-const extractAttachments = (response) => {
+export const extractAttachments = (response) => {
   if (Array.isArray(response)) return response;
   if (Array.isArray(response?.data)) return response.data;
   if (Array.isArray(response?.attachments)) return response.attachments;
@@ -14,9 +14,13 @@ const extractAttachments = (response) => {
   return [];
 };
 
-export const studentHasActiveAttachment = async () => {
+export const getActiveAttachment = async () => {
   const response = await attachmentService.getMyAttachments();
-  return extractAttachments(response).some(isActiveAttachment);
+  return extractAttachments(response).find(isActiveAttachment) || null;
+};
+
+export const studentHasActiveAttachment = async () => {
+  return Boolean(await getActiveAttachment());
 };
 
 export const getStudentLandingPath = async () => {
