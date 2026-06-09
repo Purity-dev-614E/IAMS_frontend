@@ -10,7 +10,8 @@ export const registerService = {
       const user = new User({
         userName: `${userData.fname} ${userData.lname}`,
         userEmail: userData.email,
-        userRole: userData.role === 'supervisor' ? 'uni_supervisor' : userData.role
+        userRole: userData.role === 'supervisor' ? 'uni_supervisor' : userData.role,
+        staffId: userData.role === 'supervisor' ? userData.staffId : undefined
       });
       
       // Validate the user model

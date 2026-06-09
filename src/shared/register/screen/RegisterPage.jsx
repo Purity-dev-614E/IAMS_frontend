@@ -30,6 +30,7 @@ export default function RegisterPage() {
     school: '',
     yearOfStudy: '',
     admissionYear: '',
+    staffId: '',
     pw: '',
     cpw: ''
   });
@@ -130,6 +131,10 @@ export default function RegisterPage() {
       if (!formData.yearOfStudy.trim()) newErrors.yearOfStudy = true;
       if (!formData.admissionYear.trim()) newErrors.admissionYear = true;
     }
+
+    if (currentRole === 'supervisor') {
+      if (!formData.staffId.trim()) newErrors.staffId = true;
+    }
         
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -173,6 +178,7 @@ export default function RegisterPage() {
       school: '',
       yearOfStudy: '',
       admissionYear: '',
+      staffId: '',
       pw: '',
       cpw: ''
     });
@@ -318,6 +324,18 @@ export default function RegisterPage() {
                 error={errors.admissionYear}
               />
             </>
+          )}
+
+          {/* University supervisor-only fields */}
+          {currentRole === 'supervisor' && (
+            <FormField
+              id="staffId"
+              label="Staff ID"
+              placeholder="e.g. STF101"
+              value={formData.staffId}
+              onChange={handleInputChange}
+              error={errors.staffId}
+            />
           )}
 
           <PasswordField
