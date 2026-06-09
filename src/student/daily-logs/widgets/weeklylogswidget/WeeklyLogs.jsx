@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './WeeklyLogs.module.css';
 import { useDailyLogs } from '../../services/useDailyLogs';
-import { attachmentService } from '../../../attachments/services/attachmentService';
 import { weeklyReviewService } from '../../../reviews/services/weeklyReviewService';
+import ReviewCard from '../../../reviews/widgets/ReviewCard';
 
 const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
   const navigate = useNavigate();
@@ -12,6 +12,12 @@ const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
   const [weeklyReviews, setWeeklyReviews] = useState([]);
   const [isRequestingReview, setIsRequestingReview] = useState(false);
   const [rateLimitInfo, setRateLimitInfo] = useState({ allowed: true, reason: '' });
+  const [reviewPopup, setReviewPopup] = useState({
+    open: false,
+    loading: false,
+    error: '',
+    review: null
+  });
 
   // Helper to parse YYYY-MM-DD or ISO string to local Date at midnight
   const parseLocalDate = (dateInput) => {
@@ -236,8 +242,6 @@ const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
     
     const diffWeeks = Math.round(diffTime / oneWeekMs);
     
-    const weekNum = Math.max(1, diffWeeks + 1);
-    
     return Math.max(1, diffWeeks);
   };
 
@@ -323,10 +327,82 @@ const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
     }
   };
 
+  const getCurrentWeekReview = () => {
+    const weekNum = getWeekNumber();
+    return weeklyReviews.find(r => Number(r.week_number || r.weekNumber) === Number(weekNum));
+  };
+
+  const handleViewReviewStatus = async () => {
+    const currentReview = getCurrentWeekReview();
+
+    if (!currentReview) {
+      setReviewPopup({
+        open: true,
+        loading: false,
+        error: 'No weekly review was found for this week.',
+        review: null
+      });
+      return;
+    }
+
+    setReviewPopup({
+      open: true,
+      loading: true,
+      error: '',
+      review: null
+    });
+
+    try {
+      const transformedReview = weeklyReviewService.transformReviewData(currentReview);
+
+      if (transformedReview.dailyLogs.length > 0) {
+        setReviewPopup({
+          open: true,
+          loading: false,
+          error: '',
+          review: transformedReview
+        });
+        return;
+      }
+
+      const logs = await weeklyReviewService.getReviewLogs(currentReview);
+      const dailyLogs = weeklyReviewService.normalizeDailyLogs(logs);
+
+      setReviewPopup({
+        open: true,
+        loading: false,
+        error: '',
+        review: {
+          ...transformedReview,
+          dailyLogs,
+          logsSubmitted: transformedReview.logsSubmitted || dailyLogs.filter(log => !log.missing).length,
+          totalLogs: transformedReview.totalLogs || dailyLogs.length || 5
+        }
+      });
+    } catch (popupError) {
+      console.error('Error loading weekly review status:', popupError);
+      setReviewPopup({
+        open: true,
+        loading: false,
+        error: 'Could not load the weekly review status. Please try again.',
+        review: null
+      });
+    }
+  };
+
+  const closeReviewPopup = () => {
+    setReviewPopup({
+      open: false,
+      loading: false,
+      error: '',
+      review: null
+    });
+  };
+
   const allLogsFilled = weekLogs.length === 5 && 
                     weekLogs.every(log => log.status === 'submitted' || log.status === 'reviewed' || log.status === 'irrelevant') &&
                     weekLogs.some(log => log.status === 'submitted' || log.status === 'reviewed');
-   const reviewExists = weeklyReviews.some(r => Number(r.week_number) === Number(getWeekNumber()));
+   const reviewExists = Boolean(getCurrentWeekReview());
 
   if (loading) {
     return (
@@ -372,6 +448,7 @@ const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
   };
 
   return (
+    <>
     <div className={styles.card} style={{marginBottom: '1.25rem'}}>
       <div className={styles.cardHeader}>
         <span className={styles.cardTitle}>
@@ -477,22 +554,64 @@ const WeeklyLogs = ({ currentDate = new Date(), attachment = null }) => {
                 <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--navy)' }}>Weekly review in progress</h4>
                 <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--subtle)' }}>Your supervisors have been notified to review Week {getWeekNumber()}.</p>
               </div>
-              <a 
-                href="/student/reviews" 
+              <button
+                type="button"
+                onClick={handleViewReviewStatus}
+                className={styles.statusLink}
                 style={{
                   fontSize: '13px',
                   color: 'var(--blue)',
-                  textDecoration: 'none',
                   fontWeight: '500'
                 }}
               >
                 View status →
-              </a>
+              </button>
             </div>
           </div>
         )}
       </div>
     </div>
+    {reviewPopup.open && (
+      <div
+        className={styles.popupOverlay}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="review-status-title"
+        onClick={closeReviewPopup}
+      >
+        <div className={styles.popupPanel} onClick={(event) => event.stopPropagation()}>
+          <div className={styles.popupHeader}>
+            <div>
+              <h3 id="review-status-title">Weekly review status</h3>
+              <p>Week {getWeekNumber()} supervisor review progress</p>
+            </div>
+            <button
+              type="button"
+              className={styles.popupClose}
+              onClick={closeReviewPopup}
+              aria-label="Close review status"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div className={styles.popupBody}>
+            {reviewPopup.loading && (
+              <div className={styles.popupState}>Loading review status...</div>
+            )}
+
+            {!reviewPopup.loading && reviewPopup.error && (
+              <div className={styles.popupError}>{reviewPopup.error}</div>
+            )}
+
+            {!reviewPopup.loading && reviewPopup.review && (
+              <ReviewCard {...reviewPopup.review} isExpanded />
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
