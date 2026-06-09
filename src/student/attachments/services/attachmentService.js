@@ -144,7 +144,7 @@ class StudentAttachmentService {
   // Format attachment data for display using Attachment model
   formatAttachmentForDisplay(attachment) {
     const attachmentModel = new Attachment(attachment);
-    return {
+    const formattedAttachment = {
       ...attachment,
       // Map API field names to frontend component prop names using model
       organization: attachmentModel.organizationName,
@@ -153,7 +153,9 @@ class StudentAttachmentService {
       startDate: attachmentModel.startDate,
       endDate: attachmentModel.endDate,
       department: attachment.department || '',
-      universitySupervisor: attachment.university_supervisor || 'Not yet assigned',
+      universitySupervisor: attachmentModel.universitySupervisorName,
+      universitySupervisorEmail: attachmentModel.universitySupervisorEmail,
+      universitySupervisorStaffId: attachmentModel.universitySupervisorStaffId,
       duration: attachment.duration || attachmentModel.getDurationInDays(),
       status: attachmentModel.status || 'Draft',
       submissionDate: attachment.created_at || new Date().toISOString(),
@@ -162,6 +164,29 @@ class StudentAttachmentService {
       currentWeek: attachment.current_week,
       progress: attachment.progress
     };
+
+    console.log('[IAMS supervisor debug] attachment display transform:', {
+      attachmentId: formattedAttachment.id || formattedAttachment.attachmentId,
+      rawSupervisorFields: {
+        universitySupervisorName: attachment.universitySupervisorName,
+        universitySupervisor: attachment.universitySupervisor,
+        university_supervisor: attachment.university_supervisor,
+        uniSupervisorName: attachment.uniSupervisorName,
+        uni_supervisor_name: attachment.uni_supervisor_name,
+        supervisor_name: attachment.supervisor_name,
+        supervisor_email: attachment.supervisor_email,
+        supervisor_staff_id: attachment.supervisor_staff_id,
+        uni_supervisor_id: attachment.uni_supervisor_id,
+        supervisorName: attachment.supervisorName,
+        nestedSupervisorName: attachment.supervisor?.name
+      },
+      modelUniversitySupervisorName: attachmentModel.universitySupervisorName,
+      modelUniversitySupervisorEmail: attachmentModel.universitySupervisorEmail,
+      modelUniversitySupervisorStaffId: attachmentModel.universitySupervisorStaffId,
+      formattedUniversitySupervisor: formattedAttachment.universitySupervisor
+    });
+
+    return formattedAttachment;
   }
 }
 

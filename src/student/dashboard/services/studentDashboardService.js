@@ -27,6 +27,12 @@ export const studentDashboardService = {
         throw new Error(data.message || 'Failed to fetch dashboard data');
       }
 
+      console.log('[IAMS supervisor debug] dashboard raw attachment:', {
+        activeAttachment: data.dashboard?.activeAttachment,
+        studentSupervisorName: data.dashboard?.student?.supervisor_name,
+        studentSupervisorEmail: data.dashboard?.student?.supervisor_email
+      });
+
       return data.dashboard;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -65,16 +71,41 @@ export const studentDashboardService = {
     if (!attachment) return null;
 
     const attachmentModel = transformToModel(attachment, Attachment);
-    return {
+    const transformedAttachment = {
       id: attachmentModel.attachmentId,
       organizationName: attachmentModel.organizationName,
       industrySupervisorName: attachmentModel.industrySupervisorName,
       industrySupervisorEmail: attachmentModel.industrySupervisorEmail,
+      universitySupervisorName: attachmentModel.universitySupervisorName,
+      universitySupervisorEmail: attachmentModel.universitySupervisorEmail,
+      universitySupervisorStaffId: attachmentModel.universitySupervisorStaffId,
       startDate: attachmentModel.startDate ? new Date(attachmentModel.startDate) : null,
       endDate: attachmentModel.endDate ? new Date(attachmentModel.endDate) : null,
       status: attachmentModel.status,
       duration: attachmentModel.getDurationInDays ? attachmentModel.getDurationInDays() : 0
     };
+
+    console.log('[IAMS supervisor debug] dashboard attachment transform:', {
+      rawSupervisorFields: {
+        universitySupervisorName: attachment.universitySupervisorName,
+        universitySupervisor: attachment.universitySupervisor,
+        university_supervisor: attachment.university_supervisor,
+        uniSupervisorName: attachment.uniSupervisorName,
+        uni_supervisor_name: attachment.uni_supervisor_name,
+        supervisor_name: attachment.supervisor_name,
+        supervisor_email: attachment.supervisor_email,
+        supervisor_staff_id: attachment.supervisor_staff_id,
+        uni_supervisor_id: attachment.uni_supervisor_id,
+        supervisorName: attachment.supervisorName,
+        nestedSupervisorName: attachment.supervisor?.name
+      },
+      modelUniversitySupervisorName: attachmentModel.universitySupervisorName,
+      modelUniversitySupervisorEmail: attachmentModel.universitySupervisorEmail,
+      modelUniversitySupervisorStaffId: attachmentModel.universitySupervisorStaffId,
+      transformedUniversitySupervisorName: transformedAttachment.universitySupervisorName
+    });
+
+    return transformedAttachment;
   },
 
   // Transform statistics for components

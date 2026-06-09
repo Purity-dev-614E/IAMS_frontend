@@ -171,6 +171,19 @@ const MyAttachments = () => {
     return attachments.length > 0 ? attachments[0] : null;
   };
 
+  const getUniversitySupervisorName = (attachment) => {
+    const supervisorName = attachment?.universitySupervisor || '';
+
+    console.log('[IAMS supervisor debug] attachment card supervisor display:', {
+      attachmentSupervisor: attachment?.universitySupervisor,
+      attachmentSupervisorEmail: attachment?.universitySupervisorEmail,
+      attachmentSupervisorStaffId: attachment?.universitySupervisorStaffId,
+      displayedSupervisor: supervisorName
+    });
+
+    return supervisorName;
+  };
+
   return (
     <div className={styles.shell}>
       <AttachmentSidebar />
@@ -241,7 +254,7 @@ const MyAttachments = () => {
                     status={attachment.status}
                     industrySupervisor={attachment.industrySupervisor}
                     industrySupervisorEmail={attachment.industrySupervisorEmail}
-                    universitySupervisor={attachment.universitySupervisor || 'Not yet assigned'}
+                    universitySupervisor={getUniversitySupervisorName(attachment)}
                     startDate={formatDate(attachment.startDate)}
                     endDate={formatDate(attachment.endDate)}
                     submissionDate={formatDate(attachment.submissionDate)}
@@ -260,7 +273,7 @@ const MyAttachments = () => {
                   status={attachment.status}
                   industrySupervisor={attachment.industrySupervisor}
                   industrySupervisorEmail={attachment.industrySupervisorEmail}
-                  universitySupervisor={attachment.universitySupervisor}
+                  universitySupervisor={getUniversitySupervisorName(attachment)}
                   startDate={formatDate(attachment.startDate)}
                   endDate={formatDate(attachment.endDate)}
                   duration={attachment.duration}

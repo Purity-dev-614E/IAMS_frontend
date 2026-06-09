@@ -19,6 +19,14 @@ export const tokenStorage = {
   }
 };
 
+export const extractAuthTokens = (payload = {}) => {
+  const source = payload.data || payload;
+  const token = source.token || source.accessToken || source.access_token || source.jwt;
+  const refreshToken = source.refreshToken || source.refresh_token || source.refresh;
+
+  return { token, refreshToken };
+};
+
 // Track if token refresh is in progress to prevent multiple simultaneous refreshes
 let isRefreshing = false;
 let refreshSubscribers = [];
@@ -47,7 +55,7 @@ async function refreshToken() {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ refreshToken }),
+    body: JSON.stringify({ refreshToken, refresh_token: refreshToken }),
   });
 
   const data = await response.json();
@@ -56,9 +64,11 @@ async function refreshToken() {
     throw new Error(data?.message || 'Token refresh failed');
   }
 
-  if (data.success && data.token && data.refreshToken) {
-    tokenStorage.setTokens(data.token, data.refreshToken);
-    return data.token;
+  const tokens = extractAuthTokens(data);
+
+  if (data?.success !== false && tokens.token) {
+    tokenStorage.setTokens(tokens.token, tokens.refreshToken || refreshToken);
+    return tokens.token;
   }
 
   throw new Error('Invalid refresh response');
@@ -135,7 +145,7 @@ async function request(endpoint, options = {}) {
         
         // Notify all waiting requests
         notifyRefreshSubscribers(newToken);
-      } catch (refreshError) {
+      } catch {
         // Refresh failed, notify all waiting requests and redirect to login
         notifyRefreshSubscribers(null);
         handleAuthError();

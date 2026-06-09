@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiClient, tokenStorage } from '../apis';
+import { apiClient, extractAuthTokens, tokenStorage } from '../apis';
 import { API_ROUTES } from '../apis/apiRoutes';
-import { User, transformToModel, transformError } from '../models';
+import { User, transformToModel } from '../models';
 
 const AuthContext = createContext();
 
@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }) => {
       });
       
       if (response.success) {
-        const { token: authToken, refreshToken, user: userData } = response;
+        const { token: authToken, refreshToken } = extractAuthTokens(response);
+        const { user: userData } = response.data || response;
         
         // Transform user data using User model
         const userModel = transformToModel(userData, User);
@@ -111,7 +112,8 @@ export const AuthProvider = ({ children }) => {
       const response = await registerService.registerUser(userData);
       
       if (response.success) {
-        const { user: userData, token: authToken, refreshToken } = response;
+        const { token: authToken, refreshToken } = extractAuthTokens(response);
+        const { user: userData } = response.data || response;
         
         // Transform user data using User model
         const userModel = transformToModel(userData, User);

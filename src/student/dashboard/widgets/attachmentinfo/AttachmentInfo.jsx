@@ -2,6 +2,14 @@ import React from 'react';
 import styles from './AttachmentInfo.module.css';
 
 const AttachmentInfo = ({ student, attachment }) => {
+  const universitySupervisorName = attachment?.universitySupervisorName || student?.supervisorName;
+
+  console.log('[IAMS supervisor debug] dashboard attachment widget render:', {
+    attachmentUniversitySupervisorName: attachment?.universitySupervisorName,
+    studentSupervisorName: student?.supervisorName,
+    displayedUniversitySupervisorName: universitySupervisorName
+  });
+
   const formatDateRange = () => {
     if (!attachment?.startDate || !attachment?.endDate) return 'N/A';
     const start = new Date(attachment.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -59,7 +67,7 @@ const AttachmentInfo = ({ student, attachment }) => {
           </div>
           <div className={styles.infoRow}>
             <span className={styles.infoKey}>University supervisor</span>
-            <span className={styles.infoVal}>{student?.supervisorName || 'Not assigned'}</span>
+            <span className={styles.infoVal}>{universitySupervisorName || 'Not assigned'}</span>
           </div>
           <div className={styles.infoRow}>
             <span className={styles.infoKey}>Period</span>

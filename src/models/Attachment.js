@@ -8,6 +8,17 @@ export class Attachment extends BaseModel {
     this.organizationName = data.organizationName || data.organization_name || data.organization;
     this.industrySupervisorName = data.industrySupervisorName || data.industry_supervisor_name || data.supervisorName;
     this.industrySupervisorEmail = data.industrySupervisorEmail || data.industry_supervisor_email || data.supervisorEmail;
+    this.universitySupervisorName = data.universitySupervisorName
+      || data.universitySupervisor
+      || data.university_supervisor
+      || data.uniSupervisorName
+      || data.uni_supervisor_name
+      || data.supervisor_name
+      || data.supervisor?.name
+      || '';
+    this.universitySupervisorId = data.universitySupervisorId || data.uni_supervisor_id || data.supervisor?.id || null;
+    this.universitySupervisorEmail = data.universitySupervisorEmail || data.supervisor_email || data.supervisor?.email || '';
+    this.universitySupervisorStaffId = data.universitySupervisorStaffId || data.supervisor_staff_id || data.supervisor?.staff_id || '';
     this.startDate = data.startDate || data.start_date;
     this.endDate = data.endDate || data.end_date;
     this.status = data.status;
@@ -21,6 +32,10 @@ export class Attachment extends BaseModel {
       organizationName: 'organization_name',
       industrySupervisorName: 'industry_supervisor_name',
       industrySupervisorEmail: 'industry_supervisor_email',
+      universitySupervisorName: 'supervisor_name',
+      universitySupervisorId: 'uni_supervisor_id',
+      universitySupervisorEmail: 'supervisor_email',
+      universitySupervisorStaffId: 'supervisor_staff_id',
       startDate: 'start_date',
       endDate: 'end_date'
     };
